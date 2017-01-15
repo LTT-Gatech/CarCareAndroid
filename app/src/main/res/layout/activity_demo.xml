@@ -27,6 +27,13 @@
                 android:id="@+id/connect_button"
                 android:onClick="connect"/>
 
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Send Custom Request"
+                android:id="@+id/sendRequestButton"
+                android:onClick="sendCustomRequest" />
+
         </LinearLayout>
 
         <LinearLayout
@@ -38,11 +45,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Request Text:"
+                android:text="Custom Request Text:"
                 android:id="@+id/requestText"/>
 
             <EditText
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="ATZ"
@@ -50,28 +57,15 @@
                 android:maxWidth="150dp"
                 android:maxHeight="100dp"/>
 
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Send Request"
-                android:id="@+id/sendRequestButton"
-                android:onClick="sendRequest"/>
         </LinearLayout>
 
         <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="Response"
@@ -87,6 +81,14 @@
                 />
 
         </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        </LinearLayout>
+
     </LinearLayout>
 
 </RelativeLayout>
