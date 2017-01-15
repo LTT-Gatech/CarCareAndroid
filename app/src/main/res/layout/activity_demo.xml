@@ -39,15 +39,14 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="Request Text:"
-                android:id="@+id/requestLabel"
-                android:labelFor="@+id/requestText"/>
+                android:id="@+id/requestText"/>
 
             <EditText
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="ATZ"
-                android:id="@+id/requestText"
+                android:id="@+id/requestContent"
                 android:maxWidth="150dp"
                 android:maxHeight="100dp"/>
 
@@ -56,8 +55,7 @@
                 android:layout_height="wrap_content"
                 android:text="Send Request"
                 android:id="@+id/sendRequestButton"
-                android:onClick="sendRequest"
-                android:labelFor="@+id/responseText"/>
+                android:onClick="sendRequest"/>
         </LinearLayout>
 
         <LinearLayout
@@ -65,38 +63,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="UUID:"
-                android:id="@+id/uuidLabel"
-                android:labelFor="@+id/uuidText"/>
-
-            <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="0x1101"
-                android:id="@+id/uuidText"
-                android:maxWidth="150dp"
-                android:maxHeight="100dp"/>
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Set UUID"
-                android:id="@+id/setUuidButton"
-                android:labelFor="@+id/uuidText"
-                android:onClick="setUuid"/>
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="ELM 327 UUID"
-                android:id="@+id/button"
-                android:labelFor="@+id/uuidText"
-                android:onClick="setUuidElm"/>
         </LinearLayout>
 
         <LinearLayout

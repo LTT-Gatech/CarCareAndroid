@@ -59,6 +59,7 @@ public class DemoActivity extends AppCompatActivity {
     private boolean connecting = false;
     // True while the app has a connected socket to the BT device
     private boolean connected = false;
+    // UUID that is required to talk to the OBD II adapter
     private UUID uuid = new UUID(0L, 0x1101L);
 
     private Button connectButton;
@@ -75,6 +76,9 @@ public class DemoActivity extends AppCompatActivity {
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         registerReceiver(bluetoothReceiver, filter);
+
+        // Will this always be the UUID in our case?
+        uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     }
 
     @Override
@@ -97,7 +101,7 @@ public class DemoActivity extends AppCompatActivity {
                 }
             }
         }
-        // Else device does not support Bluetooth//
+        // Else device does not support Bluetooth
     }
 
     @Override
@@ -105,7 +109,6 @@ public class DemoActivity extends AppCompatActivity {
         if (requestCode == REQUEST_ENABLE_BT && resultCode == RESULT_OK) {
             Log.i("debug BT", "bluetooth enabled");
             getObdDevice();
-            Log.i("tag", "play dammin");
         }
     }
 
@@ -157,6 +160,7 @@ public class DemoActivity extends AppCompatActivity {
                         socket.connect();
                         inputStream = socket.getInputStream();
                         outputStream = socket.getOutputStream();
+
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -170,11 +174,9 @@ public class DemoActivity extends AppCompatActivity {
                         protected Void doInBackground(Void[] params) {
                             byte[] buffer = new byte[1024];
                             int bytes;
-                            Log.i("debug BT", "checking for data to be read");
                             while (true) {
                                 try {
                                     int numRead = inputStream.read(buffer);
-                                    Log.i("are we lifting", "try");
                                     publishProgress(buffer);
                                 } catch (IOException e) {
                                     break;
@@ -185,7 +187,6 @@ public class DemoActivity extends AppCompatActivity {
 
                         @Override
                         protected void onProgressUpdate(byte[]... values) {
-                            Log.i("are we lifting", "try2");
 
                             readResponse(values[0]);
                         }
@@ -208,7 +209,6 @@ public class DemoActivity extends AppCompatActivity {
                     if (socket.isConnected()) {
                         displayConnected();
                         communicateTask.execute();
-                        Log.i("communicating", "test");
                     } else {
                         connectButton.setText("Retry Connect");
                     }
@@ -222,35 +222,19 @@ public class DemoActivity extends AppCompatActivity {
         }
     }
 
-    public void setUuid(View view) {
-        if ((findViewById(view.getLabelFor())) != null) {
-            try {
-                uuid = UUID.fromString(((TextView) findViewById(view.getLabelFor())).getText().toString());
-            } catch (IllegalArgumentException e) {
-                TextView uuidInput = (TextView) findViewById(view.getLabelFor());
-                String invalid = " - Invalid Format";
-                uuidInput.setText(uuidInput.getText().toString().replace(invalid, "") + invalid);
-            }
-        }
-    }
-
-    public void setUuidElm(View view) {
-        if ((findViewById(view.getLabelFor())) != null) {
-            uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-        }
-    }
-
     public void sendRequest(View view) {
+        String request = ((TextView) findViewById(R.id.requestContent)).getText().toString();
         if (socket != null && socket.isConnected()) {
-            String request = ((TextView) findViewById(view.getLabelFor())).getText().toString();
+            //String request = ((TextView) findViewById(view.getLabelFor())).getText().toString();
             try {
                 Log.i("debug BT", "writing");
-                outputStream.write(request.getBytes());
+                outputStream.write((request + "\r").getBytes());
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        } else {
+            Log.i("debug BT", "not sending request\r " + request + "\r" + " - no open socket");
         }
-        Log.i("outta here", "test");
     }
 
     public void readResponse(byte[] response) {
@@ -260,3 +244,16 @@ public class DemoActivity extends AppCompatActivity {
         ((TextView) findViewById(R.id.responseText)).setText(responseString);
     }
 }
+
+//Commands - all commands need '\r' at the end of them - all commands are sent in ascii
+/*
+AT commands
+ATZ - reset
+ATSP0 - auto find protocol
+ATRV - find system voltage
+IB 10 - set ISO baud rate to 10400
+IB 48 - set ISO baud rate to 4800
+IB 96 - set ISO baud rate to 9600
+0100 - returns PIDs available under mode 01
+010c - returns 4 times the RPM (in hex)
+ */
