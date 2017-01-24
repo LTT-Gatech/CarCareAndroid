@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -32,6 +33,10 @@ public class DemoActivity extends AppCompatActivity {
     private BluetoothAdapter bluetoothAdapter;
     private BluetoothSocket socket;
     private BluetoothDevice obdDevice = null;
+
+    // TODO let the user edit this
+    private final String obdii = "OBDII";
+
     // Create a BroadcastReceiver for ACTION_FOUND
     private final BroadcastReceiver bluetoothReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
@@ -42,7 +47,7 @@ public class DemoActivity extends AppCompatActivity {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 Log.i("debug BT", "potential device found");
                 Log.i("debug BT", device.toString());
-                if (device.getName() != null && device.getName().equals("OBDII")) {
+                if (device.getName() != null && device.getName().equals(obdii)) {
                     Log.i("debug BT", "desired device found");
                     obdDevice = device;
                     obdDeviceObtained();
@@ -57,10 +62,8 @@ public class DemoActivity extends AppCompatActivity {
 
     // True after the button to connect is pressed until connected becomes true
     private boolean connecting = false;
-    // True while the app has a connected socket to the BT device
-    private boolean connected = false;
     // UUID that is required to talk to the OBD II adapter
-    private UUID uuid = new UUID(0L, 0x1101L);
+    private UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     // A button view that opens the socket to the OBD adapter. Text on the buttons serves as connection status
     private Button connectButton;
@@ -69,7 +72,6 @@ public class DemoActivity extends AppCompatActivity {
     private InputStream inputStream;
     // Serial port output stream. Write to send requests to the OBD
     private OutputStream outputStream;
-
 
     /**
      * This task takes control of the device's bluetooth and opens a socket to the OBD adapter.
@@ -124,14 +126,12 @@ public class DemoActivity extends AppCompatActivity {
 
         @Override
         protected void onProgressUpdate(byte[]... values) {
-
             readResponse(values[0]);
         }
 
-        // If there is ever and IOException while reading data, the socket will close and the UI will be updated.
+        // If there is ever an IOException while reading data, the socket will close and the UI will be updated.
         @Override
         protected void onPostExecute(Void result) {
-            connected = false;
             connectButton.setText("Reestablish Connection");
             try {
                 inputStream.close();
@@ -154,9 +154,6 @@ public class DemoActivity extends AppCompatActivity {
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         registerReceiver(bluetoothReceiver, filter);
-
-        // Will this always be the UUID in our case?
-        uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     }
 
     @Override
@@ -168,16 +165,19 @@ public class DemoActivity extends AppCompatActivity {
 
     /**
      * Connects the Android device's bluetooth adapter with the OBD II adapter
-     * @param view the onClick button
+     * TFhe user may call this function to retry connection by clicking the button again.
+     * @param view the onClick button @+id/connect_button
      */
     public void connect(View view) {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter != null) {
+            // Do not try to connect if the device is already trying to or if our socket is open
             if (!connecting && !(socket != null && socket.isConnected())) {
                 if (!bluetoothAdapter.isEnabled()) {
                     Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                     // Gives the user a chance to reject Bluetooth privileges at this time
                     startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+                    // goes to onActivityResult where requestCode == REQUEST_ENABLE_BT
                 } else {
                     // If bluetooth is on, go ahead and use it
                     connecting = true;
@@ -206,7 +206,7 @@ public class DemoActivity extends AppCompatActivity {
         if (pairedDevices.size() > 0) {
             // Loop through paired devices
             for (BluetoothDevice device : pairedDevices) {
-                if (device.getName().equals(("OBDII"))) {
+                if (device.getName().equals(obdii)) {
                     obdDevice = device;
                     break;
                 }
@@ -214,12 +214,13 @@ public class DemoActivity extends AppCompatActivity {
         }
         if (obdDevice != null) {
             /* TODO a cached pair for device named "OBDII" is found if you have connected successfully. But what if
-            you try using a new adapter with a new MAC address - this will need to be discovered 8*/
+            you try using a new adapter with a new MAC address - this will need to be discovered */
             Log.i("debug BT", "pair found");
             obdDeviceObtained();
         } else {
             Log.i("debug BT", "starting discovery");
             if (bluetoothAdapter.startDiscovery()) {
+                // Control goes to bluetoothReceiver member variable
                 Log.i("debug BT", "discovery started");
                 connectButton.setText("Discovering Devices...");
             } else {
@@ -239,7 +240,6 @@ public class DemoActivity extends AppCompatActivity {
             socket = obdDevice.createRfcommSocketToServiceRecord(uuid);
             connectButton.setText("Connecting...");
 
-
             connectTask.execute();
 
         } catch (IOException e) {
@@ -249,7 +249,7 @@ public class DemoActivity extends AppCompatActivity {
 
     /**
      * Takes the text from the custom request field, appends \r to it, and writes it to the socket's output stream
-     * @param view onClick button
+     * @param view onClick button @+id/sendRequestButton
      */
     public void sendCustomRequest(View view) {
         String request = ((TextView) findViewById(R.id.requestContent)).getText().toString();
@@ -269,23 +269,10 @@ public class DemoActivity extends AppCompatActivity {
      * A UI thread method that prints the latest response from the OBD adapter to the UI.
      * @param response a buffer of the response from the socket's output stream
      */
-    public void readResponse(byte[] response) {
+    public void readResponse(@NonNull byte[] response) {
         Log.i("debug BT", "data read");
         String responseString = new String(response);
         Log.i("OBD response", responseString);
         ((TextView) findViewById(R.id.responseText)).setText(responseString);
     }
 }
-
-//Commands - all commands need '\r' at the end of them - all commands are sent in ascii
-/*
-AT commands
-ATZ - reset
-ATSP0 - auto find protocol
-ATRV - find system voltage
-IB 10 - set ISO baud rate to 10400
-IB 48 - set ISO baud rate to 4800
-IB 96 - set ISO baud rate to 9600
-0100 - returns PIDs available under mode 01
-010c - returns 4 times the RPM (in hex)
- */
