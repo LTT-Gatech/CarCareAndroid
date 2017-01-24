@@ -1,4 +1,4 @@
-package com.teamltt.carcare;
+package com.teamltt.carcare.activity;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -13,8 +13,12 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
+
+import com.teamltt.carcare.R;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -72,6 +76,8 @@ public class DemoActivity extends AppCompatActivity {
     private InputStream inputStream;
     // Serial port output stream. Write to send requests to the OBD
     private OutputStream outputStream;
+
+    private ArrayAdapter<String> responseAdapter;
 
     /**
      * This task takes control of the device's bluetooth and opens a socket to the OBD adapter.
@@ -154,6 +160,12 @@ public class DemoActivity extends AppCompatActivity {
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         registerReceiver(bluetoothReceiver, filter);
+
+        responseAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
+        ListView responseList = (ListView) findViewById(R.id.responseList);
+        if (responseList != null) {
+            responseList.setAdapter(responseAdapter);
+        }
     }
 
     @Override
@@ -252,7 +264,13 @@ public class DemoActivity extends AppCompatActivity {
      * @param view onClick button @+id/sendRequestButton
      */
     public void sendCustomRequest(View view) {
-        String request = ((TextView) findViewById(R.id.requestContent)).getText().toString();
+//        String request = ((TextView) findViewById(R.id.requestContent)).getText().toString();
+        // refactored to below because above is a possible NullPointerException
+        TextView requestContent = (TextView) findViewById(R.id.requestContent);
+        String request = "";
+        if (requestContent != null) {
+            request = requestContent.getText().toString();
+        }
         if (socket != null && socket.isConnected()) {
             try {
                 Log.i("debug BT", "sending request:\n " + request);
@@ -273,6 +291,6 @@ public class DemoActivity extends AppCompatActivity {
         Log.i("debug BT", "data read");
         String responseString = new String(response);
         Log.i("OBD response", responseString);
-        ((TextView) findViewById(R.id.responseText)).setText(responseString);
+        responseAdapter.add(responseString);
     }
 }

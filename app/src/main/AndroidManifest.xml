@@ -10,7 +10,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.teamltt.carcare.DemoActivity">
+        <activity android:name="com.teamltt.carcare.activity.DemoActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
