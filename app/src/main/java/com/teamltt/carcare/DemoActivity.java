@@ -2,7 +2,6 @@ package com.teamltt.carcare;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -15,6 +14,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
+import com.teamltt.carcare.adapter.IObdSocket;
+import com.teamltt.carcare.adapter.bluetooth.DeviceSocket;
+import com.teamltt.carcare.adapter.simulator.SimulatedSocket;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,7 +34,7 @@ public class DemoActivity extends AppCompatActivity {
     private static final int REQUEST_ENABLE_BT = 1;
 
     private BluetoothAdapter bluetoothAdapter;
-    private BluetoothSocket socket;
+    private IObdSocket socket;
     private BluetoothDevice obdDevice = null;
 
     // TODO let the user edit this
@@ -84,8 +87,7 @@ public class DemoActivity extends AppCompatActivity {
                 // Android advises to cancel discovery before using socket.connect()
                 bluetoothAdapter.cancelDiscovery();
                 socket.connect();
-                inputStream = socket.getInputStream();
-                outputStream = socket.getOutputStream();
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -94,16 +96,26 @@ public class DemoActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Void result) {
-            if (socket.isConnected()) {
-                // Update connection status on UI
-                displayConnected();
-                communicateTask.execute();
-            } else {
-                connectButton.setText("Retry Connect");
-            }
-            connecting = false;
+            beginCommunication();
         }
     };
+
+    private void beginCommunication() {
+        if (socket.isConnected()) {
+            try {
+                inputStream = socket.getInputStream();
+                outputStream = socket.getOutputStream();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            // Update connection status on UI
+            displayConnected();
+            communicateTask.execute();
+        } else {
+            connectButton.setText("Retry Connect");
+        }
+        connecting = false;
+    }
 
     /**
      * This AsyncTask constantly checks if there is data to be read from the OBD, and if there is, it publishes
@@ -162,6 +174,7 @@ public class DemoActivity extends AppCompatActivity {
 
         unregisterReceiver(bluetoothReceiver);
     }
+    private boolean useSimulator = false;
 
     /**
      * Connects the Android device's bluetooth adapter with the OBD II adapter
@@ -169,23 +182,31 @@ public class DemoActivity extends AppCompatActivity {
      * @param view the onClick button @+id/connect_button
      */
     public void connect(View view) {
-        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (bluetoothAdapter != null) {
-            // Do not try to connect if the device is already trying to or if our socket is open
-            if (!connecting && !(socket != null && socket.isConnected())) {
-                if (!bluetoothAdapter.isEnabled()) {
-                    Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                    // Gives the user a chance to reject Bluetooth privileges at this time
-                    startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-                    // goes to onActivityResult where requestCode == REQUEST_ENABLE_BT
-                } else {
-                    // If bluetooth is on, go ahead and use it
-                    connecting = true;
-                    getObdDevice();
+        if (useSimulator) {
+            connecting = true;
+            socket = new SimulatedSocket();
+            beginCommunication();
+        }
+        else {
+
+            bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+            if (bluetoothAdapter != null) {
+                // Do not try to connect if the device is already trying to or if our socket is open
+                if (!connecting && !(socket != null && socket.isConnected())) {
+                    if (!bluetoothAdapter.isEnabled()) {
+                        Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                        // Gives the user a chance to reject Bluetooth privileges at this time
+                        startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+                        // goes to onActivityResult where requestCode == REQUEST_ENABLE_BT
+                    } else {
+                        // If bluetooth is on, go ahead and use it
+                        connecting = true;
+                        getObdDevice();
+                    }
                 }
             }
+            // Else device does not support Bluetooth
         }
-        // Else device does not support Bluetooth
     }
 
     @Override
@@ -237,7 +258,7 @@ public class DemoActivity extends AppCompatActivity {
     private void obdDeviceObtained() {
         Log.i("debug BT", "trying socket creation");
         try {
-            socket = obdDevice.createRfcommSocketToServiceRecord(uuid);
+            socket = new DeviceSocket(obdDevice.createRfcommSocketToServiceRecord(uuid));
             connectButton.setText("Connecting...");
 
             connectTask.execute();
