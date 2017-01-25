@@ -11,6 +11,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -19,6 +21,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.teamltt.carcare.R;
+import com.teamltt.carcare.fragment.MyObdResponseRecyclerViewAdapter;
+import com.teamltt.carcare.fragment.ObdResponseFragment;
+import com.teamltt.carcare.model.ObdContent;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,7 +35,7 @@ import java.util.UUID;
  * Demo code for Bluetooth functionality taken from
  * https://developer.android.com/guide/topics/connectivity/bluetooth.html
  */
-public class DemoActivity extends AppCompatActivity {
+public class DemoActivity extends AppCompatActivity implements ObdResponseFragment.OnListFragmentInteractionListener {
 
     private static final int REQUEST_ENABLE_BT = 1;
 
@@ -150,6 +155,10 @@ public class DemoActivity extends AppCompatActivity {
 
     };
 
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -161,11 +170,15 @@ public class DemoActivity extends AppCompatActivity {
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         registerReceiver(bluetoothReceiver, filter);
 
-        responseAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
-        ListView responseList = (ListView) findViewById(R.id.responseList);
-        if (responseList != null) {
-            responseList.setAdapter(responseAdapter);
-        }
+        mRecyclerView = (RecyclerView) findViewById(R.id.obd_reponse_list);
+
+        mRecyclerView.setHasFixedSize(true);
+
+        mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+
+        mAdapter = new MyObdResponseRecyclerViewAdapter(ObdContent.ITEMS, this);
+        mRecyclerView.setAdapter(mAdapter);
     }
 
     @Override
@@ -291,6 +304,13 @@ public class DemoActivity extends AppCompatActivity {
         Log.i("debug BT", "data read");
         String responseString = new String(response);
         Log.i("OBD response", responseString);
-        responseAdapter.add(responseString);
+        int nextId = mAdapter.getItemCount() + 1;
+        ObdContent.addItem(ObdContent.createDummyItem(nextId));
+        mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onListFragmentInteraction(ObdContent.ObdResponse item) {
+        Log.i("ObdResponse Card", item.toString());
     }
 }

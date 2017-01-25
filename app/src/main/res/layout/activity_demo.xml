@@ -15,7 +15,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true">
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true" >
 
         <LinearLayout
             android:orientation="horizontal"
@@ -74,10 +75,10 @@
                 android:id="@+id/responseLabel"
                 android:labelFor="@+id/responseList"/>
 
-            <ListView
+            <include
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:id="@+id/responseList" />
+                layout="@layout/fragment_obdresponse_list"/>
 
         </LinearLayout>
 
