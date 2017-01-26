@@ -67,7 +67,7 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 Log.i("debug BT", "discovery unsuccessful");
                 connecting = false;
-                connectButton.setText("Retry Connect");
+                connectButton.setText(R.string.retry_connect);
             }
         }
     };
@@ -115,7 +115,7 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
             displayConnected();
             communicateTask.execute();
         } else {
-            connectButton.setText("Retry Connect");
+            connectButton.setText(R.string.retry_connect);
         }
         connecting = false;
     }
@@ -148,7 +148,7 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
         // If there is ever an IOException while reading data, the socket will close and the UI will be updated.
         @Override
         protected void onPostExecute(Void result) {
-            connectButton.setText("Reestablish Connection");
+            connectButton.setText(R.string.retry_connect);
             try {
                 socket.close();
             } catch (IOException e) {
@@ -271,23 +271,23 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
             if (bluetoothAdapter.startDiscovery()) {
                 // Control goes to bluetoothReceiver member variable
                 Log.i("debug BT", "discovery started");
-                connectButton.setText("Discovering Devices...");
+                connectButton.setText(R.string.discovering);
             } else {
                 Log.i("debug BT", "discovery not started");
-                connectButton.setText("Bluetooth Permissions Insufficient");
+                connectButton.setText(R.string.permission_fail_bt);
             }
         }
     }
 
     private void displayConnected() {
-        connectButton.setText("Connected");
+        connectButton.setText(R.string.connected_bt);
     }
 
     private void obdDeviceObtained() {
         Log.i("debug BT", "trying socket creation");
         try {
             socket = new DeviceSocket(obdDevice.createRfcommSocketToServiceRecord(uuid));
-            connectButton.setText("Connecting...");
+            connectButton.setText(R.string.connecting_bt);
 
             connectTask.execute();
 
