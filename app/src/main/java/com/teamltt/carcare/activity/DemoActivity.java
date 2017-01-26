@@ -45,7 +45,7 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
     /**
      * Controls whether the app searches for a car's OBD adapter or an internal simulator.
      */
-    private boolean useSimulator = false;
+    private boolean useSimulator = true;
 
     // TODO let the user edit this
     private final String obdii = "OBDII";
