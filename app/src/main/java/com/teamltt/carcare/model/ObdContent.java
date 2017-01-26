@@ -23,15 +23,6 @@ public class ObdContent {
      */
     public static final Map<String, ObdResponse> ITEM_MAP = new HashMap<>();
 
-    private static final int COUNT = 25;
-
-    static {
-        // Add some sample items.
-        for (int i = 1; i <= COUNT; i++) {
-            addItem(createDummyItem(i));
-        }
-    }
-
     public static void addItem(ObdResponse item) {
         ITEMS.add(item);
         ITEM_MAP.put(item.id, item);
