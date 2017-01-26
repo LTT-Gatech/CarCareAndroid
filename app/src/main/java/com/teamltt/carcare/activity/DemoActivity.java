@@ -15,9 +15,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.teamltt.carcare.R;
@@ -82,7 +80,9 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
     // Serial port output stream. Write to send requests to the OBD
     private OutputStream outputStream;
 
-    private ArrayAdapter<String> responseAdapter;
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
 
     /**
      * This task takes control of the device's bluetooth and opens a socket to the OBD adapter.
@@ -154,10 +154,6 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
         }
 
     };
-
-    private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
