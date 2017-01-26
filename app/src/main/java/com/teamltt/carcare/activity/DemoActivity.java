@@ -1,4 +1,4 @@
-package com.teamltt.carcare;
+package com.teamltt.carcare.activity;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -10,18 +10,23 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 
 import com.teamltt.carcare.adapter.IObdSocket;
 import com.teamltt.carcare.adapter.bluetooth.DeviceSocket;
 import com.teamltt.carcare.adapter.simulator.SimulatedSocket;
+import com.teamltt.carcare.R;
+import com.teamltt.carcare.fragment.MyObdResponseRecyclerViewAdapter;
+import com.teamltt.carcare.fragment.ObdResponseFragment;
+import com.teamltt.carcare.model.ObdContent;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Set;
 import java.util.UUID;
 
@@ -29,13 +34,18 @@ import java.util.UUID;
  * Demo code for Bluetooth functionality taken from
  * https://developer.android.com/guide/topics/connectivity/bluetooth.html
  */
-public class DemoActivity extends AppCompatActivity {
+public class DemoActivity extends AppCompatActivity implements ObdResponseFragment.OnListFragmentInteractionListener {
 
     private static final int REQUEST_ENABLE_BT = 1;
 
     private BluetoothAdapter bluetoothAdapter;
     private IObdSocket socket;
     private BluetoothDevice obdDevice = null;
+
+    /**
+     * Controls whether the app searches for a car's OBD adapter or an internal simulator.
+     */
+    private boolean useSimulator = false;
 
     // TODO let the user edit this
     private final String obdii = "OBDII";
@@ -70,6 +80,9 @@ public class DemoActivity extends AppCompatActivity {
 
     // A button view that opens the socket to the OBD adapter. Text on the buttons serves as connection status
     private Button connectButton;
+
+
+    private ArrayAdapter<String> responseAdapter;
 
     /**
      * This task takes control of the device's bluetooth and opens a socket to the OBD adapter.
@@ -143,6 +156,10 @@ public class DemoActivity extends AppCompatActivity {
 
     };
 
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -153,6 +170,16 @@ public class DemoActivity extends AppCompatActivity {
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         registerReceiver(bluetoothReceiver, filter);
+
+        mRecyclerView = (RecyclerView) findViewById(R.id.obd_reponse_list);
+
+        mRecyclerView.setHasFixedSize(true);
+
+        mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+
+        mAdapter = new MyObdResponseRecyclerViewAdapter(ObdContent.ITEMS, this);
+        mRecyclerView.setAdapter(mAdapter);
     }
 
     @Override
@@ -161,7 +188,6 @@ public class DemoActivity extends AppCompatActivity {
 
         unregisterReceiver(bluetoothReceiver);
     }
-    private boolean useSimulator = false;
 
     /**
      * Connects the Android device's bluetooth adapter with the OBD II adapter
@@ -260,7 +286,13 @@ public class DemoActivity extends AppCompatActivity {
      * @param view onClick button @+id/sendRequestButton
      */
     public void sendCustomRequest(View view) {
-        String request = ((TextView) findViewById(R.id.requestContent)).getText().toString();
+//        String request = ((TextView) findViewById(R.id.requestContent)).getText().toString();
+        // refactored to below because above is a possible NullPointerException
+        TextView requestContent = (TextView) findViewById(R.id.requestContent);
+        String request = "";
+        if (requestContent != null) {
+            request = requestContent.getText().toString();
+        }
         if (socket != null && socket.isConnected()) {
             try {
                 Log.i("debug BT", "sending request:\n " + request);
@@ -281,6 +313,13 @@ public class DemoActivity extends AppCompatActivity {
         Log.i("debug BT", "data read");
         String responseString = new String(response);
         Log.i("OBD response", responseString);
-        ((TextView) findViewById(R.id.responseText)).setText(responseString);
+        int nextId = mAdapter.getItemCount() + 1;
+        ObdContent.addItem(ObdContent.createDummyItem(nextId));
+        mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onListFragmentInteraction(ObdContent.ObdResponse item) {
+        Log.i("ObdResponse Card", item.toString());
     }
 }
