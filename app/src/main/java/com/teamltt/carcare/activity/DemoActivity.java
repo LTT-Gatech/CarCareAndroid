@@ -14,7 +14,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -82,7 +81,9 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
     private Button connectButton;
 
 
-    private ArrayAdapter<String> responseAdapter;
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
 
     /**
      * This task takes control of the device's bluetooth and opens a socket to the OBD adapter.
@@ -155,10 +156,6 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
         }
 
     };
-
-    private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
