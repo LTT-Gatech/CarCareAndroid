@@ -12,6 +12,8 @@ import java.io.OutputStream;
 
 public class SimulatedSocket implements IObdSocket {
 
+    private boolean connected = false;
+
     public SimulatedSocket() {
         InputStream inputStream = new InputStream() {
             @Override
@@ -44,5 +46,15 @@ public class SimulatedSocket implements IObdSocket {
     @Override
     public void close() throws IOException {
 
+    }
+
+    @Override
+    public void writeTo(byte[] bytes) throws IOException {
+
+    }
+
+    @Override
+    public int readFrom(byte[] buffer) throws IOException {
+        return 0;
     }
 }

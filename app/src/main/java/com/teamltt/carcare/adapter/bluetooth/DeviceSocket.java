@@ -37,6 +37,19 @@ public class DeviceSocket implements IObdSocket {
     }
 
     public void close() throws IOException {
+        getInputStream().close();
+        getOutputStream().close();
         socket.close();
+    }
+
+    @Override
+    public void writeTo(byte[] bytes) throws IOException {
+        getOutputStream().write(bytes);
+
+    }
+
+    @Override
+    public int readFrom(byte[] buffer) throws IOException {
+        return getInputStream().read(buffer);
     }
 }

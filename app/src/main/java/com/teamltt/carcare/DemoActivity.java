@@ -71,11 +71,6 @@ public class DemoActivity extends AppCompatActivity {
     // A button view that opens the socket to the OBD adapter. Text on the buttons serves as connection status
     private Button connectButton;
 
-    // Serial port input stream. Read to get responses from the OBD
-    private InputStream inputStream;
-    // Serial port output stream. Write to send requests to the OBD
-    private OutputStream outputStream;
-
     /**
      * This task takes control of the device's bluetooth and opens a socket to the OBD adapter.
      * If successful, it starts another "communicate" AsyncTask
@@ -102,12 +97,6 @@ public class DemoActivity extends AppCompatActivity {
 
     private void beginCommunication() {
         if (socket.isConnected()) {
-            try {
-                inputStream = socket.getInputStream();
-                outputStream = socket.getOutputStream();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
             // Update connection status on UI
             displayConnected();
             communicateTask.execute();
@@ -127,7 +116,7 @@ public class DemoActivity extends AppCompatActivity {
             byte[] buffer = new byte[1024];
             while (true) {
                 try {
-                    int numRead = inputStream.read(buffer);
+                    int numRead = socket.readFrom(buffer);
                     publishProgress(buffer);
                 } catch (IOException e) {
                     break;
@@ -146,8 +135,6 @@ public class DemoActivity extends AppCompatActivity {
         protected void onPostExecute(Void result) {
             connectButton.setText("Reestablish Connection");
             try {
-                inputStream.close();
-                outputStream.close();
                 socket.close();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -277,7 +264,7 @@ public class DemoActivity extends AppCompatActivity {
         if (socket != null && socket.isConnected()) {
             try {
                 Log.i("debug BT", "sending request:\n " + request);
-                outputStream.write((request + "\r").getBytes());
+                socket.writeTo((request + "\r").getBytes());
             } catch (IOException e) {
                 e.printStackTrace();
             }

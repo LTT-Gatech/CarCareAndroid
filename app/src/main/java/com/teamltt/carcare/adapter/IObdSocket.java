@@ -18,4 +18,19 @@ public interface IObdSocket {
     boolean isConnected();
 
     void close() throws IOException;
+
+    /**
+     * Writes a request to the socket so that it is sent to the OBD adapter
+     * @param bytes the ASCII message to send
+     * @throws IOException
+     */
+    void writeTo(byte[] bytes) throws IOException;
+
+    /**
+     * Reads a response from the socket that is received from the OBD adapter by the device
+     * @param buffer the response in ASCII
+     * @return the number of bytes read from buffer
+     * @throws IOException
+     */
+    int readFrom(byte[] buffer) throws IOException;
 }
