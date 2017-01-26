@@ -23,6 +23,7 @@ import com.teamltt.carcare.adapter.simulator.SimulatedSocket;
 import com.teamltt.carcare.R;
 import com.teamltt.carcare.fragment.MyObdResponseRecyclerViewAdapter;
 import com.teamltt.carcare.fragment.ObdResponseFragment;
+import com.teamltt.carcare.fragment.SimpleDividerItemDecoration;
 import com.teamltt.carcare.model.ObdContent;
 
 import java.io.IOException;
@@ -192,6 +193,8 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
 
         mAdapter = new MyObdResponseRecyclerViewAdapter(ObdContent.ITEMS, this);
         mRecyclerView.setAdapter(mAdapter);
+
+        mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
     }
 
     @Override
