@@ -53,11 +53,17 @@ public class SimulatedSocket implements IObdSocket {
 
     @Override
     public void writeTo(byte[] bytes) throws IOException {
+        if (buffer == null) {
+            // todo null check on buffer
+            // it sometimes is null when android studio does an Instant Run, but why?
+            return;
+        }
         String request = new String(bytes);
         if(request.equals("ATZ\r")) {
-            // todo null check on buffer
-            byte[] testResponse = "read".getBytes();
-            for(int i = 0; i < 4; i++) {
+            String testResponseString = "read";
+            byte[] testResponse = testResponseString.getBytes();
+            numRead = testResponse.length;
+            for(int i = 0; i < numRead; i++) {
                 buffer[i] = testResponse[i];
             }
             Log.i("debug Sim", "sending request to sim");

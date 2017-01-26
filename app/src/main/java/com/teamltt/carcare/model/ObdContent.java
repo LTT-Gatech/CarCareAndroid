@@ -41,6 +41,10 @@ public class ObdContent {
         return new ObdResponse(String.valueOf(position), "Item " + position, makeDetails(position));
     }
 
+    public static ObdResponse createItemWithResponse(int position, String s) {
+        return new ObdResponse(String.valueOf(position), s, makeDetails(position));
+    }
+
     private static String makeDetails(int position) {
         StringBuilder builder = new StringBuilder();
         builder.append("Details about Item: ").append(position);

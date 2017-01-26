@@ -124,14 +124,15 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
      * This AsyncTask constantly checks if there is data to be read from the OBD, and if there is, it publishes
      * that data to the UI.
      */
-    private AsyncTask<Void, byte[], Void> communicateTask = new AsyncTask<Void, byte[], Void>() {
+    private AsyncTask<Void, Response, Void> communicateTask = new AsyncTask<Void, Response, Void>() {
         @Override
         protected Void doInBackground(Void[] params) {
             byte[] buffer = new byte[1024];
             while (true) {
                 try {
                     int numRead = socket.readFrom(buffer);
-                    publishProgress(buffer);
+                    Response response = new Response(buffer, numRead);
+                    publishProgress(response);
                 } catch (IOException e) {
                     break;
                 }
@@ -140,8 +141,8 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
         }
 
         @Override
-        protected void onProgressUpdate(byte[]... values) {
-            readResponse(values[0]);
+        protected void onProgressUpdate(Response... values) {
+            readResponse(values[0].data, values[0].length);
         }
 
         // If there is ever an IOException while reading data, the socket will close and the UI will be updated.
@@ -155,7 +156,21 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
             }
         }
 
+
+
     };
+
+    /**
+     * This response class simply wraps a byte array and the meaningful size of the byte array in a single object
+     */
+    class Response {
+        byte[] data;
+        int length;
+        Response(byte[] d, int l) {
+            data = d;
+            length = l;
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -192,31 +207,34 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
      * @param view the onClick button @+id/connect_button
      */
     public void connect(View view) {
-        if (useSimulator) {
-            connecting = true;
-            socket = new SimulatedSocket();
-            beginCommunication();
-        }
-        else {
+        if (socket == null) {
+            if (useSimulator) {
+                connecting = true;
+                socket = new SimulatedSocket();
+                beginCommunication();
+            }
+            else {
 
-            bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-            if (bluetoothAdapter != null) {
-                // Do not try to connect if the device is already trying to or if our socket is open
-                if (!connecting && !(socket != null && socket.isConnected())) {
-                    if (!bluetoothAdapter.isEnabled()) {
-                        Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                        // Gives the user a chance to reject Bluetooth privileges at this time
-                        startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-                        // goes to onActivityResult where requestCode == REQUEST_ENABLE_BT
-                    } else {
-                        // If bluetooth is on, go ahead and use it
-                        connecting = true;
-                        getObdDevice();
+                bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+                if (bluetoothAdapter != null) {
+                    // Do not try to connect if the device is already trying to or if our socket is open
+                    if (!connecting && !(socket != null && socket.isConnected())) {
+                        if (!bluetoothAdapter.isEnabled()) {
+                            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                            // Gives the user a chance to reject Bluetooth privileges at this time
+                            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+                            // goes to onActivityResult where requestCode == REQUEST_ENABLE_BT
+                        } else {
+                            // If bluetooth is on, go ahead and use it
+                            connecting = true;
+                            getObdDevice();
+                        }
                     }
                 }
+                // Else device does not support Bluetooth
             }
-            // Else device does not support Bluetooth
         }
+
     }
 
     @Override
@@ -306,12 +324,12 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
      * A UI thread method that prints the latest response from the OBD adapter to the UI.
      * @param response a buffer of the response from the socket's output stream
      */
-    public void readResponse(@NonNull byte[] response) {
+    public void readResponse(@NonNull byte[] response, int length) {
         Log.i("debug BT", "data read");
-        String responseString = new String(response);
+        String responseString = new String(response).substring(0, length);
         Log.i("OBD response", responseString);
         int nextId = mAdapter.getItemCount() + 1;
-        ObdContent.addItem(ObdContent.createDummyItem(nextId));
+        ObdContent.addItem(ObdContent.createItemWithResponse(nextId, responseString));
         mAdapter.notifyDataSetChanged();
     }
 
