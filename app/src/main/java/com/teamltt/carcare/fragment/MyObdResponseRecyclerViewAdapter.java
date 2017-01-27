@@ -15,7 +15,6 @@ import java.util.List;
 /**
  * {@link RecyclerView.Adapter} that can display a {@link ObdContent.ObdResponse} and makes a call to the
  * specified {@link OnListFragmentInteractionListener}.
- * TODO: Replace the implementation with code for your data type.
  */
 public class MyObdResponseRecyclerViewAdapter extends RecyclerView.Adapter<MyObdResponseRecyclerViewAdapter.ViewHolder> {
 
