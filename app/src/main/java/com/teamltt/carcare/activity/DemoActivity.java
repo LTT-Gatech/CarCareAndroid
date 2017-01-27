@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -26,7 +27,14 @@ import com.teamltt.carcare.fragment.ObdResponseFragment;
 import com.teamltt.carcare.fragment.SimpleDividerItemDecoration;
 import com.teamltt.carcare.model.ObdContent;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.util.Set;
 import java.util.UUID;
 
@@ -40,12 +48,14 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
 
     private BluetoothAdapter bluetoothAdapter;
     private IObdSocket socket;
+    Writer logWriter;
+
     private BluetoothDevice obdDevice = null;
 
     /**
      * Controls whether the app searches for a car's OBD adapter or an internal simulator.
      */
-    private boolean useSimulator = true;
+    private boolean useSimulator = false;
 
     // TODO let the user edit this
     private final String obdii = "OBDII";
@@ -195,11 +205,38 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
         mRecyclerView.setAdapter(mAdapter);
 
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
+
+
+        /* Checks if external storage is available for read and write */
+
+        File directory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            try {
+                logWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(directory.getAbsolutePath() + "/CarCareLog.txt", true), "UTF-8"));
+            } catch (UnsupportedEncodingException | FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+
+
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        // Let go of resources
+        try {
+            if (socket != null) {
+                socket.close();
+            }
+            if (logWriter != null ){
+                logWriter.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         unregisterReceiver(bluetoothReceiver);
     }
@@ -314,7 +351,13 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
         if (socket != null && socket.isConnected()) {
             try {
                 Log.i("debug BT", "sending request:\n " + request);
+                // Write to OBD
                 socket.writeTo((request + "\r").getBytes());
+                // Write to log file
+                //logWriter.write((request + "\r"));
+                // Write to UI
+                int nextId = mAdapter.getItemCount() + 1;
+                ObdContent.addItem(ObdContent.createItemWithResponse(nextId, request + "\r"));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -331,9 +374,19 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
         Log.i("debug BT", "data read");
         String responseString = new String(response).substring(0, length);
         Log.i("OBD response", responseString);
+
+        // Write to log file
+//        try {
+//            //logWriter.write(responseString);
+//            //logWriter.flush();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+
         int nextId = mAdapter.getItemCount() + 1;
         ObdContent.addItem(ObdContent.createItemWithResponse(nextId, responseString));
         mAdapter.notifyDataSetChanged();
+
     }
 
     @Override
