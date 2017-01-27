@@ -58,19 +58,15 @@ public class SimulatedSocket implements IObdSocket {
             // it sometimes is null when android studio does an Instant Run, but why?
             return;
         }
-        String request = new String(bytes);
-        if(request.equals("ATZ\r")) {
-            String testResponseString = "read";
-            byte[] testResponse = testResponseString.getBytes();
-            numRead = testResponse.length;
-            for(int i = 0; i < numRead; i++) {
-                buffer[i] = testResponse[i];
-            }
-            Log.i("debug Sim", "sending request to sim");
-            latch.countDown();
-        } else {
-            // nothing
+
+        String testResponseString = "read\n";
+        byte[] testResponse = testResponseString.getBytes();
+        numRead = testResponse.length;
+        for(int i = 0; i < numRead; i++) {
+            buffer[i] = testResponse[i];
         }
+        Log.i("debug Sim", "sending request to sim");
+        latch.countDown();
     }
 
     @Override
