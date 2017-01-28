@@ -12,14 +12,8 @@ import java.util.Map;
  */
 public class ObdContent {
 
-    /**
-     * An array of sample (dummy) items.
-     */
     public static final List<ObdResponse> ITEMS = new ArrayList<>();
 
-    /**
-     * A map of sample (dummy) items, by ID.
-     */
     public static final Map<String, ObdResponse> ITEM_MAP = new HashMap<>();
 
     public static void addItem(ObdResponse item) {
