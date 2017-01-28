@@ -24,7 +24,7 @@ public class ObdResponseFragment extends Fragment {
     private static final String ARG_COLUMN_COUNT = "column-count";
     private static final String ARG_ROW_COUNT = "row-count";
     private int mColumnCount = 1;
-    private int mRowCount = 2;
+    private int mRowCount = 1;
     private OnListFragmentInteractionListener mListener;
 
     /**
