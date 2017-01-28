@@ -14,9 +14,11 @@ import java.io.OutputStream;
 
 public class DeviceSocket implements IObdSocket {
     private BluetoothSocket socket;
+    private int numRead;
 
     public DeviceSocket(BluetoothSocket socket) {
         this.socket = socket;
+        numRead = 0;
     }
 
     @Override
@@ -50,6 +52,16 @@ public class DeviceSocket implements IObdSocket {
 
     @Override
     public int readFrom(byte[] buffer) throws IOException {
-        return getInputStream().read(buffer);
+
+        // Read at most 50 bytes from the stream into the buffer at offset numRead
+        numRead += getInputStream().read(buffer, numRead, 50);
+        // If last byte in the buffer is '>', then return a value indicating data read
+        if ((char) buffer[numRead - 1] == '>') {
+            int numReadFull = numRead;
+            numRead = 0;
+            return numReadFull;
+        } else {
+            return 0;
+        }
     }
 }
