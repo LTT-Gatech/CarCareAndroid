@@ -195,8 +195,9 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
         registerReceiver(bluetoothReceiver, filter);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.obd_reponse_list);
-
-        mRecyclerView.setHasFixedSize(true);
+        if (mRecyclerView != null) {
+            mRecyclerView.setHasFixedSize(true);
+        }
 
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
