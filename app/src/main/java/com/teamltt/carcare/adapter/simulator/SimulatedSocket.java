@@ -59,13 +59,12 @@ public class SimulatedSocket implements IObdSocket {
     @Override
     public void close() throws IOException {
         // Noop, because we never really open a socket
-        return;
     }
 
     @Override
     public void writeTo(byte[] bytes) throws IOException {
         if (buffer == null) {
-            // todo null check on buffer
+            // TODO: null check on buffer
             // it sometimes is null when android studio does an Instant Run, but why?
             return;
         }
@@ -73,9 +72,7 @@ public class SimulatedSocket implements IObdSocket {
         String testResponseString = "read\n";
         byte[] testResponse = testResponseString.getBytes();
         numRead = testResponse.length;
-        for(int i = 0; i < numRead; i++) {
-            buffer[i] = testResponse[i];
-        }
+        System.arraycopy(testResponse, 0, buffer, 0, testResponse.length);
         Log.i("debug Sim", "sending request to sim");
         latch.countDown();
     }
