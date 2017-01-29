@@ -1,8 +1,12 @@
 <resources>
     <string name="app_name">Car Care</string>
     <string name="retry_connect">Retry Connect</string>
-    <string name="discovering">Discovering Devices...</string>
+    <string name="discovering">Discovering Devices&#8230;</string>
     <string name="permission_fail_bt">Bluetooth Permissions Insufficient</string>
+    <string name="connect_bt">Connect</string>
     <string name="connected_bt">Connected</string>
-    <string name="connecting_bt">Connecting...</string>
+    <string name="connecting_bt">Connecting&#8230;</string>
+    <string name="request_selector">Request Selector:</string>
+    <string name="send_request">Send Request</string>
+    <string name="response">Response</string>
 </resources>

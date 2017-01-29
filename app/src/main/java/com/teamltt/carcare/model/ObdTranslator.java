@@ -1,9 +1,7 @@
 package com.teamltt.carcare.model;
 
 import com.github.pires.obd.commands.ObdCommand;
-import com.github.pires.obd.commands.control.TroubleCodesCommand;
 import com.github.pires.obd.commands.engine.RPMCommand;
-import com.github.pires.obd.commands.fuel.ConsumptionRateCommand;
 import com.github.pires.obd.commands.protocol.EchoOffCommand;
 import com.github.pires.obd.commands.protocol.LineFeedOffCommand;
 import com.github.pires.obd.commands.protocol.ObdResetCommand;
@@ -22,15 +20,11 @@ public final class ObdTranslator {
 
     private static Map<String, ObdCommand> translator;
 
-    private ObdTranslator() {
-
-    }
 
     public static ObdCommand translate(String englishCommand) {
         if (translator == null) {
             buildTranslator();
         }
-
         return translator.get(englishCommand);
     }
 

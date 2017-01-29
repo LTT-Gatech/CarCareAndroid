@@ -22,9 +22,7 @@ import com.teamltt.carcare.model.ObdContent;
 public class ObdResponseFragment extends Fragment {
 
     private static final String ARG_COLUMN_COUNT = "column-count";
-    private static final String ARG_ROW_COUNT = "row-count";
     private int mColumnCount = 1;
-    private int mRowCount = 1;
     private OnListFragmentInteractionListener mListener;
 
     /**
@@ -39,7 +37,6 @@ public class ObdResponseFragment extends Fragment {
         ObdResponseFragment fragment = new ObdResponseFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
-        args.putInt(ARG_ROW_COUNT, rowCount);
         fragment.setArguments(args);
         return fragment;
     }
@@ -50,7 +47,6 @@ public class ObdResponseFragment extends Fragment {
 
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-            mRowCount = getArguments().getInt(ARG_ROW_COUNT);
         }
     }
 
@@ -72,7 +68,6 @@ public class ObdResponseFragment extends Fragment {
         }
         return view;
     }
-
 
     @Override
     public void onAttach(Context context) {
@@ -102,7 +97,6 @@ public class ObdResponseFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onListFragmentInteraction(ObdContent.ObdResponse item);
     }
 }

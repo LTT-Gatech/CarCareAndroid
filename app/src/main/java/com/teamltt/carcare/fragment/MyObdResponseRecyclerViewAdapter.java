@@ -35,9 +35,10 @@ public class MyObdResponseRecyclerViewAdapter extends RecyclerView.Adapter<MyObd
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mItem = mValues.get(position);
-//        holder.mIdView.setText(mValues.get(position).id);
-        holder.mContentView.setText(mValues.get(position).content);
+        ObdContent.ObdResponse item = mValues.get(position);
+        holder.mItem = item;
+        holder.mRequestView.setText(item.request);
+        holder.mResponseView.setText(item.response);
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -58,20 +59,20 @@ public class MyObdResponseRecyclerViewAdapter extends RecyclerView.Adapter<MyObd
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
-//        public final TextView mIdView;
-        public final TextView mContentView;
+        public final TextView mRequestView;
+        public final TextView mResponseView;
         public ObdContent.ObdResponse mItem;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
-//            mIdView = (TextView) view.findViewById(R.id.id);
-            mContentView = (TextView) view.findViewById(R.id.content);
+            mRequestView = (TextView) view.findViewById(R.id.request_text);
+            mResponseView = (TextView) view.findViewById(R.id.response_text);
         }
 
         @Override
         public String toString() {
-            return super.toString() + " '" + mContentView.getText() + "'";
+            return super.toString() + " '" + mResponseView.getText() + "'";
         }
     }
 }

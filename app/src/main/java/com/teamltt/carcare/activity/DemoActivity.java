@@ -9,7 +9,6 @@ import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,13 +16,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import com.github.pires.obd.commands.ObdCommand;
+import com.teamltt.carcare.R;
 import com.teamltt.carcare.adapter.IObdSocket;
 import com.teamltt.carcare.adapter.bluetooth.DeviceSocket;
 import com.teamltt.carcare.adapter.simulator.SimulatedSocket;
-import com.teamltt.carcare.R;
 import com.teamltt.carcare.fragment.MyObdResponseRecyclerViewAdapter;
 import com.teamltt.carcare.fragment.ObdResponseFragment;
 import com.teamltt.carcare.fragment.SimpleDividerItemDecoration;
@@ -94,10 +92,8 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
     // A button view that opens the socket to the OBD adapter. Text on the buttons serves as connection status
     private Button connectButton;
 
-
-    private RecyclerView mRecyclerView;
+    // Used to keep track of the items in the RecyclerView
     private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
 
     /**
      * This task takes control of the device's bluetooth and opens a socket to the OBD adapter.
@@ -134,60 +130,6 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
         connecting = false;
     }
 
-    /**
-     * This AsyncTask constantly checks if there is data to be read from the OBD, and if there is, it publishes
-     * that data to the UI.
-     */
-    private AsyncTask<Void, Response, Void> communicateTask = new AsyncTask<Void, Response, Void>() {
-        @Override
-        protected Void doInBackground(Void[] params) {
-            byte[] buffer = new byte[1024];
-            while (true) {
-                try {
-                    int numRead = socket.readFrom(buffer);
-                    if (numRead > 0) {
-                        Response response = new Response(buffer, numRead);
-                        publishProgress(response);
-                    }
-                } catch (IOException e) {
-                    break;
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void onProgressUpdate(Response... values) {
-            readResponse(values[0].data, values[0].length);
-        }
-
-        // If there is ever an IOException while reading data, the socket will close and the UI will be updated.
-        @Override
-        protected void onPostExecute(Void result) {
-            connectButton.setText(R.string.retry_connect);
-            try {
-                socket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-
-    };
-
-    /**
-     * This response class simply wraps a byte array and the meaningful size of the byte array in a single object
-     */
-    class Response {
-        byte[] data;
-        int length;
-
-        Response(byte[] d, int l) {
-            data = d;
-            length = l;
-        }
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -199,19 +141,16 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         registerReceiver(bluetoothReceiver, filter);
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.obd_reponse_list);
-        if (mRecyclerView != null) {
-            mRecyclerView.setHasFixedSize(true);
-        }
-
-        mLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-
+        // Set up the list for responses
         mAdapter = new MyObdResponseRecyclerViewAdapter(ObdContent.ITEMS, this);
-        mRecyclerView.setAdapter(mAdapter);
-
-        mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
-
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.obd_reponse_list);
+        if (recyclerView != null) {
+            recyclerView.setHasFixedSize(true);
+            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+            recyclerView.setLayoutManager(layoutManager);
+            recyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
+            recyclerView.setAdapter(mAdapter);
+        }
 
         /* Checks if external storage is available for read and write */
 
@@ -342,41 +281,10 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
         }
     }
 
-    /**
-     * Takes the text from the custom request field, appends \r to it, and writes it to the socket's output stream
-     *
-     * @param view onClick button @+id/sendRequestButton
-     */
-    public void sendCustomRequest(View view) {
-//        String request = ((TextView) findViewById(R.id.requestContent)).getText().toString();
-        // refactored to below because above is a possible NullPointerException
-        TextView requestContent = (TextView) findViewById(R.id.requestContent);
-        String request = "";
-        if (requestContent != null) {
-            request = requestContent.getText().toString();
-        }
-        if (socket != null && socket.isConnected()) {
-            try {
-                Log.i("debug BT", "sending request:\n " + request);
-                // Write to OBD
-                socket.writeTo((request + "\r").getBytes());
-                // Write to log file
-                //logWriter.write((request + "\r"));
-                // Write to UI
-                int nextId = mAdapter.getItemCount() + 1;
-                ObdContent.addItem(ObdContent.createItemWithResponse(nextId, request + "\r"));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            Log.i("debug BT", "not sending request\n " + request + "\n" + " - no open socket");
-        }
-    }
-
     public void sendSupportedRequest(View view) {
 
         // Get UI Text
-        Spinner selectedRequest = (Spinner) findViewById(R.id.supportedRequestContent);
+        Spinner selectedRequest = (Spinner) findViewById(R.id.supported_request_content);
 
         String request = "";
         if (selectedRequest != null) {
@@ -399,13 +307,9 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
                         try {
                             Log.i("library", "running command");
                             command.run(socket.getInputStream(), socket.getOutputStream());
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } catch (InterruptedException e) {
+                        } catch (IOException | InterruptedException e) {
                             e.printStackTrace();
                         }
-
-
                     } else {
                         return null;
                     }
@@ -421,12 +325,9 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
 
                 // Translate into english and post
                 String commandEnglish = command.getName();
-                int nextId = mAdapter.getItemCount() + 1;
-                ObdContent.addItem(ObdContent.createItemWithResponse(nextId, commandEnglish));
-
                 String result = command.getFormattedResult();
-                nextId = mAdapter.getItemCount() + 1;
-                ObdContent.addItem(ObdContent.createItemWithResponse(nextId, result));
+                int nextId = mAdapter.getItemCount() + 1;
+                ObdContent.addItem(ObdContent.createItemWithResponse(nextId, commandEnglish, result));
                 mAdapter.notifyDataSetChanged();
             }
 
@@ -434,31 +335,6 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
         Log.i("library", "executing");
         task.execute(command);
         task.getStatus();
-    }
-
-
-    /**
-     * A UI thread method that prints the latest response from the OBD adapter to the UI.
-     *
-     * @param response a buffer of the response from the socket's output stream
-     */
-    public void readResponse(@NonNull byte[] response, int length) {
-        Log.i("debug BT", "data read");
-        String responseString = new String(response).substring(0, length);
-        Log.i("OBD response", responseString);
-
-        // Write to log file
-//        try {
-//            //logWriter.write(responseString);
-//            //logWriter.flush();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
-        int nextId = mAdapter.getItemCount() + 1;
-        ObdContent.addItem(ObdContent.createItemWithResponse(nextId, responseString));
-        mAdapter.notifyDataSetChanged();
-
     }
 
     @Override
