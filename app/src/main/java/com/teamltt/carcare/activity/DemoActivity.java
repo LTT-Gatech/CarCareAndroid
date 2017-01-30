@@ -24,7 +24,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -37,21 +36,13 @@ import com.github.pires.obd.commands.ObdCommand;
 import com.teamltt.carcare.R;
 import com.teamltt.carcare.adapter.IObdSocket;
 import com.teamltt.carcare.adapter.bluetooth.DeviceSocket;
-import com.teamltt.carcare.adapter.simulator.SimulatedSocket;
 import com.teamltt.carcare.fragment.MyObdResponseRecyclerViewAdapter;
 import com.teamltt.carcare.fragment.ObdResponseFragment;
 import com.teamltt.carcare.fragment.SimpleDividerItemDecoration;
 import com.teamltt.carcare.model.ObdContent;
 import com.teamltt.carcare.model.ObdTranslator;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
 import java.util.Set;
 import java.util.UUID;
 
@@ -65,7 +56,6 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
 
     private BluetoothAdapter bluetoothAdapter;
     private IObdSocket socket;
-    Writer logWriter;
 
     private BluetoothDevice obdDevice = null;
 
@@ -113,7 +103,6 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
 
     /**
      * This task takes control of the device's bluetooth and opens a socket to the OBD adapter.
-     * If successful, it starts another "communicate" AsyncTask
      */
     AsyncTask<Void, Void, Void> connectTask = new AsyncTask<Void, Void, Void>() {
         @Override
@@ -122,7 +111,6 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
                 // Android advises to cancel discovery before using socket.connect()
                 bluetoothAdapter.cancelDiscovery();
                 socket.connect();
-
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -139,7 +127,6 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
         if (socket.isConnected()) {
             // Update connection status on UI
             displayConnected();
-            //communicateTask.execute();
         } else {
             connectButton.setText(R.string.retry_connect);
         }
@@ -167,33 +154,17 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
             recyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
             recyclerView.setAdapter(mAdapter);
         }
-
-        /* Checks if external storage is available for read and write */
-
-        File directory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-        String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            try {
-                logWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(directory.getAbsolutePath() + "/CarCareLog.txt", true), "UTF-8"));
-            } catch (UnsupportedEncodingException | FileNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
-
-
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
+        //FIXME I don't think onDestroy is the right place to put this. When I swiped the app from the app switcher,
+        // this wasn't run. is onStop better?
         // Let go of resources
         try {
             if (socket != null) {
                 socket.close();
-            }
-            if (logWriter != null) {
-                logWriter.close();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -210,32 +181,24 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
      */
     public void connect(View view) {
         if (socket == null || !socket.isConnected()) {
-            if (useSimulator) {
-                connecting = true;
-                socket = new SimulatedSocket();
-                beginCommunication();
-            } else {
-
-                bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-                if (bluetoothAdapter != null) {
-                    // Do not try to connect if the device is already trying to or if our socket is open
-                    if (!connecting && !(socket != null && socket.isConnected())) {
-                        if (!bluetoothAdapter.isEnabled()) {
-                            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                            // Gives the user a chance to reject Bluetooth privileges at this time
-                            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-                            // goes to onActivityResult where requestCode == REQUEST_ENABLE_BT
-                        } else {
-                            // If bluetooth is on, go ahead and use it
-                            connecting = true;
-                            getObdDevice();
-                        }
+            bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+            if (bluetoothAdapter != null) {
+                // Do not try to connect if the device is already trying to or if our socket is open
+                if (!connecting && !(socket != null && socket.isConnected())) {
+                    if (!bluetoothAdapter.isEnabled()) {
+                        Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                        // Gives the user a chance to reject Bluetooth privileges at this time
+                        startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+                        // goes to onActivityResult where requestCode == REQUEST_ENABLE_BT
+                    } else {
+                        // If bluetooth is on, go ahead and use it
+                        connecting = true;
+                        getObdDevice();
                     }
                 }
-                // Else device does not support Bluetooth
             }
+            // Else device does not support Bluetooth
         }
-
     }
 
     @Override

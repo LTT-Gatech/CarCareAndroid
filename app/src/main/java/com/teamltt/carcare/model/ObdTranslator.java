@@ -17,12 +17,19 @@
 package com.teamltt.carcare.model;
 
 import com.github.pires.obd.commands.ObdCommand;
+import com.github.pires.obd.commands.SpeedCommand;
+import com.github.pires.obd.commands.control.PendingTroubleCodesCommand;
 import com.github.pires.obd.commands.engine.RPMCommand;
+import com.github.pires.obd.commands.engine.RuntimeCommand;
+import com.github.pires.obd.commands.fuel.ConsumptionRateCommand;
 import com.github.pires.obd.commands.protocol.EchoOffCommand;
 import com.github.pires.obd.commands.protocol.LineFeedOffCommand;
 import com.github.pires.obd.commands.protocol.ObdResetCommand;
 import com.github.pires.obd.commands.protocol.SelectProtocolCommand;
 import com.github.pires.obd.commands.protocol.TimeoutCommand;
+import com.github.pires.obd.commands.temperature.AirIntakeTemperatureCommand;
+import com.github.pires.obd.commands.temperature.AmbientAirTemperatureCommand;
+import com.github.pires.obd.commands.temperature.EngineCoolantTemperatureCommand;
 import com.github.pires.obd.enums.ObdProtocols;
 
 import java.util.HashMap;
@@ -42,12 +49,17 @@ public final class ObdTranslator {
 
     private static void buildTranslator() {
         translator = new HashMap<>();
+        translator.put("Reset", new ObdResetCommand());
         translator.put("Echo Off", new EchoOffCommand());
         translator.put("Line Feed Off", new LineFeedOffCommand());
         translator.put("Timeout", new TimeoutCommand(125));
         translator.put("Set Protocol", new SelectProtocolCommand(ObdProtocols.AUTO));
-        translator.put("Reset", new ObdResetCommand());
         translator.put("RPM", new RPMCommand());
+        translator.put("Pending Trouble Codes", new PendingTroubleCodesCommand());
+        translator.put("Engine Coolant Temp", new EngineCoolantTemperatureCommand());
+        translator.put("Vehicle Speed", new SpeedCommand());
+        translator.put("Intake Air Temp", new AirIntakeTemperatureCommand());
+        translator.put("Current Engine Runtime", new RuntimeCommand());
     }
 
 
