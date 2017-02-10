@@ -31,6 +31,7 @@ import java.util.UUID;
  */
 public class ObdBluetoothService extends Service {
 
+    private static final String TAG = "ObdBluetoothService";
     // Text that appears in the phone's bluetooth manager for the adapter
     private final String OBDII_NAME = "OBDII";
     // UUID that is required to talk to the OBD II adapter
@@ -54,7 +55,7 @@ public class ObdBluetoothService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            Log.i("bluetooth", "bt state receiver " + action);
+            Log.i(TAG, "bt state receiver " + action);
             if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
                 int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1);
 
@@ -76,22 +77,22 @@ public class ObdBluetoothService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            Log.i("bluetooth", "discovery receiver " + action);
+            Log.i(TAG, "discovery receiver " + action);
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 // Get the BluetoothDevice object from the Intent
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                Log.i("bluetooth", "potential device found");
-                Log.i("bluetooth", device.toString());
+                Log.i(TAG, "potential device found");
+                Log.i(TAG, device.toString());
                 if (device.getName() != null && device.getName().equals(OBDII_NAME)) {
-                    Log.i("bluetooth", "desired device found");
+                    Log.i(TAG, "desired device found");
                     obdDevice = device;
                     obdDeviceObtained();
                 }
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
-                Log.i("bluetooth", "discovery unsuccessful");
+                Log.i(TAG, "discovery unsuccessful");
                 // UI message connectButton.setText(R.string.retry_connect);
             } else if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
-                Log.i("bluetooth", "discovery started");
+                Log.i(TAG, "discovery started");
             }
         }
     };
@@ -108,7 +109,7 @@ public class ObdBluetoothService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.i("bluetooth", "service started");
+        Log.i(TAG, "service started");
         // Register the BroadcastReceiver
         IntentFilter discoveryFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         discoveryFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
@@ -122,7 +123,7 @@ public class ObdBluetoothService extends Service {
             // Do not try to connect if the device is already trying to or if our socket is open
 
             if (!bluetoothAdapter.isEnabled()) {
-                Log.i("bluetooth", "requesting to enable BT");
+                Log.i(TAG, "requesting to enable BT");
 
                 Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 enableBtIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -131,7 +132,7 @@ public class ObdBluetoothService extends Service {
                 // goes to onActivityResult where requestCode == REQUEST_ENABLE_BT
             }
             else {
-                Log.i("bluetooth", "adapter enabled");
+                Log.i(TAG, "adapter enabled");
                 // If bluetooth is on, go ahead and use it
                 getObdDevice();
             }
@@ -147,7 +148,7 @@ public class ObdBluetoothService extends Service {
         // release resources
         unregisterReceiver(discoveryReceiver);
         unregisterReceiver(bluetoothReceiver);
-        Log.i("bluetooth", "service stopped");
+        Log.i(TAG, "service stopped");
     }
 
     /**
@@ -169,23 +170,23 @@ public class ObdBluetoothService extends Service {
         if (obdDevice != null) {
             /* TODO a cached pair for device named "OBDII_NAME" is found if you have connected successfully. But what if
             you try using a new adapter with a new MAC address - this will need to be discovered */
-            Log.i("bluetooth", "existing pair found");
+            Log.i(TAG, "existing pair found");
             obdDeviceObtained();
         } else {
-            Log.i("bluetooth", "starting discovery");
+            Log.i(TAG, "starting discovery");
             if (bluetoothAdapter.startDiscovery()) {
                 // Control goes to bluetoothReceiver member variable
-                Log.i("bluetooth", "discovery started");
+                Log.i(TAG, "discovery started");
                 // UI message connectButton.setText(R.string.discovering);
             } else {
-                Log.i("bluetooth", "discovery not started");
+                Log.i(TAG, "discovery not started");
                 // UI message connectButton.setText(R.string.permission_fail_bt);
             }
         }
     }
 
     private void obdDeviceObtained() {
-        Log.i("bluetooth", "trying socket creation");
+        Log.i(TAG, "trying socket creation");
         try {
             socket = new DeviceSocket(obdDevice.createRfcommSocketToServiceRecord(uuid));
             // UI message connectButton.setText(R.string.connecting_bt);
