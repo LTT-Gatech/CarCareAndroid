@@ -210,7 +210,7 @@ public class ObdBluetoothService extends Service {
                     // connect if discovery successfully canceled
                     socket.connect();
                 } else {
-                    Log.e(TAG, "discovery unable to cancel");
+                    Log.e(TAG, "could not cancel discovery");
                 }
                 // Connect to the database
                 db = new DbHelper(ObdBluetoothService.this).getWritableDatabase();
@@ -238,15 +238,15 @@ public class ObdBluetoothService extends Service {
             try {
                 while (socket.isConnected()) {
                     // Check for can's "heartbeat"
-                    boolean isCarOn = false;
-                    while (!isCarOn) {
-                        ObdCommand heartbeat = new RuntimeCommand();
+                    ObdCommand heartbeat = new RuntimeCommand();
+                    while (true) {
                         heartbeat.run(socket.getInputStream(), socket.getOutputStream());
-
                         if (Integer.parseInt(heartbeat.getFormattedResult()) > 0) {
-                            isCarOn = true;
+                            break;
                         }
                     }
+
+                    // TODO establish a new trip_id here
 
                     Set<Class<? extends ObdCommand>> commands = new HashSet<>();
                     // TODO get these classes from somewhere else
@@ -264,7 +264,6 @@ public class ObdBluetoothService extends Service {
 
                         // Add this response to the database
                         ContentValues values = new ContentValues();
-                        // TODO trip_id logic?
                         values.put(ResponseContract.ResponseEntry.COLUMN_NAME_TRIP_ID, 0);
                         values.put(ResponseContract.ResponseEntry.COLUMN_NAME_NAME, sendCommand.getName());
                         values.put(ResponseContract.ResponseEntry.COLUMN_NAME_PID, sendCommand.getCommandPID());
