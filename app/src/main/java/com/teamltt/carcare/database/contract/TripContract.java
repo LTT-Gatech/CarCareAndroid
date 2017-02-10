@@ -16,11 +16,16 @@
 
 package com.teamltt.carcare.database.contract;
 
+import android.content.ContentValues;
+import android.database.sqlite.SQLiteDatabase;
+
+import com.teamltt.carcare.database.DbHelper;
+
 public class TripContract {
 
     public static final String SQL_CREATE_ENTRIES = "CREATE TABLE " + TripEntry.COLUMN_NAME_ID + " (" +
             // trip_id INTEGER PRIMARY KEY
-            TripEntry.COLUMN_NAME_ID + " INTEGER PRIMARY KEY," +
+            TripEntry.COLUMN_NAME_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
             // vehicle_id INTEGER REFERENCES vehicles(vehicle_id)
             TripEntry.COLUMN_NAME_VEHICLE_ID + " INTEGER REFERENCES " +
             VehicleContract.VehicleEntry.TABLE_NAME + "(" + VehicleContract.VehicleEntry.COLUMN_NAME_ID + ")," +
@@ -29,6 +34,17 @@ public class TripContract {
             ");";
 
     public static final String SQL_DROP_ENTRIES = "DROP TABLE IF EXISTS " + TripEntry.TABLE_NAME;
+
+    public static long createNewTrip(SQLiteDatabase db, long vehicleId) {
+        long status = DbHelper.errorChecks(db);
+        if (status != DbHelper.DB_OK) {
+            return status;
+        }
+        ContentValues values = new ContentValues();
+        values.put(TripEntry.COLUMN_NAME_VEHICLE_ID, vehicleId);
+        values.put(TripEntry.COLUMN_NAME_START_TIME, DbHelper.now());
+        return db.insert(TripEntry.TABLE_NAME, null, values);
+    }
 
     // HACK: private to prevent someone from accidentally instantiating a contract
     private TripContract() {

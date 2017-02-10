@@ -26,14 +26,21 @@ import com.teamltt.carcare.database.contract.TripContract;
 import com.teamltt.carcare.database.contract.UserContract;
 import com.teamltt.carcare.database.contract.VehicleContract;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class DbHelper extends SQLiteOpenHelper {
 
+    public static final long DB_ERROR_NULL = -6;
     public static final long DB_ERROR_NOT_OPEN = -5;
     public static final long DB_ERROR_READ_ONLY = -4;
     public static final long DB_WRITE_ERROR = -1; // from SQLiteDatabase if there an error occurred
+    public static final long DB_OK = 0;
 
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "CarCare.db";
+
+    private static final SimpleDateFormat sqlDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     public DbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -62,5 +69,22 @@ public class DbHelper extends SQLiteOpenHelper {
     @Override
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         onUpgrade(db, oldVersion, newVersion);
+    }
+
+    public static long errorChecks(SQLiteDatabase db) {
+        if (db == null) {
+            return DB_ERROR_NULL;
+        } else if (!db.isOpen()) {
+            return DB_ERROR_NOT_OPEN;
+        } else if (db.isReadOnly()) {
+            return DB_ERROR_READ_ONLY;
+        } else {
+            return DB_OK;
+        }
+    }
+
+    public static String now() {
+        // set the format to sql date time
+        return sqlDateFormat.format(new Date());
     }
 }

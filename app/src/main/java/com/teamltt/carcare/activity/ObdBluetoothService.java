@@ -19,6 +19,7 @@ import com.teamltt.carcare.adapter.IObdSocket;
 import com.teamltt.carcare.adapter.bluetooth.DeviceSocket;
 import com.teamltt.carcare.database.DbHelper;
 import com.teamltt.carcare.database.contract.ResponseContract;
+import com.teamltt.carcare.database.contract.TripContract;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -243,10 +244,12 @@ public class ObdBluetoothService extends Service {
                         if (Integer.parseInt(heartbeat.getFormattedResult()) > 0) {
                             break;
                         }
+                        Thread.sleep(1000);
                     }
 
-                    // TODO establish a new trip_id here
-                    long tempId = 1;
+                    // TODO get current vehicle identifier
+                    long vehicleId = 1;
+                    long tripId = TripContract.createNewTrip(db, vehicleId);
 
                     Set<Class<? extends ObdCommand>> commands = new HashSet<>();
                     // TODO get these classes from somewhere else
@@ -262,7 +265,7 @@ public class ObdBluetoothService extends Service {
                             sendCommand.run(socket.getInputStream(), socket.getOutputStream());
                         }
 
-                        ResponseContract.insert(db, tempId, sendCommand.getName(),
+                        ResponseContract.insert(db, tripId, sendCommand.getName(),
                                 sendCommand.getCommandPID(), sendCommand.getFormattedResult());
                     }
                 }
