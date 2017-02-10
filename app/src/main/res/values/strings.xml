@@ -9,4 +9,5 @@
     <string name="request_selector">Request Selector:</string>
     <string name="send_request">Send Request</string>
     <string name="response">Response</string>
+    <string name="bt_service_description">Handles Bluetooth connection to your OBD adapter for the CarCare application.</string>
 </resources>
