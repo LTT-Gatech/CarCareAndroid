@@ -206,11 +206,14 @@ public class ObdBluetoothService extends Service {
         protected Void doInBackground(Void... params) {
             try {
                 // Android advises to cancel discovery before using socket.connect()
-                bluetoothAdapter.cancelDiscovery();
-                socket.connect();
+                if (bluetoothAdapter.cancelDiscovery()) {
+                    // connect if discovery successfully canceled
+                    socket.connect();
+                } else {
+                    Log.e(TAG, "discovery unable to cancel");
+                }
                 // Connect to the database
-                DbHelper dbHelper = new DbHelper(ObdBluetoothService.this);
-                db = dbHelper.getWritableDatabase();
+                db = new DbHelper(ObdBluetoothService.this).getWritableDatabase();
             } catch (IOException e) {
                 e.printStackTrace();
             }
