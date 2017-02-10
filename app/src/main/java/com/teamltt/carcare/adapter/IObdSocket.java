@@ -32,18 +32,4 @@ public interface IObdSocket {
 
     void close() throws IOException;
 
-    /**
-     * Writes a request to the socket so that it is sent to the OBD adapter
-     * @param bytes the ASCII message to send
-     * @throws IOException
-     */
-    void writeTo(byte[] bytes) throws IOException;
-
-    /**
-     * Populates buffer with the response from the OBD adapter
-     * @param buffer an array to put the ASCII response in
-     * @return the number of bytes that the buffer was populated with
-     * @throws IOException
-     */
-    int readFrom(byte[] buffer) throws IOException;
 }

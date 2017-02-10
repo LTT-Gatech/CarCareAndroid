@@ -24,7 +24,7 @@ public class ResponseContract {
             TripContract.TripEntry.TABLE_NAME + "(" + TripContract.TripEntry.COLUMN_NAME_ID + ")," +
             // this will automatically give each row the current timestamp upon insert
             ResponseEntry.COLUMN_NAME_TIMESTAMP + " DATETIME DEFAULT CURRENT_TIMESTAMP," +
-            ResponseEntry.COLUMN_NAME_MODE + " TEXT," +
+            ResponseEntry.COLUMN_NAME_NAME + " TEXT," +
             ResponseEntry.COLUMN_NAME_PID + " TEXT," +
             ResponseEntry.COLUMN_NAME_VALUE + " TEXT" +
             ");";
@@ -39,7 +39,7 @@ public class ResponseContract {
         public static final String TABLE_NAME = "responses";
         public static final String COLUMN_NAME_TRIP_ID = TripContract.TripEntry.COLUMN_NAME_ID;
         public static final String COLUMN_NAME_TIMESTAMP = "timestamp";
-        public static final String COLUMN_NAME_MODE = "mode";
+        public static final String COLUMN_NAME_NAME = "name";
         public static final String COLUMN_NAME_PID = "pid";
         public static final String COLUMN_NAME_VALUE = "value";
     }

@@ -19,9 +19,11 @@ package com.teamltt.carcare.activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -36,6 +38,8 @@ import com.github.pires.obd.commands.ObdCommand;
 import com.teamltt.carcare.R;
 import com.teamltt.carcare.adapter.IObdSocket;
 import com.teamltt.carcare.adapter.bluetooth.DeviceSocket;
+import com.teamltt.carcare.database.DbHelper;
+import com.teamltt.carcare.database.contract.ResponseContract;
 import com.teamltt.carcare.fragment.MyObdResponseRecyclerViewAdapter;
 import com.teamltt.carcare.fragment.ObdResponseFragment;
 import com.teamltt.carcare.fragment.SimpleDividerItemDecoration;
@@ -58,6 +62,11 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
     private IObdSocket socket;
 
     private BluetoothDevice obdDevice = null;
+
+    /**
+     * A writable database connection
+     */
+    private SQLiteDatabase db;
 
     /**
      * Controls whether the app searches for a car's OBD adapter or an internal simulator.
@@ -111,6 +120,9 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
                 // Android advises to cancel discovery before using socket.connect()
                 bluetoothAdapter.cancelDiscovery();
                 socket.connect();
+                // Connect to the database
+                DbHelper dbHelper = new DbHelper(DemoActivity.this);
+                db = dbHelper.getWritableDatabase();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -169,7 +181,7 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        db.close();
         unregisterReceiver(bluetoothReceiver);
     }
 
@@ -181,7 +193,6 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
      */
     public void connect(View view) {
         if (socket == null || !socket.isConnected()) {
-            bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             if (bluetoothAdapter != null) {
                 // Do not try to connect if the device is already trying to or if our socket is open
                 if (!connecting && !(socket != null && socket.isConnected())) {
@@ -293,6 +304,14 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
                         return null;
                     }
                 }
+                ContentValues values = new ContentValues();
+                values.put(ResponseContract.ResponseEntry.COLUMN_NAME_TRIP_ID, 0);
+                values.put(ResponseContract.ResponseEntry.COLUMN_NAME_NAME, command.getName());
+                values.put(ResponseContract.ResponseEntry.COLUMN_NAME_PID, command.getCommandPID());
+                values.put(ResponseContract.ResponseEntry.COLUMN_NAME_VALUE, command.getFormattedResult());
+
+                long newRowId = db.insert(ResponseContract.ResponseEntry.TABLE_NAME, null, values);
+
                 return command;
             }
 
@@ -305,13 +324,15 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
                 // Translate into english and post
                 String commandEnglish = command.getName();
                 String result = command.getFormattedResult();
+
+
+
                 int nextId = mAdapter.getItemCount() + 1;
                 ObdContent.addItem(ObdContent.createItemWithResponse(nextId, commandEnglish, result));
                 mAdapter.notifyDataSetChanged();
             }
 
         };
-        Log.i("library", "executing");
         task.execute(command);
         task.getStatus();
     }
