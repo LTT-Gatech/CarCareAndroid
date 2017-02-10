@@ -233,6 +233,12 @@ public class ObdBluetoothService extends Service {
      * storing them in the database.
      */
     AsyncTask<Void, Void, Void> queryTask = new AsyncTask<Void, Void, Void>() {
+
+        boolean tripEstablished = false;
+        // HACK until we find a way to get the true vehicle identifier
+        long vehicleId = 1;
+        long tripId;
+
         @Override
         protected Void doInBackground(Void... ignore) {
             try {
@@ -244,12 +250,16 @@ public class ObdBluetoothService extends Service {
                         if (Integer.parseInt(heartbeat.getFormattedResult()) > 0) {
                             break;
                         }
-                        Thread.sleep(1000);
                     }
 
-                    // TODO get current vehicle identifier
-                    long vehicleId = 1;
-                    long tripId = TripContract.createNewTrip(db, vehicleId);
+                    if (!tripEstablished) {
+                        tripEstablished = true;
+                        tripId = TripContract.createNewTrip(db, vehicleId);
+                        if (tripId == DbHelper.DB_ERROR_NULL || tripId == DbHelper.DB_ERROR_NOT_OPEN
+                                || tripId == DbHelper.DB_ERROR_READ_ONLY) {
+                            Log.e(TAG, "error occurred with the database: " + tripId);
+                        }
+                    }
 
                     Set<Class<? extends ObdCommand>> commands = new HashSet<>();
                     // TODO get these classes from somewhere else
