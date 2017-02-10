@@ -4,7 +4,6 @@ import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -247,6 +246,7 @@ public class ObdBluetoothService extends Service {
                     }
 
                     // TODO establish a new trip_id here
+                    long tempId = 1;
 
                     Set<Class<? extends ObdCommand>> commands = new HashSet<>();
                     // TODO get these classes from somewhere else
@@ -262,14 +262,8 @@ public class ObdBluetoothService extends Service {
                             sendCommand.run(socket.getInputStream(), socket.getOutputStream());
                         }
 
-                        // Add this response to the database
-                        ContentValues values = new ContentValues();
-                        values.put(ResponseContract.ResponseEntry.COLUMN_NAME_TRIP_ID, 0);
-                        values.put(ResponseContract.ResponseEntry.COLUMN_NAME_NAME, sendCommand.getName());
-                        values.put(ResponseContract.ResponseEntry.COLUMN_NAME_PID, sendCommand.getCommandPID());
-                        values.put(ResponseContract.ResponseEntry.COLUMN_NAME_VALUE, sendCommand.getFormattedResult());
-
-                        db.insert(ResponseContract.ResponseEntry.TABLE_NAME, null, values);
+                        ResponseContract.insert(db, tempId, sendCommand.getName(),
+                                sendCommand.getCommandPID(), sendCommand.getFormattedResult());
                     }
                 }
             } catch (IOException | InterruptedException | IllegalAccessException | InstantiationException e) {

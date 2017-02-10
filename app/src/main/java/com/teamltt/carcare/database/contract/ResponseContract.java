@@ -16,6 +16,11 @@
 
 package com.teamltt.carcare.database.contract;
 
+import android.content.ContentValues;
+import android.database.sqlite.SQLiteDatabase;
+
+import com.teamltt.carcare.database.DbHelper;
+
 public class ResponseContract {
 
     public static final String SQL_CREATE_ENTRIES = "CREATE TABLE " + ResponseEntry.TABLE_NAME + " (" +
@@ -30,6 +35,30 @@ public class ResponseContract {
             ");";
 
     public static final String SQL_DROP_ENTRIES = "DROP TABLE IF EXISTS " + ResponseEntry.TABLE_NAME;
+
+    /**
+     * Abstraction method
+     *
+     * @param db      the writable db
+     * @param trip_id the trip_id from {@link TripContract.TripEntry}
+     * @param name    the name of the command
+     * @param pid     the process id of the command
+     * @param value   the formatted result after the command returns
+     * @return the new row id or a {@link DbHelper} error code
+     */
+    public static long insert(SQLiteDatabase db, long trip_id, String name, String pid, String value) {
+        if (!db.isOpen()) {
+            return DbHelper.DB_ERROR_NOT_OPEN;
+        } else if (db.isReadOnly()) {
+            return DbHelper.DB_ERROR_READ_ONLY;
+        }
+        ContentValues values = new ContentValues();
+        values.put(ResponseContract.ResponseEntry.COLUMN_NAME_TRIP_ID, trip_id);
+        values.put(ResponseContract.ResponseEntry.COLUMN_NAME_NAME, name);
+        values.put(ResponseContract.ResponseEntry.COLUMN_NAME_PID, pid);
+        values.put(ResponseContract.ResponseEntry.COLUMN_NAME_VALUE, value);
+        return db.insert(ResponseEntry.TABLE_NAME, null, values);
+    }
 
     // HACK: private to prevent someone from accidentally instantiating a contract
     private ResponseContract() {
