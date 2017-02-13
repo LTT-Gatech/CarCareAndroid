@@ -28,8 +28,10 @@ import com.teamltt.carcare.database.contract.VehicleContract;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
-public class DbHelper extends SQLiteOpenHelper {
+public class DbHelper extends SQLiteOpenHelper implements IObservable {
 
     // errors are negative, ok is 0, anything else is positive.
     public static final long DB_ERROR_NULL = -6;
@@ -87,5 +89,62 @@ public class DbHelper extends SQLiteOpenHelper {
     public static String now() {
         // set the format to sql date time
         return sqlDateFormat.format(new Date());
+    }
+
+    private Set<IObserver> observers = new HashSet<>();
+
+    @Override
+    public void addObserver(IObserver observer) {
+        observers.add(observer);
+    }
+
+    @Override
+    public int countObservers() {
+        return observers.size();
+    }
+
+    @Override
+    public void deleteObserver(IObserver observer) {
+        observers.remove(observer);
+    }
+
+    @Override
+    public void deleteObservers() {
+        observers.clear();
+    }
+
+    private boolean changed = false;
+
+    @Override
+    public boolean hasChanged() {
+        return changed;
+    }
+
+    @Override
+    public void notifyObservers(Object arg) {
+        if (hasChanged()) {
+            for (IObserver observer : observers) {
+                observer.update(this, observer);
+            }
+            clearChanged();
+        }
+    }
+
+    @Override
+    public void notifyObservers() {
+        if (hasChanged()) {
+            for (IObserver observer : observers) {
+                observer.update(this, null);
+            }
+            clearChanged();
+        }
+    }
+
+    protected void clearChanged() {
+        changed = false;
+    }
+
+    protected void setChanged() {
+        changed = true;
     }
 }
