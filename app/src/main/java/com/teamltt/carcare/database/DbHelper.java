@@ -31,6 +31,7 @@ import java.util.Date;
 
 public class DbHelper extends SQLiteOpenHelper {
 
+    // errors are negative, ok is 0, anything else is positive.
     public static final long DB_ERROR_NULL = -6;
     public static final long DB_ERROR_NOT_OPEN = -5;
     public static final long DB_ERROR_READ_ONLY = -4;

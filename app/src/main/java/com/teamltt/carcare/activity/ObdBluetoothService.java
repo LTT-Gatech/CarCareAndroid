@@ -58,9 +58,9 @@ public class ObdBluetoothService extends Service {
     private IObdSocket socket;
 
     /**
-     * A writable database connection
+     * Abstraction layer over a database connection.
      */
-    private SQLiteDatabase db;
+    private DbHelper dbHelper;
 
 
     /**
@@ -229,7 +229,8 @@ public class ObdBluetoothService extends Service {
                     Log.e(TAG, "could not cancel discovery");
                 }
                 // Connect to the database
-                db = new DbHelper(ObdBluetoothService.this).getWritableDatabase();
+                dbHelper = new DbHelper(ObdBluetoothService.this);
+//                db = dbHelper.getWritableDatabase();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -255,6 +256,19 @@ public class ObdBluetoothService extends Service {
         long vehicleId = 1;
         long tripId;
 
+        // a writable database connection.
+        private SQLiteDatabase db;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            db = dbHelper.getWritableDatabase();
+            long status = DbHelper.errorChecks(db);
+            if (status < 0) {
+                Log.e(TAG, "error occurred with db when connecting: " + status);
+            }
+        }
+
         @Override
         protected Void doInBackground(Void... ignore) {
             try {
@@ -271,9 +285,8 @@ public class ObdBluetoothService extends Service {
                     if (!tripEstablished) {
                         tripEstablished = true;
                         tripId = TripContract.createNewTrip(db, vehicleId);
-                        if (tripId == DbHelper.DB_ERROR_NULL || tripId == DbHelper.DB_ERROR_NOT_OPEN
-                                || tripId == DbHelper.DB_ERROR_READ_ONLY) {
-                            Log.e(TAG, "error occurred with the database: " + tripId);
+                        if (tripId < 0) {
+                            Log.e(TAG, "error occurred with the database when inserting: " + tripId);
                         }
                     }
 
