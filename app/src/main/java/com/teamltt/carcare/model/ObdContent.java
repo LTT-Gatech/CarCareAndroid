@@ -32,6 +32,14 @@ public class ObdContent {
 
     public static final Map<String, ObdResponse> ITEM_MAP = new HashMap<>();
 
+    public static void setItems(List<ObdResponse> items) {
+        ITEMS.clear();
+        ITEMS.addAll(items);
+        for (ObdResponse item : items) {
+            ITEM_MAP.put(item.id, item);
+        }
+    }
+
     public static void addItem(ObdResponse item) {
         ITEMS.add(item);
         ITEM_MAP.put(item.id, item);

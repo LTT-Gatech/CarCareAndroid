@@ -16,6 +16,8 @@
 
 package com.teamltt.carcare.database;
 
+import android.os.Bundle;
+
 public interface IObserver {
-    void update(IObservable o, Object arg);
+    void update(IObservable o, Bundle args);
 }

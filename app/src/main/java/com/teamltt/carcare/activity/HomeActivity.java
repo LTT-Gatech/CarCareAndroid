@@ -19,7 +19,6 @@ package com.teamltt.carcare.activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -27,18 +26,21 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
 import com.teamltt.carcare.R;
+import com.teamltt.carcare.database.DbHelper;
+import com.teamltt.carcare.database.IObservable;
+import com.teamltt.carcare.database.IObserver;
 import com.teamltt.carcare.database.contract.ResponseContract;
+import com.teamltt.carcare.database.contract.TripContract;
 import com.teamltt.carcare.fragment.MyObdResponseRecyclerViewAdapter;
 import com.teamltt.carcare.fragment.ObdResponseFragment;
 import com.teamltt.carcare.fragment.SimpleDividerItemDecoration;
 import com.teamltt.carcare.model.ObdContent;
 
-public class HomeActivity extends AppCompatActivity  implements ObdResponseFragment.OnListFragmentInteractionListener {
+import java.util.ArrayList;
+import java.util.List;
 
-    /**
-     * A writable database connection
-     */
-    SQLiteDatabase db;
+public class HomeActivity extends AppCompatActivity implements IObserver, ObdResponseFragment.OnListFragmentInteractionListener {
+
     // Used to keep track of the items in the RecyclerView
     private RecyclerView.Adapter responseListAdapter;
 
@@ -66,56 +68,75 @@ public class HomeActivity extends AppCompatActivity  implements ObdResponseFragm
         }
     }
 
-    // This should be called somewhere so we can read the data into a graph
-    AsyncTask<Void, String, Void> readTask = new AsyncTask<Void, String, Void>() {
-        @Override
-        protected Void doInBackground(Void... voids) {
-            // Read from the database
-            String[] projection = {
-                    ResponseContract.ResponseEntry.COLUMN_NAME_NAME,
-                    ResponseContract.ResponseEntry.COLUMN_NAME_VALUE,
-            };
-            String sortOrder =
-                    ResponseContract.ResponseEntry.COLUMN_NAME_TIMESTAMP + " ASC";
-
-            Cursor cursor = db.query(
-                    ResponseContract.ResponseEntry.TABLE_NAME,                     // The table to query
-                    projection,                               // The columns to return
-                    null,                                // The columns for the WHERE clause
-                    null,                            // The values for the WHERE clause
-                    null,                                     // don't group the rows
-                    null,                                     // don't filter by row groups
-                    sortOrder                                 // The sort order
-            );
-
-            while(cursor.moveToNext()) {
-                byte[] commandNameBytes = cursor.getBlob(
-                        cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_NAME));
-                String commandName = new String(commandNameBytes);
-                byte[] valueBytes = cursor.getBlob(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_VALUE));
-                String value = new String(valueBytes);
-                publishProgress(commandName, value);
-
-            }
-            cursor.close();
-            return null;
-        }
-
-        @Override
-        public void onProgressUpdate(String... values) {
-            int nextId = responseListAdapter.getItemCount() + 1;
-            ObdContent.addItem(ObdContent.createItemWithResponse(nextId, values[0], values[1]));
-            responseListAdapter.notifyDataSetChanged();
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-
-        }
-    };
+//     This should be called somewhere so we can read the data into a graph
+//    AsyncTask<Void, String, Void> readTask = new AsyncTask<Void, String, Void>() {
+//        @Override
+//        protected Void doInBackground(Void... voids) {
+//            // Read from the database
+//            String[] projection = {
+//                    ResponseContract.ResponseEntry.COLUMN_NAME_NAME,
+//                    ResponseContract.ResponseEntry.COLUMN_NAME_VALUE,
+//            };
+//            String sortOrder =
+//                    ResponseContract.ResponseEntry.COLUMN_NAME_TIMESTAMP + " ASC";
+//
+//            Cursor cursor = db.query(
+//                    ResponseContract.ResponseEntry.TABLE_NAME,                     // The table to query
+//                    projection,                               // The columns to return
+//                    null,                                // The columns for the WHERE clause
+//                    null,                            // The values for the WHERE clause
+//                    null,                                     // don't group the rows
+//                    null,                                     // don't filter by row groups
+//                    sortOrder                                 // The sort order
+//            );
+//
+//            while(cursor.moveToNext()) {
+//                byte[] commandNameBytes = cursor.getBlob(
+//                        cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_NAME));
+//                String commandName = new String(commandNameBytes);
+//                byte[] valueBytes = cursor.getBlob(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_VALUE));
+//                String value = new String(valueBytes);
+//                publishProgress(commandName, value);
+//
+//            }
+//            cursor.close();
+//            return null;
+//        }
+//
+//        @Override
+//        public void onProgressUpdate(String... values) {
+//            int nextId = responseListAdapter.getItemCount() + 1;
+//            ObdContent.addItem(ObdContent.createItemWithResponse(nextId, values[0], values[1]));
+//            responseListAdapter.notifyDataSetChanged();
+//        }
+//
+//        @Override
+//        protected void onPostExecute(Void aVoid) {
+//
+//        }
+//    };
 
     @Override
     public void onListFragmentInteraction(ObdContent.ObdResponse item) {
         Log.i("ObdResponse Card", item.toString());
+    }
+
+    @Override
+    public void update(IObservable o, Bundle args) {
+        if (args != null && o instanceof DbHelper) {
+            DbHelper dbHelper = (DbHelper) o;
+            long tripId = args.getLong(TripContract.TripEntry.COLUMN_NAME_ID);
+            SQLiteDatabase db = dbHelper.getReadableDatabase();
+            Cursor cursor = ResponseContract.queryByTripId(db, tripId);
+            List<ObdContent.ObdResponse> items = new ArrayList<>();
+            while (cursor.moveToNext()) {
+                String name = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_NAME));
+                String value = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_VALUE));
+                items.add(ObdContent.createItemWithResponse(items.size(), name, value));
+            }
+            cursor.close();
+            ObdContent.setItems(items);
+            responseListAdapter.notifyDataSetChanged();
+        }
     }
 }

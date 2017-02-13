@@ -19,6 +19,7 @@ package com.teamltt.carcare.database;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Bundle;
 
 import com.teamltt.carcare.database.contract.OwnershipContract;
 import com.teamltt.carcare.database.contract.ResponseContract;
@@ -121,10 +122,10 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
     }
 
     @Override
-    public void notifyObservers(Object arg) {
+    public void notifyObservers(Bundle args) {
         if (hasChanged()) {
             for (IObserver observer : observers) {
-                observer.update(this, observer);
+                observer.update(this, args);
             }
             clearChanged();
         }
@@ -132,12 +133,7 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
 
     @Override
     public void notifyObservers() {
-        if (hasChanged()) {
-            for (IObserver observer : observers) {
-                observer.update(this, null);
-            }
-            clearChanged();
-        }
+        notifyObservers(null);
     }
 
     protected void clearChanged() {

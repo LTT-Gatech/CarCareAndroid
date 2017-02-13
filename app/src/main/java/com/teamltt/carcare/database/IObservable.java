@@ -16,6 +16,8 @@
 
 package com.teamltt.carcare.database;
 
+import android.os.Bundle;
+
 public interface IObservable {
 
     // public
@@ -29,7 +31,7 @@ public interface IObservable {
 
     boolean hasChanged();
 
-    void notifyObservers(Object arg);
+    void notifyObservers(Bundle args);
 
     void notifyObservers();
 }

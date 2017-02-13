@@ -25,6 +25,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -305,8 +306,9 @@ public class ObdBluetoothService extends Service {
                             sendCommand.run(socket.getInputStream(), socket.getOutputStream());
                         }
 
-                        ResponseContract.insert(db, tripId, sendCommand.getName(),
+                        long rowId = ResponseContract.insert(db, tripId, sendCommand.getName(),
                                 sendCommand.getCommandPID(), sendCommand.getFormattedResult());
+                        dbHelper.setChanged();
                     }
                     publishProgress();
                 }
@@ -321,7 +323,9 @@ public class ObdBluetoothService extends Service {
         @Override
         protected void onProgressUpdate(Void... ignore) {
             super.onProgressUpdate(ignore);
-            dbHelper.setChanged();
+            Bundle args = new Bundle();
+            args.putLong(TripContract.TripEntry.COLUMN_NAME_ID, tripId);
+            dbHelper.notifyObservers(args);
         }
 
         protected void onPostExecute(Void ignore) {
