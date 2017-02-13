@@ -17,6 +17,7 @@
 package com.teamltt.carcare.database.contract;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.teamltt.carcare.database.DbHelper;
@@ -57,6 +58,22 @@ public class ResponseContract {
         values.put(ResponseContract.ResponseEntry.COLUMN_NAME_PID, pid);
         values.put(ResponseContract.ResponseEntry.COLUMN_NAME_VALUE, value);
         return db.insert(ResponseEntry.TABLE_NAME, null, values);
+    }
+
+    public static Cursor queryByTripId(SQLiteDatabase db, long tripId) {
+        String table = ResponseEntry.TABLE_NAME;
+        String[] columns = {
+//                ResponseEntry.COLUMN_NAME_TRIP_ID, // shouldn't be necessary to include in cursor
+                ResponseEntry.COLUMN_NAME_TIMESTAMP,
+                ResponseEntry.COLUMN_NAME_NAME,
+                ResponseEntry.COLUMN_NAME_PID,
+                ResponseEntry.COLUMN_NAME_VALUE
+        };
+        String selection = ResponseEntry.COLUMN_NAME_TRIP_ID + " = ?";
+        String[] selectionArgs = {Long.toString(tripId)};
+        String orderBy = ResponseEntry.COLUMN_NAME_TIMESTAMP + " ASC";
+
+        return db.query(table, columns, selection, selectionArgs, null, null, orderBy);
     }
 
     // HACK: private to prevent someone from accidentally instantiating a contract
