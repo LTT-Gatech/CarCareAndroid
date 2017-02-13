@@ -45,6 +45,10 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
 
     private static final SimpleDateFormat sqlDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
+    // for observer pattern to notify when data has been updated
+    private Set<IObserver> observers = new HashSet<>();
+    private boolean changed = false;
+
     public DbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -91,8 +95,6 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         return sqlDateFormat.format(new Date());
     }
 
-    private Set<IObserver> observers = new HashSet<>();
-
     @Override
     public void addObserver(IObserver observer) {
         observers.add(observer);
@@ -112,8 +114,6 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
     public void deleteObservers() {
         observers.clear();
     }
-
-    private boolean changed = false;
 
     @Override
     public boolean hasChanged() {
@@ -144,7 +144,7 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         changed = false;
     }
 
-    protected void setChanged() {
+    public void setChanged() {
         changed = true;
     }
 }

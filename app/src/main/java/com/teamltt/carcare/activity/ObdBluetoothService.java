@@ -269,6 +269,7 @@ public class ObdBluetoothService extends Service {
             }
         }
 
+
         @Override
         protected Void doInBackground(Void... ignore) {
             try {
@@ -307,6 +308,7 @@ public class ObdBluetoothService extends Service {
                         ResponseContract.insert(db, tripId, sendCommand.getName(),
                                 sendCommand.getCommandPID(), sendCommand.getFormattedResult());
                     }
+                    publishProgress();
                 }
             } catch (IOException | InterruptedException | IllegalAccessException | InstantiationException e) {
                 e.printStackTrace();
@@ -314,6 +316,12 @@ public class ObdBluetoothService extends Service {
 
             return null;
 
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... ignore) {
+            super.onProgressUpdate(ignore);
+            dbHelper.setChanged();
         }
 
         protected void onPostExecute(Void ignore) {
