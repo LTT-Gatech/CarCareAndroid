@@ -24,7 +24,7 @@ import com.teamltt.carcare.database.DbHelper;
 public class TripContract {
 
     public static final String SQL_CREATE_ENTRIES = "CREATE TABLE " + TripEntry.COLUMN_NAME_ID + " (" +
-            // trip_id INTEGER PRIMARY KEY
+            // trip_id INTEGER PRIMARY KEY AUTOINCREMENT
             TripEntry.COLUMN_NAME_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
             // vehicle_id INTEGER REFERENCES vehicles(vehicle_id)
             TripEntry.COLUMN_NAME_VEHICLE_ID + " INTEGER REFERENCES " +

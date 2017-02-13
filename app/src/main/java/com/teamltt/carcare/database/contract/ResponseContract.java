@@ -25,6 +25,8 @@ import com.teamltt.carcare.database.DbHelper;
 public class ResponseContract {
 
     public static final String SQL_CREATE_ENTRIES = "CREATE TABLE " + ResponseEntry.TABLE_NAME + " (" +
+            // response_id INTEGER PRIMARY KEY AUTOINCREMENT
+            ResponseEntry.COLUMN_NAME_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
             // trip_id INTEGER REFERENCES trips(trip_id)
             ResponseEntry.COLUMN_NAME_TRIP_ID + " INTEGER REFERENCES " +
             TripContract.TripEntry.TABLE_NAME + "(" + TripContract.TripEntry.COLUMN_NAME_ID + ")," +
@@ -63,6 +65,7 @@ public class ResponseContract {
     public static Cursor queryByTripId(SQLiteDatabase db, long tripId) {
         String table = ResponseEntry.TABLE_NAME;
         String[] columns = {
+                ResponseEntry.COLUMN_NAME_ID,
 //                ResponseEntry.COLUMN_NAME_TRIP_ID, // shouldn't be necessary to include in cursor
                 ResponseEntry.COLUMN_NAME_TIMESTAMP,
                 ResponseEntry.COLUMN_NAME_NAME,
@@ -76,12 +79,33 @@ public class ResponseContract {
         return db.query(table, columns, selection, selectionArgs, null, null, orderBy);
     }
 
+    public static Cursor queryByIds(SQLiteDatabase db, long... rowIds) {
+        String table = ResponseEntry.TABLE_NAME;
+        String[] columns = {
+                ResponseEntry.COLUMN_NAME_ID,
+                ResponseEntry.COLUMN_NAME_TRIP_ID,
+                ResponseEntry.COLUMN_NAME_TIMESTAMP,
+                ResponseEntry.COLUMN_NAME_NAME,
+                ResponseEntry.COLUMN_NAME_PID,
+                ResponseEntry.COLUMN_NAME_VALUE
+        };
+        String selection = ResponseEntry.COLUMN_NAME_ID + " = ?";
+        String[] selectionArgs = new String[rowIds.length];
+        for (int i = 0; i < rowIds.length; i++) {
+            selectionArgs[i] = Long.toString(rowIds[i]);
+        }
+        String orderBy = ResponseEntry.COLUMN_NAME_TIMESTAMP + " ASC";
+
+        return db.query(table, columns, selection, selectionArgs, null, null, orderBy);
+    }
+
     // HACK: private to prevent someone from accidentally instantiating a contract
     private ResponseContract() {
     }
 
     public static class ResponseEntry {
         public static final String TABLE_NAME = "responses";
+        public static final String COLUMN_NAME_ID = "response_id";
         public static final String COLUMN_NAME_TRIP_ID = TripContract.TripEntry.COLUMN_NAME_ID;
         public static final String COLUMN_NAME_TIMESTAMP = "timestamp";
         public static final String COLUMN_NAME_NAME = "name";
