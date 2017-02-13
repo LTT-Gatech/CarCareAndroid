@@ -30,7 +30,6 @@ import com.teamltt.carcare.database.DbHelper;
 import com.teamltt.carcare.database.IObservable;
 import com.teamltt.carcare.database.IObserver;
 import com.teamltt.carcare.database.contract.ResponseContract;
-import com.teamltt.carcare.database.contract.TripContract;
 import com.teamltt.carcare.fragment.MyObdResponseRecyclerViewAdapter;
 import com.teamltt.carcare.fragment.ObdResponseFragment;
 import com.teamltt.carcare.fragment.SimpleDividerItemDecoration;
@@ -125,17 +124,18 @@ public class HomeActivity extends AppCompatActivity implements IObserver, ObdRes
     public void update(IObservable o, Bundle args) {
         if (args != null && o instanceof DbHelper) {
             DbHelper dbHelper = (DbHelper) o;
-            long tripId = args.getLong(TripContract.TripEntry.COLUMN_NAME_ID);
+            long[] responseIds = args.getLongArray(ResponseContract.ResponseEntry.COLUMN_NAME_ID + "_ARRAY");
             SQLiteDatabase db = dbHelper.getReadableDatabase();
-            Cursor cursor = ResponseContract.queryByTripId(db, tripId);
+            Cursor cursor = ResponseContract.queryByIds(db, responseIds);
             List<ObdContent.ObdResponse> items = new ArrayList<>();
             while (cursor.moveToNext()) {
+                long id = cursor.getLong(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_ID));
                 String name = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_NAME));
                 String value = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_VALUE));
-                items.add(ObdContent.createItemWithResponse(items.size(), name, value));
+                items.add(ObdContent.createItemWithResponse(((Long) id).intValue(), name, value));
             }
             cursor.close();
-            ObdContent.setItems(items);
+            ObdContent.addItems(items);
             responseListAdapter.notifyDataSetChanged();
         }
     }

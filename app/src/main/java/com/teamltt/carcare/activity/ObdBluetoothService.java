@@ -257,6 +257,8 @@ public class ObdBluetoothService extends Service {
         long vehicleId = 1;
         long tripId;
 
+        Set<Long> newResponseIds = new HashSet<>();
+
         // a writable database connection.
         private SQLiteDatabase db;
 
@@ -306,8 +308,9 @@ public class ObdBluetoothService extends Service {
                             sendCommand.run(socket.getInputStream(), socket.getOutputStream());
                         }
 
-                        long rowId = ResponseContract.insert(db, tripId, sendCommand.getName(),
+                        long responseId = ResponseContract.insert(db, tripId, sendCommand.getName(),
                                 sendCommand.getCommandPID(), sendCommand.getFormattedResult());
+                        newResponseIds.add(responseId);
                         dbHelper.setChanged();
                     }
                     publishProgress();
@@ -323,9 +326,20 @@ public class ObdBluetoothService extends Service {
         @Override
         protected void onProgressUpdate(Void... ignore) {
             super.onProgressUpdate(ignore);
-            Bundle args = new Bundle();
-            args.putLong(TripContract.TripEntry.COLUMN_NAME_ID, tripId);
-            dbHelper.notifyObservers(args);
+            if (!newResponseIds.isEmpty()) {
+                Bundle args = new Bundle();
+                args.putLong(TripContract.TripEntry.COLUMN_NAME_ID, tripId);
+
+                // HACK because Java hates primitives
+                Long[] foo = newResponseIds.toArray(new Long[0]);
+                long[] bar = new long[foo.length];
+                for (int i = 0; i < foo.length; i++) {
+                    bar[i] = foo[i];
+                }
+                args.putLongArray(ResponseContract.ResponseEntry.COLUMN_NAME_ID + "_ARRAY", bar);
+                dbHelper.notifyObservers(args);
+                newResponseIds.clear();
+            }
         }
 
         protected void onPostExecute(Void ignore) {
