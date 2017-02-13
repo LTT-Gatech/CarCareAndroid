@@ -34,9 +34,13 @@ public class ObdContent {
 
     public static void setItems(List<ObdResponse> items) {
         ITEMS.clear();
-        ITEMS.addAll(items);
+        ITEM_MAP.clear();
+        addItems(items);
+    }
+
+    public static void addItems(List<ObdResponse> items) {
         for (ObdResponse item : items) {
-            ITEM_MAP.put(item.id, item);
+            addItem(item);
         }
     }
 
@@ -45,8 +49,8 @@ public class ObdContent {
         ITEM_MAP.put(item.id, item);
     }
 
-    public static ObdResponse createItemWithResponse(int position, String request, String response) {
-        return new ObdResponse(String.valueOf(position), request, response);
+    public static ObdResponse createItemWithResponse(int id, String request, String response) {
+        return new ObdResponse(String.valueOf(id), request, response);
     }
 
     public static class ObdResponse {
