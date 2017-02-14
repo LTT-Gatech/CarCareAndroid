@@ -36,7 +36,6 @@ import com.github.pires.obd.commands.engine.RuntimeCommand;
 import com.teamltt.carcare.adapter.IObdSocket;
 import com.teamltt.carcare.adapter.bluetooth.DeviceSocket;
 import com.teamltt.carcare.database.DbHelper;
-import com.teamltt.carcare.database.IObservable;
 import com.teamltt.carcare.database.IObserver;
 import com.teamltt.carcare.database.contract.ResponseContract;
 import com.teamltt.carcare.database.contract.TripContract;
@@ -125,7 +124,6 @@ public class ObdBluetoothService extends Service {
     /**
      * Activities wanting to use this service will bind with it, but it will also be started, so in the absence of
      * activities, data should still be logged.
-     *
      */
     @Override
     public IBinder onBind(Intent intent) {
@@ -140,14 +138,6 @@ public class ObdBluetoothService extends Service {
         dbObservers = new LinkedList<>();
         dbObservers.add(observer);
     }
-
-    public class ObdServiceBinder extends Binder {
-        ObdBluetoothService getService() {
-            // Return this instance of LocalService so clients can call public methods
-            return ObdBluetoothService.this;
-        }
-    }
-
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -376,4 +366,11 @@ public class ObdBluetoothService extends Service {
         }
 
     };
+
+    public class ObdServiceBinder extends Binder {
+        ObdBluetoothService getService() {
+            // Return this instance of LocalService so clients can call public methods
+            return ObdBluetoothService.this;
+        }
+    }
 }

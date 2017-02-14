@@ -44,24 +44,39 @@ import java.util.List;
 
 public class HomeActivity extends AppCompatActivity implements IObserver, ObdResponseFragment.OnListFragmentInteractionListener {
 
+    boolean bound = false;
+    // started in onCreate, bound in onStart, and unbound in onStop
+    private ObdBluetoothService btService;
+    private Intent btServiceIntent = new Intent(this, ObdBluetoothService.class);
     // Used to keep track of the items in the RecyclerView
     private RecyclerView.Adapter responseListAdapter;
+    private ServiceConnection mConnection = new ServiceConnection() {
 
-    ObdBluetoothService btService = null;
-    boolean bound;
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // Bound to the bluetooth service, cast binder and get service instance
+            ObdBluetoothService.ObdServiceBinder binder = (ObdBluetoothService.ObdServiceBinder) service;
+            btService = binder.getService();
+            btService.observeDatabase(HomeActivity.this);
+            bound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            bound = false;
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-
-        Intent intent = new Intent(this, ObdBluetoothService.class);
         // Stop any existing services, we don't need more than one running
-        stopService(intent); // is this immediate?
+        stopService(btServiceIntent); // is this immediate?
         // Now start the new service
-        startService(intent);
-        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        startService(btServiceIntent);
 
         // Set up the list for responses
         responseListAdapter = new MyObdResponseRecyclerViewAdapter(ObdContent.ITEMS, this);
@@ -75,76 +90,10 @@ public class HomeActivity extends AppCompatActivity implements IObserver, ObdRes
         }
     }
 
-//     This should be called somewhere so we can read the data into a graph
-//    AsyncTask<Void, String, Void> readTask = new AsyncTask<Void, String, Void>() {
-//        @Override
-//        protected Void doInBackground(Void... voids) {
-//            // Read from the database
-//            String[] projection = {
-//                    ResponseContract.ResponseEntry.COLUMN_NAME_NAME,
-//                    ResponseContract.ResponseEntry.COLUMN_NAME_VALUE,
-//            };
-//            String sortOrder =
-//                    ResponseContract.ResponseEntry.COLUMN_NAME_TIMESTAMP + " ASC";
-//
-//            Cursor cursor = db.query(
-//                    ResponseContract.ResponseEntry.TABLE_NAME,                     // The table to query
-//                    projection,                               // The columns to return
-//                    null,                                // The columns for the WHERE clause
-//                    null,                            // The values for the WHERE clause
-//                    null,                                     // don't group the rows
-//                    null,                                     // don't filter by row groups
-//                    sortOrder                                 // The sort order
-//            );
-//
-//            while(cursor.moveToNext()) {
-//                byte[] commandNameBytes = cursor.getBlob(
-//                        cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_NAME));
-//                String commandName = new String(commandNameBytes);
-//                byte[] valueBytes = cursor.getBlob(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_VALUE));
-//                String value = new String(valueBytes);
-//                publishProgress(commandName, value);
-//
-//            }
-//            cursor.close();
-//            return null;
-//        }
-//
-//        @Override
-//        public void onProgressUpdate(String... values) {
-//            int nextId = responseListAdapter.getItemCount() + 1;
-//            ObdContent.addItem(ObdContent.createItemWithResponse(nextId, values[0], values[1]));
-//            responseListAdapter.notifyDataSetChanged();
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Void aVoid) {
-//
-//        }
-//    };
-
     @Override
     public void onListFragmentInteraction(ObdContent.ObdResponse item) {
         Log.i("ObdResponse Card", item.toString());
     }
-
-    private ServiceConnection mConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName className,
-                                       IBinder service) {
-            // Bound to the bluetooth service, cast binder and get service instance
-            ObdBluetoothService.ObdServiceBinder binder = (ObdBluetoothService.ObdServiceBinder) service;
-            btService = binder.getService();
-            btService.observeDatabase((HomeActivity.this));
-            bound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            bound = false;
-        }
-    };
 
     @Override
     public void update(IObservable o, Bundle args) {
@@ -167,11 +116,19 @@ public class HomeActivity extends AppCompatActivity implements IObserver, ObdRes
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        if (!bound) {
+            bindService(btServiceIntent, mConnection, Context.BIND_AUTO_CREATE);
+        }
+    }
+
+    @Override
     protected void onStop() {
         super.onStop();
         // Unbind from the service
         if (bound) {
-            unbindService(mConnection); //TODO rebind in onContinue
+            unbindService(mConnection);
             bound = false;
         }
     }
