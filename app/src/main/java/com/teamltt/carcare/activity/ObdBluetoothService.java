@@ -36,12 +36,15 @@ import com.github.pires.obd.commands.engine.RuntimeCommand;
 import com.teamltt.carcare.adapter.IObdSocket;
 import com.teamltt.carcare.adapter.bluetooth.DeviceSocket;
 import com.teamltt.carcare.database.DbHelper;
+import com.teamltt.carcare.database.IObservable;
 import com.teamltt.carcare.database.IObserver;
 import com.teamltt.carcare.database.contract.ResponseContract;
 import com.teamltt.carcare.database.contract.TripContract;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -67,6 +70,7 @@ public class ObdBluetoothService extends Service {
      */
     private DbHelper dbHelper;
 
+    private List<IObserver> dbObservers;
 
     /**
      * Used to catch bluetooth status related events.
@@ -133,7 +137,8 @@ public class ObdBluetoothService extends Service {
      * @param observer An observer entity, like an Activity that shows data from the Response table
      */
     public void observeDatabase(IObserver observer) {
-        dbHelper.addObserver(observer);
+        dbObservers = new LinkedList<>();
+        dbObservers.add(observer);
     }
 
     public class ObdServiceBinder extends Binder {
@@ -251,7 +256,9 @@ public class ObdBluetoothService extends Service {
                 }
                 // Connect to the database
                 dbHelper = new DbHelper(ObdBluetoothService.this);
-//                db = dbHelper.getWritableDatabase();
+                for (IObserver observer :  dbObservers) {
+                    dbHelper.addObserver(observer);
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -261,8 +268,9 @@ public class ObdBluetoothService extends Service {
         @Override
         protected void onPostExecute(Void result) {
             // TODO Add user feedback with Messenger and Handler
-
-            queryTask.execute();
+            if (dbHelper != null) {
+                queryTask.execute();
+            }
         }
     };
 
