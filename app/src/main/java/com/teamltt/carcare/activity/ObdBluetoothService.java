@@ -25,6 +25,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
+import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -35,6 +36,7 @@ import com.github.pires.obd.commands.engine.RuntimeCommand;
 import com.teamltt.carcare.adapter.IObdSocket;
 import com.teamltt.carcare.adapter.bluetooth.DeviceSocket;
 import com.teamltt.carcare.database.DbHelper;
+import com.teamltt.carcare.database.IObserver;
 import com.teamltt.carcare.database.contract.ResponseContract;
 import com.teamltt.carcare.database.contract.TripContract;
 
@@ -53,6 +55,8 @@ public class ObdBluetoothService extends Service {
     private final String OBDII_NAME = "OBDII";
     // UUID that is required to talk to the OBD II adapter
     private UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    // Binder given to activities that use OBD data
+    private final IBinder binder = new ObdServiceBinder();
 
     private BluetoothDevice obdDevice = null;
     private BluetoothAdapter bluetoothAdapter;
@@ -115,14 +119,30 @@ public class ObdBluetoothService extends Service {
     };
 
     /**
-     * Activities wanting to use this service will register with it instead of binding, but in the absence of all
+     * Activities wanting to use this service will bind with it, but it will also be started, so in the absence of
      * activities, data should still be logged.
      *
      */
     @Override
     public IBinder onBind(Intent intent) {
-        throw new UnsupportedOperationException("This Service does not support binding.");
+        return binder;
     }
+
+    /**
+     * Registers an Observer with the database
+     * @param observer An observer entity, like an Activity that shows data from the Response table
+     */
+    public void observeDatabase(IObserver observer) {
+        dbHelper.addObserver(observer);
+    }
+
+    public class ObdServiceBinder extends Binder {
+        ObdBluetoothService getService() {
+            // Return this instance of LocalService so clients can call public methods
+            return ObdBluetoothService.this;
+        }
+    }
+
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {

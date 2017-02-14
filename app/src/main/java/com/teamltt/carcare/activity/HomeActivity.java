@@ -16,10 +16,14 @@
 
 package com.teamltt.carcare.activity;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -43,6 +47,9 @@ public class HomeActivity extends AppCompatActivity implements IObserver, ObdRes
     // Used to keep track of the items in the RecyclerView
     private RecyclerView.Adapter responseListAdapter;
 
+    ObdBluetoothService btService = null;
+    boolean bound;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +61,7 @@ public class HomeActivity extends AppCompatActivity implements IObserver, ObdRes
         stopService(intent); // is this immediate?
         // Now start the new service
         startService(intent);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 
         // Set up the list for responses
         responseListAdapter = new MyObdResponseRecyclerViewAdapter(ObdContent.ITEMS, this);
@@ -120,6 +128,24 @@ public class HomeActivity extends AppCompatActivity implements IObserver, ObdRes
         Log.i("ObdResponse Card", item.toString());
     }
 
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // Bound to the bluetooth service, cast binder and get service instance
+            ObdBluetoothService.ObdServiceBinder binder = (ObdBluetoothService.ObdServiceBinder) service;
+            btService = binder.getService();
+            btService.observeDatabase((HomeActivity.this));
+            bound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            bound = false;
+        }
+    };
+
     @Override
     public void update(IObservable o, Bundle args) {
         if (args != null && o instanceof DbHelper) {
@@ -137,6 +163,16 @@ public class HomeActivity extends AppCompatActivity implements IObserver, ObdRes
             cursor.close();
             ObdContent.addItems(items);
             responseListAdapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // Unbind from the service
+        if (bound) {
+            unbindService(mConnection); //TODO rebind in onContinue
+            bound = false;
         }
     }
 }
