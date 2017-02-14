@@ -23,7 +23,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Bundle;
@@ -42,8 +41,6 @@ import com.teamltt.carcare.database.contract.TripContract;
 
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -69,7 +66,7 @@ public class ObdBluetoothService extends Service {
      */
     private DbHelper dbHelper;
 
-    private List<IObserver> dbObservers;
+    private Set<IObserver> dbObservers = new HashSet<>();
 
     /**
      * Used to catch bluetooth status related events.
@@ -135,7 +132,6 @@ public class ObdBluetoothService extends Service {
      * @param observer An observer entity, like an Activity that shows data from the Response table
      */
     public void observeDatabase(IObserver observer) {
-        dbObservers = new LinkedList<>();
         dbObservers.add(observer);
     }
 
@@ -162,8 +158,7 @@ public class ObdBluetoothService extends Service {
                 // Gives the user a chance to reject Bluetooth privileges at this time
                 startActivity(enableBtIntent);
                 // goes to onActivityResult where requestCode == REQUEST_ENABLE_BT
-            }
-            else {
+            } else {
                 Log.i(TAG, "adapter enabled");
                 // If bluetooth is on, go ahead and use it
                 getObdDevice();
@@ -180,6 +175,7 @@ public class ObdBluetoothService extends Service {
         // release resources
         unregisterReceiver(discoveryReceiver);
         unregisterReceiver(bluetoothReceiver);
+        dbHelper.deleteObservers();
         Log.i(TAG, "service stopped");
     }
 
@@ -277,20 +273,6 @@ public class ObdBluetoothService extends Service {
 
         Set<Long> newResponseIds = new HashSet<>();
 
-        // a writable database connection.
-        private SQLiteDatabase db;
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            db = dbHelper.getWritableDatabase();
-            long status = DbHelper.errorChecks(db);
-            if (status < 0) {
-                Log.e(TAG, "error occurred with db when connecting: " + status);
-            }
-        }
-
-
         @Override
         protected Void doInBackground(Void... ignore) {
             try {
@@ -306,10 +288,7 @@ public class ObdBluetoothService extends Service {
 
                     if (!tripEstablished) {
                         tripEstablished = true;
-                        tripId = TripContract.createNewTrip(db, vehicleId);
-                        if (tripId < 0) {
-                            Log.e(TAG, "error occurred with the database when inserting: " + tripId);
-                        }
+                        dbHelper.createNewTrip(vehicleId, null, null);
                     }
 
                     Set<Class<? extends ObdCommand>> commands = new HashSet<>();
@@ -325,11 +304,11 @@ public class ObdBluetoothService extends Service {
                         } else {
                             sendCommand.run(socket.getInputStream(), socket.getOutputStream());
                         }
-
-                        long responseId = ResponseContract.insert(db, tripId, sendCommand.getName(),
+                        long responseId = dbHelper.insertResponse(tripId, sendCommand.getName(),
                                 sendCommand.getCommandPID(), sendCommand.getFormattedResult());
-                        newResponseIds.add(responseId);
-                        dbHelper.setChanged();
+                        if (responseId > DbHelper.DB_OK) {
+                            newResponseIds.add(responseId);
+                        }
                     }
                     publishProgress();
                 }
@@ -355,8 +334,8 @@ public class ObdBluetoothService extends Service {
                     bar[i] = foo[i];
                 }
                 args.putLongArray(ResponseContract.ResponseEntry.COLUMN_NAME_ID + "_ARRAY", bar);
-                dbHelper.notifyObservers(args);
                 newResponseIds.clear();
+                dbHelper.notifyObservers(args);
             }
         }
 

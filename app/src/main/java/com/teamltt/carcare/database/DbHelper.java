@@ -20,6 +20,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.teamltt.carcare.database.contract.OwnershipContract;
 import com.teamltt.carcare.database.contract.ResponseContract;
@@ -33,6 +34,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class DbHelper extends SQLiteOpenHelper implements IObservable {
+
+    private static final String TAG = "DbHelper";
 
     // errors are negative, ok is 0, anything else is positive.
     public static final long DB_ERROR_NULL = -6;
@@ -91,9 +94,38 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         }
     }
 
+    public static String convertDate(Date date) {
+        if (date == null) {
+            return null;
+        }
+        return sqlDateFormat.format(date);
+    }
+
     public static String now() {
         // set the format to sql date time
         return sqlDateFormat.format(new Date());
+    }
+
+    public long createNewTrip(long vehicleId, Date startTime, Date endTime) {
+        SQLiteDatabase db = getWritableDatabase();
+        long status = DbHelper.errorChecks(db);
+        if (status != DbHelper.DB_OK) {
+            return status;
+        }
+        status = TripContract.insert(db, vehicleId, startTime, endTime);
+        setChanged(status);
+        return status;
+    }
+
+    public long insertResponse(long tripId, String name, String pId, String value) {
+        SQLiteDatabase db = getWritableDatabase();
+        long status = DbHelper.errorChecks(db);
+        if (status != DbHelper.DB_OK) {
+            return status;
+        }
+        status = ResponseContract.insert(db, tripId, name, pId, value);
+        setChanged(status);
+        return status;
     }
 
     @Override
@@ -140,7 +172,11 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         changed = false;
     }
 
-    public void setChanged() {
-        changed = true;
+    protected void setChanged(long status) {
+        if (status > DB_OK) {
+            changed = true;
+        } else {
+            Log.e(TAG, "error occurred when writing: " + status);
+        }
     }
 }

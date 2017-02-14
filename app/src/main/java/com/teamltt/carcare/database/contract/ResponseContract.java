@@ -45,19 +45,15 @@ public class ResponseContract {
      * @param db      the writable db
      * @param tripId the trip_id from {@link TripContract.TripEntry}
      * @param name    the name of the command
-     * @param pid     the process id of the command
+     * @param pId     the process id of the command
      * @param value   the formatted result after the command returns
      * @return the new row id or a {@link DbHelper} error code
      */
-    public static long insert(SQLiteDatabase db, long tripId, String name, String pid, String value) {
-        long status = DbHelper.errorChecks(db);
-        if (status != DbHelper.DB_OK) {
-            return status;
-        }
+    public static long insert(SQLiteDatabase db, long tripId, String name, String pId, String value) {
         ContentValues values = new ContentValues();
         values.put(ResponseContract.ResponseEntry.COLUMN_NAME_TRIP_ID, tripId);
         values.put(ResponseContract.ResponseEntry.COLUMN_NAME_NAME, name);
-        values.put(ResponseContract.ResponseEntry.COLUMN_NAME_PID, pid);
+        values.put(ResponseContract.ResponseEntry.COLUMN_NAME_PID, pId);
         values.put(ResponseContract.ResponseEntry.COLUMN_NAME_VALUE, value);
         return db.insert(ResponseEntry.TABLE_NAME, null, values);
     }

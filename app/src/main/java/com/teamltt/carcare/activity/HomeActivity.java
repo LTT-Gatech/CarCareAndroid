@@ -21,7 +21,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
@@ -100,8 +99,7 @@ public class HomeActivity extends AppCompatActivity implements IObserver, ObdRes
         if (args != null && o instanceof DbHelper) {
             DbHelper dbHelper = (DbHelper) o;
             long[] responseIds = args.getLongArray(ResponseContract.ResponseEntry.COLUMN_NAME_ID + "_ARRAY");
-            SQLiteDatabase db = dbHelper.getReadableDatabase();
-            Cursor cursor = ResponseContract.queryByIds(db, responseIds);
+            Cursor cursor = ResponseContract.queryByIds(dbHelper.getReadableDatabase(), responseIds);
             List<ObdContent.ObdResponse> items = new ArrayList<>();
             while (cursor.moveToNext()) {
                 long id = cursor.getLong(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_ID));
