@@ -25,7 +25,7 @@ import java.util.Date;
 
 public class TripContract {
 
-    public static final String SQL_CREATE_ENTRIES = "CREATE TABLE " + TripEntry.COLUMN_NAME_ID + " (" +
+    public static final String SQL_CREATE_ENTRIES = "CREATE TABLE " + TripEntry.TABLE_NAME + " (" +
             // trip_id INTEGER PRIMARY KEY AUTOINCREMENT
             TripEntry.COLUMN_NAME_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
             // vehicle_id INTEGER REFERENCES vehicles(vehicle_id)

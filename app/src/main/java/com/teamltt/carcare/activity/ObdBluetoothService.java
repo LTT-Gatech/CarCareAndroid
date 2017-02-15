@@ -31,7 +31,9 @@ import android.util.Log;
 
 import com.github.pires.obd.commands.ObdCommand;
 import com.github.pires.obd.commands.SpeedCommand;
+import com.github.pires.obd.commands.engine.RPMCommand;
 import com.github.pires.obd.commands.engine.RuntimeCommand;
+import com.github.pires.obd.exceptions.NoDataException;
 import com.teamltt.carcare.adapter.IObdSocket;
 import com.teamltt.carcare.adapter.bluetooth.DeviceSocket;
 import com.teamltt.carcare.database.DbHelper;
@@ -69,6 +71,9 @@ public class ObdBluetoothService extends Service {
     private int numBound = 0;
 
     private Set<IObserver> dbObservers = new HashSet<>();
+
+    private boolean bluetoothReceiverRegistered = false;
+    private boolean discoveryReceiverRegistered = false;
 
     /**
      * Used to catch bluetooth status related events.
@@ -157,9 +162,11 @@ public class ObdBluetoothService extends Service {
         IntentFilter discoveryFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         discoveryFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         registerReceiver(discoveryReceiver, discoveryFilter);
+        discoveryReceiverRegistered = true;
 
         IntentFilter bluetoothFilter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
         registerReceiver(bluetoothReceiver, bluetoothFilter);
+        bluetoothReceiverRegistered = true;
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter != null) {
@@ -189,8 +196,12 @@ public class ObdBluetoothService extends Service {
     public void onDestroy() {
         // release resources
         Log.i(TAG, "onDestroy");
-        unregisterReceiver(discoveryReceiver);
-        unregisterReceiver(bluetoothReceiver);
+        if (discoveryReceiverRegistered) {
+            unregisterReceiver(discoveryReceiver);
+        }
+        if (bluetoothReceiverRegistered) {
+            unregisterReceiver(bluetoothReceiver);
+        }
         dbHelper.deleteObservers();
     }
 
@@ -249,13 +260,23 @@ public class ObdBluetoothService extends Service {
         protected Void doInBackground(Void... params) {
             try {
                 // Android advises to cancel discovery before using socket.connect()
-                if (bluetoothAdapter.isEnabled() && bluetoothAdapter.isDiscovering()
-                        && bluetoothAdapter.cancelDiscovery()) {
-                    // connect if discovery successfully canceled
-                    socket.connect();
+                if (bluetoothAdapter.isEnabled()) {
+                    if (!bluetoothAdapter.isDiscovering() || bluetoothAdapter.cancelDiscovery()) {
+                        // if it is not discovering or it is discovering and succesffully canceled
+                        socket.connect();
+                    } else {
+                        Log.e(TAG, "could not cancel discovery");
+                    }
                 } else {
-                    Log.e(TAG, "could not cancel discovery");
+                    Log.e(TAG, "bluetooth not enabled");
                 }
+//                if (bluetoothAdapter.isEnabled() && bluetoothAdapter.isDiscovering()
+//                        && bluetoothAdapter.cancelDiscovery()) {
+//                    // connect if discovery successfully canceled
+//                    socket.connect();
+//                } else {
+//                    Log.e(TAG, "could not cancel discovery");
+//                }
                 for (IObserver observer :  dbObservers) {
                     dbHelper.addObserver(observer);
                 }
@@ -294,11 +315,15 @@ public class ObdBluetoothService extends Service {
             try {
                 while (socket.isConnected()) {
                     // Check for can's "heartbeat"
-                    ObdCommand heartbeat = new RuntimeCommand();
+                    ObdCommand heartbeat = new RPMCommand();
                     while (true) {
-                        heartbeat.run(socket.getInputStream(), socket.getOutputStream());
-                        if (Integer.parseInt(heartbeat.getFormattedResult()) > 0) {
-                            break;
+                        try {
+                            heartbeat.run(socket.getInputStream(), socket.getOutputStream());
+                            if (Integer.parseInt(heartbeat.getCalculatedResult()) > 0) {
+                                break;
+                            }
+                        } catch (NoDataException e) {
+                            e.printStackTrace();
                         }
                     }
 
