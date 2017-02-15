@@ -41,7 +41,7 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
     public static final long DB_ERROR_NULL = -6;
     public static final long DB_ERROR_NOT_OPEN = -5;
     public static final long DB_ERROR_READ_ONLY = -4;
-    public static final long DB_WRITE_ERROR = -1; // from SQLiteDatabase if there an error occurred
+    public static final long DB_WRITE_ERROR = -1; // from SQLiteDatabase if an error occurred
     public static final long DB_OK = 0;
 
     public static final int DATABASE_VERSION = 1;
@@ -82,7 +82,7 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         onUpgrade(db, oldVersion, newVersion);
     }
 
-    public static long errorChecks(SQLiteDatabase db) {
+    private static long errorChecks(SQLiteDatabase db) {
         if (db == null) {
             return DB_ERROR_NULL;
         } else if (!db.isOpen()) {
@@ -168,11 +168,11 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         notifyObservers(null);
     }
 
-    protected void clearChanged() {
+    private void clearChanged() {
         changed = false;
     }
 
-    protected void setChanged(long status) {
+    private void setChanged(long status) {
         if (status > DB_OK) {
             changed = true;
         } else {

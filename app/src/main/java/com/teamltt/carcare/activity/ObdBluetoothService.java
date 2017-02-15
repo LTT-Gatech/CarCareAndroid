@@ -254,6 +254,8 @@ public class ObdBluetoothService extends Service {
         @Override
         protected void onPostExecute(Void result) {
             // TODO Add user feedback with Messenger and Handler
+            // change R.id.status_bt to display connected
+            Log.i(TAG, "bluetooth connected");
             if (dbHelper != null) {
                 queryTask.execute();
             }
@@ -311,6 +313,7 @@ public class ObdBluetoothService extends Service {
                         }
                     }
                     publishProgress();
+                    Thread.sleep(1000);
                 }
             } catch (IOException | InterruptedException | IllegalAccessException | InstantiationException e) {
                 e.printStackTrace();

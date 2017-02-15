@@ -27,6 +27,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 
 import com.teamltt.carcare.R;
 import com.teamltt.carcare.database.DbHelper;
@@ -43,12 +45,15 @@ import java.util.List;
 
 public class HomeActivity extends AppCompatActivity implements IObserver, ObdResponseFragment.OnListFragmentInteractionListener {
 
+    private static final String TAG = "HomeActivity";
+
     boolean bound = false;
     // started in onCreate, bound in onStart, and unbound in onStop
     private ObdBluetoothService btService;
     private Intent btServiceIntent = new Intent(this, ObdBluetoothService.class);
     // Used to keep track of the items in the RecyclerView
     private RecyclerView.Adapter responseListAdapter;
+    private TextView mStatusTextView;
     private ServiceConnection mConnection = new ServiceConnection() {
 
         @Override
@@ -77,6 +82,11 @@ public class HomeActivity extends AppCompatActivity implements IObserver, ObdRes
         // Now start the new service
         startService(btServiceIntent);
 
+        mStatusTextView = (TextView) findViewById(R.id.status_bt);
+        if (mStatusTextView != null) {
+            mStatusTextView.setText(R.string.connecting_bt);
+        }
+
         // Set up the list for responses
         responseListAdapter = new MyObdResponseRecyclerViewAdapter(ObdContent.ITEMS, this);
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.obd_reponse_list);
@@ -91,7 +101,7 @@ public class HomeActivity extends AppCompatActivity implements IObserver, ObdRes
 
     @Override
     public void onListFragmentInteraction(ObdContent.ObdResponse item) {
-        Log.i("ObdResponse Card", item.toString());
+        Log.i(TAG, item.toString());
     }
 
     @Override
@@ -129,5 +139,14 @@ public class HomeActivity extends AppCompatActivity implements IObserver, ObdRes
             unbindService(mConnection);
             bound = false;
         }
+    }
+
+    /**
+     * From the android:onClick parameter of R.id.readData in R.layout.activity_home
+     *
+     * @param view the R.id.readData button
+     */
+    public void readData(View view) {
+        Log.i(TAG, "readData");
     }
 }
