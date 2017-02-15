@@ -261,22 +261,16 @@ public class ObdBluetoothService extends Service {
             try {
                 // Android advises to cancel discovery before using socket.connect()
                 if (bluetoothAdapter.isEnabled()) {
-                    if (!bluetoothAdapter.isDiscovering() || bluetoothAdapter.cancelDiscovery()) {
-                        // if it is not discovering or it is discovering and succesffully canceled
-                        socket.connect();
-                    } else {
-                        Log.e(TAG, "could not cancel discovery");
+
+                    if (bluetoothAdapter.isDiscovering()) {
+                        // Return value of cancelDiscovery will always be true here because bluetoothAdapter.isEnabled() is true
+                        bluetoothAdapter.cancelDiscovery();
                     }
+                    socket.connect();
                 } else {
-                    Log.e(TAG, "bluetooth not enabled");
+                    Log.i(TAG, "Bluetooth is not on");
                 }
-//                if (bluetoothAdapter.isEnabled() && bluetoothAdapter.isDiscovering()
-//                        && bluetoothAdapter.cancelDiscovery()) {
-//                    // connect if discovery successfully canceled
-//                    socket.connect();
-//                } else {
-//                    Log.e(TAG, "could not cancel discovery");
-//                }
+
                 for (IObserver observer :  dbObservers) {
                     dbHelper.addObserver(observer);
                 }
@@ -317,13 +311,10 @@ public class ObdBluetoothService extends Service {
                     // Check for can's "heartbeat"
                     ObdCommand heartbeat = new RPMCommand();
                     while (true) {
-                        try {
-                            heartbeat.run(socket.getInputStream(), socket.getOutputStream());
-                            if (Integer.parseInt(heartbeat.getCalculatedResult()) > 0) {
-                                break;
-                            }
-                        } catch (NoDataException e) {
-                            e.printStackTrace();
+                        heartbeat.run(socket.getInputStream(), socket.getOutputStream()); // todo catch nodata exception
+                        String rpm = heartbeat.getCalculatedResult();
+                        if (Integer.parseInt(rpm) > 0) {
+                            break;
                         }
                     }
 
@@ -384,6 +375,7 @@ public class ObdBluetoothService extends Service {
         protected void onPostExecute(Void ignore) {
             // TODO Tell the user the socket was disconnected or there was another exception
             // Also give them a way to reconnect it
+            Log.i(TAG, "query task on post execute");
         }
 
     };
