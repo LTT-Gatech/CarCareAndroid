@@ -90,16 +90,11 @@ public class ResponseContract {
                 ResponseEntry.COLUMN_NAME_PID,
                 ResponseEntry.COLUMN_NAME_VALUE
         };
-        String selection = ResponseEntry.COLUMN_NAME_ID + " IN (";
+        String selection = DbHelper.inClauseBuilder(ResponseEntry.COLUMN_NAME_ID, rowIds.length);
         String[] selectionArgs = new String[rowIds.length];
         for (int i = 0; i < rowIds.length; i++) {
             selectionArgs[i] = Long.toString(rowIds[i]);
-            if (i != 0) {
-                selection += ",";
-            }
-            selection += "?";
         }
-        selection += ")";
         Log.i(TAG, "printing selection, selectionArgs. assertTrue(num(?) == selectionArgs.length)");
         Log.i(TAG, selection);
         Log.i(TAG, Arrays.toString(selectionArgs));

@@ -106,6 +106,21 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         return sqlDateFormat.format(new Date());
     }
 
+    public static String inClauseBuilder(String column, int numArgs) {
+        // length will be length of column plus 5 characters " IN (" plus numArgs of "?" plus
+        // numArgs of "," - 1 plus 1 for closing parentheses.
+        StringBuilder res = new StringBuilder(column.length() + 5 + numArgs * 2);
+        res.append(column).append(" IN (");
+        for (int i = 0; i < numArgs; i++) {
+            if (i != 0) {
+                res.append(',');
+            }
+            res.append('?');
+        }
+        res.append(')');
+        return res.toString();
+    }
+
     public long createNewTrip(long vehicleId, Date startTime, Date endTime) {
         SQLiteDatabase db = getWritableDatabase();
         long status = DbHelper.errorChecks(db);
