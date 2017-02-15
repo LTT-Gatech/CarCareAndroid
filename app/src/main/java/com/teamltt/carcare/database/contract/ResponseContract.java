@@ -19,10 +19,15 @@ package com.teamltt.carcare.database.contract;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.teamltt.carcare.database.DbHelper;
 
+import java.util.Arrays;
+
 public class ResponseContract {
+
+    private static final String TAG = "ResponseContract";
 
     public static final String SQL_CREATE_ENTRIES = "CREATE TABLE " + ResponseEntry.TABLE_NAME + " (" +
             // response_id INTEGER PRIMARY KEY AUTOINCREMENT
@@ -85,11 +90,19 @@ public class ResponseContract {
                 ResponseEntry.COLUMN_NAME_PID,
                 ResponseEntry.COLUMN_NAME_VALUE
         };
-        String selection = ResponseEntry.COLUMN_NAME_ID + " = ?";
+        String selection = ResponseEntry.COLUMN_NAME_ID + " IN (";
         String[] selectionArgs = new String[rowIds.length];
         for (int i = 0; i < rowIds.length; i++) {
             selectionArgs[i] = Long.toString(rowIds[i]);
+            if (i != 0) {
+                selection += ",";
+            }
+            selection += "?";
         }
+        selection += ")";
+        Log.i(TAG, "printing selection, selectionArgs. assertTrue(num(?) == selectionArgs.length)");
+        Log.i(TAG, selection);
+        Log.i(TAG, Arrays.toString(selectionArgs));
         String orderBy = ResponseEntry.COLUMN_NAME_TIMESTAMP + " ASC";
 
         return db.query(table, columns, selection, selectionArgs, null, null, orderBy);
