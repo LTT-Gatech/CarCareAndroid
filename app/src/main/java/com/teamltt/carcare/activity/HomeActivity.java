@@ -50,7 +50,7 @@ public class HomeActivity extends AppCompatActivity implements IObserver, ObdRes
     boolean bound = false;
     // started in onCreate, bound in onStart, and unbound in onStop
     private ObdBluetoothService btService;
-    private Intent btServiceIntent = new Intent(this, ObdBluetoothService.class);
+    private Intent btServiceIntent;
     // Used to keep track of the items in the RecyclerView
     private RecyclerView.Adapter responseListAdapter;
     private TextView mStatusTextView;
@@ -76,6 +76,8 @@ public class HomeActivity extends AppCompatActivity implements IObserver, ObdRes
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+        btServiceIntent = new Intent(this, ObdBluetoothService.class);
 
         // Stop any existing services, we don't need more than one running
         stopService(btServiceIntent); // is this immediate?

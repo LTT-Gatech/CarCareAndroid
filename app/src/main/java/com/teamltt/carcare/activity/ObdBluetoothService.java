@@ -66,6 +66,8 @@ public class ObdBluetoothService extends Service {
      */
     private DbHelper dbHelper;
 
+    private int numBound = 0;
+
     private Set<IObserver> dbObservers = new HashSet<>();
 
     /**
@@ -124,7 +126,16 @@ public class ObdBluetoothService extends Service {
      */
     @Override
     public IBinder onBind(Intent intent) {
+        numBound++;
+        Log.i(TAG, "onBind " + numBound);
         return binder;
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        numBound--;
+        Log.i(TAG, "onUnbind " + numBound);
+        return super.onUnbind(intent);
     }
 
     /**
@@ -137,7 +148,11 @@ public class ObdBluetoothService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.i(TAG, "service started");
+        Log.i(TAG, "onStartCommand");
+
+        // Connect to the database
+        dbHelper = new DbHelper(ObdBluetoothService.this);
+
         // Register the BroadcastReceiver
         IntentFilter discoveryFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         discoveryFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
@@ -173,10 +188,10 @@ public class ObdBluetoothService extends Service {
     @Override
     public void onDestroy() {
         // release resources
+        Log.i(TAG, "onDestroy");
         unregisterReceiver(discoveryReceiver);
         unregisterReceiver(bluetoothReceiver);
         dbHelper.deleteObservers();
-        Log.i(TAG, "service stopped");
     }
 
     /**
@@ -234,14 +249,13 @@ public class ObdBluetoothService extends Service {
         protected Void doInBackground(Void... params) {
             try {
                 // Android advises to cancel discovery before using socket.connect()
-                if (bluetoothAdapter.cancelDiscovery()) {
+                if (bluetoothAdapter.isEnabled() && bluetoothAdapter.isDiscovering()
+                        && bluetoothAdapter.cancelDiscovery()) {
                     // connect if discovery successfully canceled
                     socket.connect();
                 } else {
                     Log.e(TAG, "could not cancel discovery");
                 }
-                // Connect to the database
-                dbHelper = new DbHelper(ObdBluetoothService.this);
                 for (IObserver observer :  dbObservers) {
                     dbHelper.addObserver(observer);
                 }
