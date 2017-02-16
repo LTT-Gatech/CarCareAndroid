@@ -17,6 +17,7 @@
 package com.teamltt.carcare.database;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
@@ -27,10 +28,13 @@ import com.teamltt.carcare.database.contract.ResponseContract;
 import com.teamltt.carcare.database.contract.TripContract;
 import com.teamltt.carcare.database.contract.UserContract;
 import com.teamltt.carcare.database.contract.VehicleContract;
+import com.teamltt.carcare.model.ObdContent;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class DbHelper extends SQLiteOpenHelper implements IObservable {
@@ -130,6 +134,31 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         status = TripContract.insert(db, vehicleId, startTime, endTime);
         setChanged(status);
         return status;
+    }
+
+    public List<Long> getAllTripIds() {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = TripContract.queryAll(db);
+        List<Long> tripIds = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            tripIds.add(cursor.getLong(cursor.getColumnIndexOrThrow(TripContract.TripEntry.COLUMN_NAME_ID)));
+        }
+        cursor.close();
+        return tripIds;
+    }
+
+    public List<ObdContent.ObdResponse> getResponsesByTrip(long tripId) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = ResponseContract.queryByTripId(db, tripId);
+        List<ObdContent.ObdResponse> responses = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            long id = cursor.getLong(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_ID));
+            String name = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_NAME));
+            String value = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_VALUE));
+            responses.add(ObdContent.createItemWithResponse(((Long) id).intValue(), name, value));
+        }
+        cursor.close();
+        return responses;
     }
 
     public long insertResponse(long tripId, String name, String pId, String value) {

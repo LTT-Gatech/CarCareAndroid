@@ -1,0 +1,102 @@
+/*
+ * Copyright 2017, Team LTT
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.teamltt.carcare.activity;
+
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+
+import com.teamltt.carcare.R;
+import com.teamltt.carcare.database.DbHelper;
+import com.teamltt.carcare.fragment.MyObdResponseRecyclerViewAdapter;
+import com.teamltt.carcare.fragment.ObdResponseFragment;
+import com.teamltt.carcare.fragment.SimpleDividerItemDecoration;
+import com.teamltt.carcare.model.ObdContent;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class TripsActivity extends AppCompatActivity implements ObdResponseFragment.OnListFragmentInteractionListener {
+
+    private static final String TAG = "TripsActivity";
+
+    private DbHelper dbHelper;
+
+    private Spinner spinner;
+    private List<Long> trips;
+    private ArrayAdapter<Long> spinnerAdapter;
+
+    // Used to keep track of the items in the RecyclerView
+    private RecyclerView.Adapter responseListAdapter;
+    private List<ObdContent.ObdResponse> responses;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_trips);
+        spinner = (Spinner) findViewById(R.id.tripsSpinner);
+        trips = new ArrayList<>();
+        spinnerAdapter = new ArrayAdapter<Long>(this, android.R.layout.simple_spinner_item, trips);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(spinnerAdapter);
+
+        responses = new ArrayList<>();
+        // Set up the list for responses
+        responseListAdapter = new MyObdResponseRecyclerViewAdapter(responses, this);
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.obd_reponse_list);
+        if (recyclerView != null) {
+            recyclerView.setHasFixedSize(true);
+            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+            recyclerView.setLayoutManager(layoutManager);
+            recyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
+            recyclerView.setAdapter(responseListAdapter);
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        dbHelper = new DbHelper(this);
+        trips.clear();
+        trips.addAll(dbHelper.getAllTripIds());
+        spinnerAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        dbHelper.close();
+    }
+
+    @Override
+    public void onListFragmentInteraction(ObdContent.ObdResponse item) {
+        Log.i(TAG, item.toString());
+    }
+
+    public void readData(View view) {
+        Log.i(TAG, "readData");
+        long tripId = trips.get(spinner.getSelectedItemPosition());
+        responses.clear();
+        responses.addAll(dbHelper.getResponsesByTrip(tripId));
+        responseListAdapter.notifyDataSetChanged();
+    }
+}

@@ -33,7 +33,6 @@ import com.github.pires.obd.commands.ObdCommand;
 import com.github.pires.obd.commands.SpeedCommand;
 import com.github.pires.obd.commands.engine.RPMCommand;
 import com.github.pires.obd.commands.engine.RuntimeCommand;
-import com.github.pires.obd.exceptions.NoDataException;
 import com.teamltt.carcare.adapter.IObdSocket;
 import com.teamltt.carcare.adapter.bluetooth.DeviceSocket;
 import com.teamltt.carcare.database.DbHelper;
@@ -202,7 +201,10 @@ public class ObdBluetoothService extends Service {
         if (bluetoothReceiverRegistered) {
             unregisterReceiver(bluetoothReceiver);
         }
-        dbHelper.deleteObservers();
+        if (dbHelper != null) {
+            dbHelper.deleteObservers();
+            dbHelper.close();
+        }
     }
 
     /**
@@ -271,7 +273,7 @@ public class ObdBluetoothService extends Service {
                     Log.i(TAG, "Bluetooth is not on");
                 }
 
-                for (IObserver observer :  dbObservers) {
+                for (IObserver observer : dbObservers) {
                     dbHelper.addObserver(observer);
                 }
             } catch (IOException e) {
@@ -311,7 +313,7 @@ public class ObdBluetoothService extends Service {
                     // Check for can's "heartbeat"
                     ObdCommand heartbeat = new RPMCommand();
                     while (true) {
-                        heartbeat.run(socket.getInputStream(), socket.getOutputStream()); // todo catch nodata exception
+                        heartbeat.run(socket.getInputStream(), socket.getOutputStream()); // TODO catch NoDataException
                         String rpm = heartbeat.getCalculatedResult();
                         if (Integer.parseInt(rpm) > 0) {
                             break;
@@ -320,7 +322,10 @@ public class ObdBluetoothService extends Service {
 
                     if (!tripEstablished) {
                         tripEstablished = true;
-                        dbHelper.createNewTrip(vehicleId, null, null);
+                        tripId = dbHelper.createNewTrip(vehicleId, null, null);
+                        if (!(tripId > DbHelper.DB_OK)) {
+                            Log.e(TAG, "could not create a trip");
+                        }
                     }
 
                     Set<Class<? extends ObdCommand>> commands = new HashSet<>();
@@ -330,11 +335,11 @@ public class ObdBluetoothService extends Service {
 
                     for (Class<? extends ObdCommand> commandClass : commands) {
                         ObdCommand sendCommand = commandClass.newInstance();
-                        if (!socket.isConnected()) {
+                        if (socket.isConnected()) {
+                            sendCommand.run(socket.getInputStream(), socket.getOutputStream());
+                        } else {
                             // In case the Bluetooth connection breaks suddenly
                             break;
-                        } else {
-                            sendCommand.run(socket.getInputStream(), socket.getOutputStream());
                         }
                         long responseId = dbHelper.insertResponse(tripId, sendCommand.getName(),
                                 sendCommand.getCommandPID(), sendCommand.getFormattedResult());

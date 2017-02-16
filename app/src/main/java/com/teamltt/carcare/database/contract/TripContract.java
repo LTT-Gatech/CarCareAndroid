@@ -17,6 +17,7 @@
 package com.teamltt.carcare.database.contract;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.teamltt.carcare.database.DbHelper;
@@ -24,6 +25,8 @@ import com.teamltt.carcare.database.DbHelper;
 import java.util.Date;
 
 public class TripContract {
+
+    private static final String TAG = "TripContract";
 
     public static final String SQL_CREATE_ENTRIES = "CREATE TABLE " + TripEntry.TABLE_NAME + " (" +
             // trip_id INTEGER PRIMARY KEY AUTOINCREMENT
@@ -36,6 +39,19 @@ public class TripContract {
             ");";
 
     public static final String SQL_DROP_ENTRIES = "DROP TABLE IF EXISTS " + TripEntry.TABLE_NAME;
+
+    public static Cursor queryAll(SQLiteDatabase db) {
+        String table = TripEntry.TABLE_NAME;
+        String[] columns = {
+                TripEntry.COLUMN_NAME_ID,
+                TripEntry.COLUMN_NAME_VEHICLE_ID,
+                TripEntry.COLUMN_NAME_START_TIME,
+                TripEntry.COLUMN_NAME_END_TIME
+        };
+        String orderBy = TripEntry.COLUMN_NAME_ID + " ASC";
+
+        return db.query(true, table, columns, null, null, null, null, orderBy, null);
+    }
 
     public static long insert(SQLiteDatabase db, long vehicleId, Date startTime, Date endTime) {
         ContentValues values = new ContentValues();
