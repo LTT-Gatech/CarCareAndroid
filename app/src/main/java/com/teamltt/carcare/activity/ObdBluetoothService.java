@@ -33,6 +33,7 @@ import com.github.pires.obd.commands.ObdCommand;
 import com.github.pires.obd.commands.SpeedCommand;
 import com.github.pires.obd.commands.engine.RPMCommand;
 import com.github.pires.obd.commands.engine.RuntimeCommand;
+import com.teamltt.carcare.R;
 import com.teamltt.carcare.adapter.IObdSocket;
 import com.teamltt.carcare.adapter.bluetooth.DeviceSocket;
 import com.teamltt.carcare.database.DbHelper;
@@ -42,6 +43,8 @@ import com.teamltt.carcare.database.contract.TripContract;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -74,6 +77,8 @@ public class ObdBluetoothService extends Service {
     private boolean bluetoothReceiverRegistered = false;
     private boolean discoveryReceiverRegistered = false;
 
+    private List<BtStatusDisplay> btActivities;
+
     /**
      * Used to catch bluetooth status related events.
      * Relies on the Android Manifest including android.bluetooth.adapter.action.STATE_CHANGED in a receiver tag
@@ -89,6 +94,7 @@ public class ObdBluetoothService extends Service {
                 switch (state){
                     case BluetoothAdapter.STATE_ON:
                         //Indicates the local Bluetooth adapter is on, and ready for use.
+                        sendToDisplays(getString(R.string.connecting_bt));
                         getObdDevice();
                         break;
 
@@ -117,12 +123,18 @@ public class ObdBluetoothService extends Service {
                 }
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 Log.i(TAG, "discovery unsuccessful");
-                // UI message connectButton.setText(R.string.retry_connect);
+                sendToDisplays(getString(R.string.retry_connect));
             } else if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
                 Log.i(TAG, "discovery started");
             }
         }
     };
+
+    @Override
+    public void onCreate(){
+        super.onCreate();
+        btActivities = new LinkedList<>();
+    }
 
     /**
      * Activities wanting to use this service will bind with it, but it will also be started, so in the absence of
@@ -169,8 +181,6 @@ public class ObdBluetoothService extends Service {
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter != null) {
-            // Do not try to connect if the device is already trying to or if our socket is open
-
             if (!bluetoothAdapter.isEnabled()) {
                 Log.i(TAG, "requesting to enable BT");
 
@@ -233,10 +243,10 @@ public class ObdBluetoothService extends Service {
             if (bluetoothAdapter.startDiscovery()) {
                 // Control goes to bluetoothReceiver member variable
                 Log.i(TAG, "discovery started");
-                // UI message connectButton.setText(R.string.discovering);
+                sendToDisplays(getString(R.string.discovering));
             } else {
                 Log.i(TAG, "discovery not started");
-                // UI message connectButton.setText(R.string.permission_fail_bt);
+                sendToDisplays(getString(R.string.permission_fail_bt));
             }
         }
     }
@@ -245,8 +255,7 @@ public class ObdBluetoothService extends Service {
         Log.i(TAG, "trying socket creation");
         try {
             socket = new DeviceSocket(obdDevice.createRfcommSocketToServiceRecord(uuid));
-            // UI message connectButton.setText(R.string.connecting_bt);
-
+            sendToDisplays(getString(R.string.connecting_bt));
             connectTask.execute();
 
         } catch (IOException e) {
@@ -287,8 +296,10 @@ public class ObdBluetoothService extends Service {
             // TODO Add user feedback with Messenger and Handler
             // change R.id.status_bt to display connected
             Log.i(TAG, "bluetooth connected");
-            if (dbHelper != null) {
+            if (dbHelper != null && socket.isConnected()) {
                 queryTask.execute();
+            } else {
+                sendToDisplays(getString(R.string.retry_connect));
             }
         }
     };
@@ -384,6 +395,23 @@ public class ObdBluetoothService extends Service {
         }
 
     };
+
+    /**
+     * Keeps track of actvities binding to the service so this service can update them on state.
+     */
+    public void addDisplay(BtStatusDisplay btActivity) {
+        btActivities.add(btActivity);
+    }
+
+    /**
+     * Calls displayStatus on all listening activities
+     * @param status the current adapter state
+     */
+    private void sendToDisplays(String status) {
+        for(BtStatusDisplay display : btActivities) {
+            display.displayStatus(status);
+        }
+    }
 
     public class ObdServiceBinder extends Binder {
         ObdBluetoothService getService() {

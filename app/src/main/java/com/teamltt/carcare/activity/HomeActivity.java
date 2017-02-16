@@ -43,7 +43,7 @@ import com.teamltt.carcare.model.ObdContent;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeActivity extends AppCompatActivity implements IObserver, ObdResponseFragment.OnListFragmentInteractionListener {
+public class HomeActivity extends AppCompatActivity implements BtStatusDisplay, IObserver, ObdResponseFragment.OnListFragmentInteractionListener {
 
     private static final String TAG = "HomeActivity";
 
@@ -63,6 +63,7 @@ public class HomeActivity extends AppCompatActivity implements IObserver, ObdRes
             ObdBluetoothService.ObdServiceBinder binder = (ObdBluetoothService.ObdServiceBinder) service;
             btService = binder.getService();
             btService.observeDatabase(HomeActivity.this);
+            btService.addDisplay(HomeActivity.this);
             bound = true;
         }
 
@@ -150,5 +151,13 @@ public class HomeActivity extends AppCompatActivity implements IObserver, ObdRes
      */
     public void readData(View view) {
         Log.i(TAG, "readData");
+    }
+
+    @Override
+    public void displayStatus(String status) {
+        mStatusTextView = (TextView) findViewById(R.id.status_bt);
+        if (mStatusTextView != null) {
+            mStatusTextView.setText(status);
+        }
     }
 }
