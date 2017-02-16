@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="supported_commands">
+        <item>Reset</item>
+        <item>Echo Off</item>
+        <item>Line Feed Off</item>
+        <item>Timeout</item>
+        <item>Set Protocol</item>
+        <item>RPM</item>
+        <item>Pending Trouble Codes</item>
+        <item>Engine Coolant Temp</item>
+        <item>Vehicle Speed</item>
+        <item>Intake Air Temp</item>
+        <item>Current Engine Runtime</item>
+    </string-array>
+</resources>
