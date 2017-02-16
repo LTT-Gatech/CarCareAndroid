@@ -48,6 +48,7 @@ import com.teamltt.carcare.database.DbHelper;
 import com.teamltt.carcare.database.IObservable;
 import com.teamltt.carcare.database.IObserver;
 import com.teamltt.carcare.database.contract.ResponseContract;
+import com.teamltt.carcare.database.contract.VehicleContract;
 import com.teamltt.carcare.fragment.MyObdResponseRecyclerViewAdapter;
 import com.teamltt.carcare.fragment.ObdResponseFragment;
 import com.teamltt.carcare.fragment.SimpleDividerItemDecoration;
@@ -66,6 +67,7 @@ public class HomeActivity extends AppCompatActivity implements IObserver, ObdRes
 
     ObdBluetoothService btService = null;
     boolean bound;
+    SQLiteDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,11 +92,16 @@ public class HomeActivity extends AppCompatActivity implements IObserver, ObdRes
             recyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
             recyclerView.setAdapter(responseListAdapter);
         }
+
+        DbHelper dbHelper = new DbHelper(HomeActivity.this);
+        db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.query(ResponseContract.ResponseEntry.TABLE_NAME, null, null, null, null, null,null);
         //placeholder table making code
+
         TableLayout table = (TableLayout) findViewById(R.id.table);
 
         TableRow tr = new TableRow(this);
-        tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+        tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
         TextView tv = new TextView(this);
         tv.setText("R1Col1");
 
@@ -221,7 +228,7 @@ public class HomeActivity extends AppCompatActivity implements IObserver, ObdRes
         Intent intent = new Intent(this, DemoActivity.class);
         startActivity(intent);
     }
-    protected void goToStatoc(View view) {
+    protected void goToStatic(View view) {
         Intent intent = new Intent(this, DemoActivity.class);
         startActivity(intent);
     }

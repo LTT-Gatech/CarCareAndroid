@@ -19,8 +19,6 @@
         android:theme="@style/AppTheme">
 
 
-        <activity android:name=".HomeActivity"/>
-
         <activity android:name=".activity.DemoActivity"/>
 
         <activity android:name=".activity.HomeActivity">
