@@ -55,7 +55,7 @@ public class TripsActivity extends AppCompatActivity implements ObdResponseFragm
         setContentView(R.layout.activity_trips);
         spinner = (Spinner) findViewById(R.id.tripsSpinner);
         trips = new ArrayList<>();
-        spinnerAdapter = new ArrayAdapter<Long>(this, android.R.layout.simple_spinner_item, trips);
+        spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, trips);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(spinnerAdapter);
 
