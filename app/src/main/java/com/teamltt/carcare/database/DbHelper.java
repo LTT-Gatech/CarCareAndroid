@@ -1,5 +1,4 @@
 /*
-<<<<<<< HEAD
  * Copyright 2017, Team LTT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,21 +12,6 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-=======
- ** Copyright 2017, Team LTT
- **
- ** Licensed under the Apache License, Version 2.0 (the "License");
- ** you may not use this file except in compliance with the License.
- ** You may obtain a copy of the License at
- **
- **     http://www.apache.org/licenses/LICENSE-2.0
- **
- ** Unless required by applicable law or agreed to in writing, software
- ** distributed under the License is distributed on an "AS IS" BASIS,
- ** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- ** See the License for the specific language governing permissions and
- ** limitations under the License.
->>>>>>> giuliano/dev
  */
 
 package com.teamltt.carcare.database;
@@ -38,12 +22,14 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.util.Log;
+
 import com.teamltt.carcare.database.contract.OwnershipContract;
 import com.teamltt.carcare.database.contract.ResponseContract;
 import com.teamltt.carcare.database.contract.TripContract;
 import com.teamltt.carcare.database.contract.UserContract;
 import com.teamltt.carcare.database.contract.VehicleContract;
 import com.teamltt.carcare.model.ObdContent;
+import com.teamltt.carcare.model.Vehicle;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -192,6 +178,19 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         db.close();
         setChanged(status);
         return status;
+    }
+
+    public Vehicle getVehicle(long vehicleId) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = VehicleContract.query(db, vehicleId);
+        long id = cursor.getLong(cursor.getColumnIndexOrThrow(VehicleContract.VehicleEntry.COLUMN_NAME_ID));
+        String nickname = cursor.getString(cursor.getColumnIndexOrThrow(VehicleContract.VehicleEntry.COLUMN_NAME_NICKNAME));
+        return new Vehicle(id, nickname);
+    }
+
+    public long updateVehicle(Vehicle vehicle) {
+        // TODO call VehicleContract.update(SQLiteDatabase, long vehicleId, String vin, String make, ...)
+        return 0L;
     }
 
 

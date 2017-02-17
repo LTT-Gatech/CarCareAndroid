@@ -1,20 +1,23 @@
 /*
- ** Copyright 2017, Team LTT
- **
- ** Licensed under the Apache License, Version 2.0 (the "License");
- ** you may not use this file except in compliance with the License.
- ** You may obtain a copy of the License at
- **
- **     http://www.apache.org/licenses/LICENSE-2.0
- **
- ** Unless required by applicable law or agreed to in writing, software
- ** distributed under the License is distributed on an "AS IS" BASIS,
- ** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- ** See the License for the specific language governing permissions and
- ** limitations under the License.
+ * Copyright 2017, Team LTT
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.teamltt.carcare.database.contract;
+
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 
 public class VehicleContract {
 
@@ -30,6 +33,29 @@ public class VehicleContract {
             VehicleEntry.COLUMN_NAME_PLATE_NUMBER + " TEXT" +
             ");";
     public static final String SQL_DROP_ENTRIES = "DROP TABLE IF EXISTS " + VehicleEntry.TABLE_NAME;
+
+    public static Cursor query(SQLiteDatabase db, long vehicleId) {
+        String table = VehicleEntry.TABLE_NAME;
+        String[] columns = {
+                VehicleEntry.COLUMN_NAME_ID,
+                VehicleEntry.COLUMN_NAME_VIN,
+                VehicleEntry.COLUMN_NAME_MAKE,
+                VehicleEntry.COLUMN_NAME_MODEL,
+                VehicleEntry.COLUMN_NAME_YEAR,
+                VehicleEntry.COLUMN_NAME_COLOR,
+                VehicleEntry.COLUMN_NAME_NICKNAME,
+                VehicleEntry.COLUMN_NAME_PLATE_NUMBER
+        };
+        String selection = VehicleEntry.COLUMN_NAME_ID + " = ?";
+        String[] selectionArgs = {Long.toString(vehicleId)};
+
+        return db.query(table, columns, selection, selectionArgs, null, null, null);
+    }
+
+    public static long update(SQLiteDatabase db, long vehicleId) {
+        // TODO update using db.update
+        return 0L;
+    }
 
     // HACK: private to prevent someone from accidentally instantiating a contract
     private VehicleContract() {
