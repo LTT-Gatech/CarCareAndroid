@@ -29,4 +29,11 @@
     <string name="response">Response</string>
     <string name="bt_service_description">Handles Bluetooth connection to your OBD adapter for the CarCare application.</string>
     <string name="read_data">Read data</string>
+    <string name="login">Login</string>
+    <string name="password">Password</string>
+    <string name="google_plus_email">GooglePlus Email</string>
+    <string name="signed_in_fmt">Signed in as: %s</string>
+    <string name="error_null_person">Error: Returned null.</string>
+    <string name="loading">Loading</string>
+    <string name="please_sign_in">Please sign in.</string>
 </resources>
