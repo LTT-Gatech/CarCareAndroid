@@ -1,17 +1,17 @@
 /*
- ** Copyright 2017, Team LTT
- **
- ** Licensed under the Apache License, Version 2.0 (the "License");
- ** you may not use this file except in compliance with the License.
- ** You may obtain a copy of the License at
- **
- **     http://www.apache.org/licenses/LICENSE-2.0
- **
- ** Unless required by applicable law or agreed to in writing, software
- ** distributed under the License is distributed on an "AS IS" BASIS,
- ** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- ** See the License for the specific language governing permissions and
- ** limitations under the License.
+ * Copyright 2017, Team LTT
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.teamltt.carcare.activity;
@@ -28,13 +28,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-
-import android.content.Intent;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -48,16 +41,11 @@ import com.teamltt.carcare.database.DbHelper;
 import com.teamltt.carcare.database.IObservable;
 import com.teamltt.carcare.database.IObserver;
 import com.teamltt.carcare.database.contract.ResponseContract;
-import com.teamltt.carcare.database.contract.VehicleContract;
 import com.teamltt.carcare.fragment.MyObdResponseRecyclerViewAdapter;
 import com.teamltt.carcare.fragment.ObdResponseFragment;
 import com.teamltt.carcare.fragment.SimpleDividerItemDecoration;
 import com.teamltt.carcare.model.ObdContent;
-import com.teamltt.carcare.service.BtStatusDisplay;
 import com.teamltt.carcare.service.ObdBluetoothService;
-
-import com.teamltt.carcare.activity.DemoActivity;
-import com.teamltt.carcare.activity.CarInfoActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,7 +55,8 @@ public class HomeActivity extends AppCompatActivity implements IObserver, ObdRes
     // Used to keep track of the items in the RecyclerView
     private RecyclerView.Adapter responseListAdapter;
 
-    ObdBluetoothService btService = null;
+    ObdBluetoothService btService;
+    Intent btServiceIntent;
     boolean bound;
     SQLiteDatabase db;
 
@@ -77,12 +66,11 @@ public class HomeActivity extends AppCompatActivity implements IObserver, ObdRes
         setContentView(R.layout.activity_home);
 
 
-        Intent intent = new Intent(this, ObdBluetoothService.class);
+        btServiceIntent = new Intent(this, ObdBluetoothService.class);
         // Stop any existing services, we don't need more than one running
-        stopService(intent); // is this immediate?
+        stopService(btServiceIntent); // is this immediate?
         // Now start the new service
-        startService(intent);
-        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        startService(btServiceIntent);
 
         // Set up the list for responses
         responseListAdapter = new MyObdResponseRecyclerViewAdapter(ObdContent.ITEMS, this);
@@ -120,53 +108,24 @@ public class HomeActivity extends AppCompatActivity implements IObserver, ObdRes
         table.addView(tr);
     }
 
-//     This should be called somewhere so we can read the data into a graph
-//    AsyncTask<Void, String, Void> readTask = new AsyncTask<Void, String, Void>() {
-//        @Override
-//        protected Void doInBackground(Void... voids) {
-//            // Read from the database
-//            String[] projection = {
-//                    ResponseContract.ResponseEntry.COLUMN_NAME_NAME,
-//                    ResponseContract.ResponseEntry.COLUMN_NAME_VALUE,
-//            };
-//            String sortOrder =
-//                    ResponseContract.ResponseEntry.COLUMN_NAME_TIMESTAMP + " ASC";
-//
-//            Cursor cursor = db.query(
-//                    ResponseContract.ResponseEntry.TABLE_NAME,                     // The table to query
-//                    projection,                               // The columns to return
-//                    null,                                // The columns for the WHERE clause
-//                    null,                            // The values for the WHERE clause
-//                    null,                                     // don't group the rows
-//                    null,                                     // don't filter by row groups
-//                    sortOrder                                 // The sort order
-//            );
-//
-//            while(cursor.moveToNext()) {
-//                byte[] commandNameBytes = cursor.getBlob(
-//                        cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_NAME));
-//                String commandName = new String(commandNameBytes);
-//                byte[] valueBytes = cursor.getBlob(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_VALUE));
-//                String value = new String(valueBytes);
-//                publishProgress(commandName, value);
-//
-//            }
-//            cursor.close();
-//            return null;
-//        }
-//
-//        @Override
-//        public void onProgressUpdate(String... values) {
-//            int nextId = responseListAdapter.getItemCount() + 1;
-//            ObdContent.addItem(ObdContent.createItemWithResponse(nextId, values[0], values[1]));
-//            responseListAdapter.notifyDataSetChanged();
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Void aVoid) {
-//
-//        }
-//    };
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (!bound) {
+            bindService(btServiceIntent, mConnection, Context.BIND_AUTO_CREATE);
+            bound = true;
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // Unbind from the service
+        if (bound) {
+            unbindService(mConnection); //TODO rebind in onContinue
+            bound = false;
+        }
+    }
 
     @Override
     public void onListFragmentInteraction(ObdContent.ObdResponse item) {
@@ -211,15 +170,6 @@ public class HomeActivity extends AppCompatActivity implements IObserver, ObdRes
         }
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        // Unbind from the service
-        if (bound) {
-            unbindService(mConnection); //TODO rebind in onContinue
-            bound = false;
-        }
-    }
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu, menu);
@@ -238,6 +188,7 @@ public class HomeActivity extends AppCompatActivity implements IObserver, ObdRes
         Intent intent = new Intent(this, DemoActivity.class);
         startActivity(intent);
     }
+
     /*protected void openDrawer(View view) {
         if (drawer.isDrawerOpen(findViewById(android.R.id.home))) {
             drawer.closeDrawer(Gravity.LEFT);
