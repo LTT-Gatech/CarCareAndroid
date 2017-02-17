@@ -1,4 +1,5 @@
 /*
+<<<<<<< HEAD
  * Copyright 2017, Team LTT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,6 +13,21 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+=======
+ ** Copyright 2017, Team LTT
+ **
+ ** Licensed under the Apache License, Version 2.0 (the "License");
+ ** you may not use this file except in compliance with the License.
+ ** You may obtain a copy of the License at
+ **
+ **     http://www.apache.org/licenses/LICENSE-2.0
+ **
+ ** Unless required by applicable law or agreed to in writing, software
+ ** distributed under the License is distributed on an "AS IS" BASIS,
+ ** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ ** See the License for the specific language governing permissions and
+ ** limitations under the License.
+>>>>>>> giuliano/dev
  */
 
 package com.teamltt.carcare.service;
@@ -124,6 +140,7 @@ public class ObdBluetoothService extends Service {
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 Log.i(TAG, "discovery unsuccessful");
                 sendToDisplays(getString(R.string.retry_connect));
+
             } else if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
                 Log.i(TAG, "discovery started");
             }
@@ -154,6 +171,7 @@ public class ObdBluetoothService extends Service {
         return super.onUnbind(intent);
     }
 
+
     /**
      * Registers an Observer with the database
      * @param observer An observer entity, like an Activity that shows data from the Response table
@@ -169,10 +187,12 @@ public class ObdBluetoothService extends Service {
         // Connect to the database
         dbHelper = new DbHelper(ObdBluetoothService.this);
 
+
         // Register the BroadcastReceiver
         IntentFilter discoveryFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         discoveryFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         registerReceiver(discoveryReceiver, discoveryFilter);
+
         discoveryReceiverRegistered = true;
 
         IntentFilter bluetoothFilter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
@@ -181,6 +201,7 @@ public class ObdBluetoothService extends Service {
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter != null) {
+
             if (!bluetoothAdapter.isEnabled()) {
                 Log.i(TAG, "requesting to enable BT");
 
@@ -189,7 +210,9 @@ public class ObdBluetoothService extends Service {
                 // Gives the user a chance to reject Bluetooth privileges at this time
                 startActivity(enableBtIntent);
                 // goes to onActivityResult where requestCode == REQUEST_ENABLE_BT
+
             } else {
+
                 Log.i(TAG, "adapter enabled");
                 // If bluetooth is on, go ahead and use it
                 getObdDevice();
@@ -204,6 +227,7 @@ public class ObdBluetoothService extends Service {
     @Override
     public void onDestroy() {
         // release resources
+
         Log.i(TAG, "onDestroy");
         if (discoveryReceiverRegistered) {
             unregisterReceiver(discoveryReceiver);
@@ -215,6 +239,7 @@ public class ObdBluetoothService extends Service {
             dbHelper.deleteObservers();
             dbHelper.close();
         }
+
     }
 
     /**
@@ -247,6 +272,7 @@ public class ObdBluetoothService extends Service {
             } else {
                 Log.i(TAG, "discovery not started");
                 sendToDisplays(getString(R.string.permission_fail_bt));
+
             }
         }
     }
@@ -283,6 +309,7 @@ public class ObdBluetoothService extends Service {
                 }
 
                 for (IObserver observer : dbObservers) {
+
                     dbHelper.addObserver(observer);
                 }
             } catch (IOException e) {
@@ -327,6 +354,7 @@ public class ObdBluetoothService extends Service {
                         heartbeat.run(socket.getInputStream(), socket.getOutputStream()); // TODO catch NoDataException
                         String rpm = heartbeat.getCalculatedResult();
                         if (Integer.parseInt(rpm) > 0) {
+
                             break;
                         }
                     }

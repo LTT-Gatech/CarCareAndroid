@@ -29,21 +29,26 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".activity.DemoActivity" />
-        <activity android:name=".activity.HomeActivity" />
-
-        <service
-            android:name=".service.ObdBluetoothService"
-            android:description="@string/bt_service_description"
-            android:enabled="true"
-            android:exported="false" />
-
-        <activity android:name=".activity.TripsActivity">
+        <activity android:name=".activity.HomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".activity.TripsActivity" />
+        <activity android:name=".activity.StaticActivity" />
+        <activity android:name=".activity.CarInfoActivity" />
+        <activity android:name=".activity.CarInfoEditActivity"></activity>
+
+
+        <service
+            android:name=".activity.ObdBluetoothService"
+            android:enabled="true"
+            android:exported="false"
+            android:description="@string/bt_service_description">
+        </service>
+
     </application>
 
 </manifest>

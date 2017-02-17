@@ -21,8 +21,12 @@ android {
     buildToolsVersion "23.0.3"
 
     defaultConfig {
+        applicationId "com.teamltt.carcare"
+        minSdkVersion 18
+
         applicationId "com.teamltt.carcaredemo"
         minSdkVersion 15
+
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
@@ -44,4 +48,5 @@ dependencies {
     compile 'com.github.pires:obd-java-api:1.0'
     compile 'com.android.support:design:23.4.0'
     testCompile 'junit:junit:4.12'
+
 }
