@@ -106,7 +106,7 @@ public class HomeActivity extends AppCompatActivity implements IObserver, ObdRes
         tv.setText("R1Col1");
 
         TextView tv2 = new TextView(this);
-        tv2.setText("R1Col2");
+        tv2.setText("R1Col777");
         tv2.setPadding(3,3,3,3);
         TableRow.LayoutParams p = new TableRow.LayoutParams(TableLayout.LayoutParams.WRAP_CONTENT, TableLayout.LayoutParams.WRAP_CONTENT);
         p.weight = 1;
