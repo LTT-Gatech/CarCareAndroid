@@ -77,6 +77,13 @@ public class HomeActivity extends AppCompatActivity implements IObserver, ObdRes
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        Intent intent = getIntent();
+        String firstName = intent.getStringExtra(LoginActivity.EXTRA_MESSAGE + ".FIRSTNAME");
+        String lastName = intent.getStringExtra(LoginActivity.EXTRA_MESSAGE + ".LASTNAME");
+        String userId = intent.getStringExtra(LoginActivity.EXTRA_MESSAGE + ".USERID");
+
+        // TODO Add user's name to the screen to show successful sign-in for demo
+
         btServiceIntent = new Intent(this, ObdBluetoothService.class);
 
         // Stop any existing services, we don't need more than one running
