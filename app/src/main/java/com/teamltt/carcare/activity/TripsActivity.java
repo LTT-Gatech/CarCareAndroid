@@ -16,11 +16,15 @@
 
 package com.teamltt.carcare.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
@@ -98,5 +102,48 @@ public class TripsActivity extends AppCompatActivity implements ObdResponseFragm
         responses.clear();
         responses.addAll(dbHelper.getResponsesByTrip(tripId));
         responseListAdapter.notifyDataSetChanged();
+    }
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    protected void goToDemo(View view) {
+        Intent intent = new Intent(this, DemoActivity.class);
+        startActivity(intent);
+    }
+    protected void goToStatic(View view) {
+        Intent intent = new Intent(this, DemoActivity.class);
+        startActivity(intent);
+    }
+    protected void goToDynamic(View view) {
+        Intent intent = new Intent(this, DemoActivity.class);
+        startActivity(intent);
+    }
+    /*protected void openDrawer(View view) {
+        if (drawer.isDrawerOpen(findViewById(android.R.id.home))) {
+            drawer.closeDrawer(Gravity.LEFT);
+        }
+        else {
+            drawer.openDrawer(Gravity.RIGHT);
+        }
+    }*/
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent;
+        switch (item.getItemId()) {
+            case (R.id.action_carInfo):
+                intent = new Intent(this, CarInfoActivity.class);
+                startActivity(intent);
+                break;
+            case (R.id.action_demo):
+                intent = new Intent(this, DemoActivity.class);
+                startActivity(intent);
+                break;
+            case (R.id.action_trips):
+                intent = new Intent(this, TripsActivity.class);
+                startActivity(intent);
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

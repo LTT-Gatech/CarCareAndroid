@@ -30,20 +30,25 @@ public class CarInfoActivity extends AppCompatActivity {
         DbHelper dbHelper = new DbHelper(CarInfoActivity.this);
         db = dbHelper.getWritableDatabase();
 
-        /*ContentValues values = new ContentValues();
-        values.put(VehicleContract.VehicleEntry.COLUMN_NAME_ID, 777);
-        values.put(VehicleContract.VehicleEntry.COLUMN_NAME_VIN, "123123");
-        values.put(VehicleContract.VehicleEntry.COLUMN_NAME_MAKE, "Toyota");
-        values.put(VehicleContract.VehicleEntry.COLUMN_NAME_MODEL, "Yaris");
-        //values.put(VehicleContract.VehicleEntry.COLUMN_NAME_YEAR, );
-        values.put(VehicleContract.VehicleEntry.COLUMN_NAME_COLOR, "Silver");
-        values.put(VehicleContract.VehicleEntry.COLUMN_NAME_NICKNAME, "CarName");
-        values.put(VehicleContract.VehicleEntry.COLUMN_NAME_PLATE_NUMBER, "BVL3636");
-        long newRowId = db.insert(VehicleContract.VehicleEntry.TABLE_NAME, null, values);
-        Log.i("table printing", ""+newRowId);*/
 
         Cursor info = db.query(VehicleContract.VehicleEntry.TABLE_NAME, null, null, null, null, null,null);
+        Log.i("count", ""+info.getCount());
+        if (info.getCount() < 2) {
+            ContentValues values = new ContentValues();
+            values.put(VehicleContract.VehicleEntry.COLUMN_NAME_ID, 777);
+            values.put(VehicleContract.VehicleEntry.COLUMN_NAME_VIN, "123123");
+            values.put(VehicleContract.VehicleEntry.COLUMN_NAME_MAKE, "Toyota");
+            values.put(VehicleContract.VehicleEntry.COLUMN_NAME_MODEL, "Yaris");
+            //values.put(VehicleContract.VehicleEntry.COLUMN_NAME_YEAR, );
+            values.put(VehicleContract.VehicleEntry.COLUMN_NAME_COLOR, "Silver");
+            values.put(VehicleContract.VehicleEntry.COLUMN_NAME_NICKNAME, "CarName");
+            values.put(VehicleContract.VehicleEntry.COLUMN_NAME_PLATE_NUMBER, "BVL3636");
+            long newRowId = db.insert(VehicleContract.VehicleEntry.TABLE_NAME, null, values);
+            Log.i("table printing", ""+newRowId);
+        }
+
         info.moveToFirst();
+        Log.i("id", info.getString(info.getColumnIndex(VehicleContract.VehicleEntry.COLUMN_NAME_ID)));
 
         TextView tv = (TextView)findViewById(R.id.fieldVIN);
         tv.setText(info.getString(info.getColumnIndex(VehicleContract.VehicleEntry.COLUMN_NAME_VIN)));
@@ -82,6 +87,9 @@ public class CarInfoActivity extends AppCompatActivity {
                 intent = new Intent(this, DemoActivity.class);
                 startActivity(intent);
                 break;
+            case (R.id.action_trips):
+                intent = new Intent(this, TripsActivity.class);
+                startActivity(intent);
         }
         return super.onOptionsItemSelected(item);
     }

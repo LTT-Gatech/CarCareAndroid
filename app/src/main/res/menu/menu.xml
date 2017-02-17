@@ -11,6 +11,11 @@
         android:id="@+id/action_demo"
         android:orderInCategory="2"
         android:title="Demo"/>
+    <item
+        android:id="@+id/action_trips"
+        android:orderInCategory="2"
+        android:title="Trips"/>
+
     <!--<item
         android:id="@+id/drawer_button"
         android:title="Drawer"

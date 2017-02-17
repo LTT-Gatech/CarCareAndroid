@@ -92,7 +92,7 @@ public class CarInfoEditActivity extends AppCompatActivity {
 
             String input;
             ContentValues values = new ContentValues();
-            int id = 0;//this id is hardcoded until we have somewhere to store preferences
+            int id = 1;//this id is hardcoded until we have somewhere to store preferences
 
             TextView tv = (TextView)findViewById(R.id.fieldVIN);
             input = tv.getText().toString();
@@ -112,7 +112,7 @@ public class CarInfoEditActivity extends AppCompatActivity {
             values.put(VehicleContract.VehicleEntry.COLUMN_NAME_PLATE_NUMBER, input);
             //values.put(VehicleContract.VehicleEntry.COLUMN_NAME_ID, id);
 
-            long newRowId = db.update(VehicleContract.VehicleEntry.TABLE_NAME, values, "vehicle_id="+0, null);
+            long newRowId = db.update(VehicleContract.VehicleEntry.TABLE_NAME, values, "vehicle_id="+id, null);
 
 
 
@@ -133,6 +133,9 @@ public class CarInfoEditActivity extends AppCompatActivity {
                 intent = new Intent(this, DemoActivity.class);
                 startActivity(intent);
                 break;
+            case (R.id.action_trips):
+                intent = new Intent(this, TripsActivity.class);
+                startActivity(intent);
         }
         return super.onOptionsItemSelected(item);
     }
