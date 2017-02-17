@@ -1,4 +1,5 @@
 /*
+<<<<<<< HEAD
  * Copyright 2017, Team LTT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,6 +13,21 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+=======
+ ** Copyright 2017, Team LTT
+ **
+ ** Licensed under the Apache License, Version 2.0 (the "License");
+ ** you may not use this file except in compliance with the License.
+ ** You may obtain a copy of the License at
+ **
+ **     http://www.apache.org/licenses/LICENSE-2.0
+ **
+ ** Unless required by applicable law or agreed to in writing, software
+ ** distributed under the License is distributed on an "AS IS" BASIS,
+ ** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ ** See the License for the specific language governing permissions and
+ ** limitations under the License.
+>>>>>>> giuliano/dev
  */
 
 package com.teamltt.carcare.database;
@@ -22,7 +38,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.util.Log;
-
 import com.teamltt.carcare.database.contract.OwnershipContract;
 import com.teamltt.carcare.database.contract.ResponseContract;
 import com.teamltt.carcare.database.contract.TripContract;
@@ -86,6 +101,7 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         onUpgrade(db, oldVersion, newVersion);
     }
 
+
     private static long errorChecks(SQLiteDatabase db) {
         if (db == null) {
             return DB_ERROR_NULL;
@@ -98,12 +114,14 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         }
     }
 
+
     public static String convertDate(Date date) {
         if (date == null) {
             return null;
         }
         return sqlDateFormat.format(date);
     }
+
 
     public static String now() {
         // set the format to sql date time
@@ -172,6 +190,7 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         return status;
     }
 
+
     @Override
     public void addObserver(IObserver observer) {
         observers.add(observer);
@@ -222,5 +241,6 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         } else {
             Log.e(TAG, "error occurred when writing: " + status);
         }
+
     }
 }
