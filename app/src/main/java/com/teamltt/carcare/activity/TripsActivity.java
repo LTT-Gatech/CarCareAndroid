@@ -92,6 +92,9 @@ public class TripsActivity extends AppCompatActivity implements ObdResponseFragm
         Log.i(TAG, item.toString());
     }
 
+    /**
+     * @param view from R.id.readData in R.layout.activity_trips
+     */
     public void readData(View view) {
         Log.i(TAG, "readData");
         long tripId = trips.get(spinner.getSelectedItemPosition());

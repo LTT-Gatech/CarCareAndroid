@@ -132,6 +132,7 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
             return status;
         }
         status = TripContract.insert(db, vehicleId, startTime, endTime);
+        db.close();
         setChanged(status);
         return status;
     }
@@ -139,6 +140,7 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
     public List<Long> getAllTripIds() {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = TripContract.queryAll(db);
+        db.close();
         List<Long> tripIds = new ArrayList<>();
         while (cursor.moveToNext()) {
             tripIds.add(cursor.getLong(cursor.getColumnIndexOrThrow(TripContract.TripEntry.COLUMN_NAME_ID)));
@@ -150,6 +152,7 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
     public List<ObdContent.ObdResponse> getResponsesByTrip(long tripId) {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = ResponseContract.queryByTripId(db, tripId);
+        db.close();
         List<ObdContent.ObdResponse> responses = new ArrayList<>();
         while (cursor.moveToNext()) {
             long id = cursor.getLong(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_ID));
@@ -168,6 +171,7 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
             return status;
         }
         status = ResponseContract.insert(db, tripId, name, pId, value);
+        db.close();
         setChanged(status);
         return status;
     }
