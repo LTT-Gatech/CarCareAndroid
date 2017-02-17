@@ -39,11 +39,11 @@
         <activity android:name=".activity.TripsActivity" />
         <activity android:name=".activity.StaticActivity" />
         <activity android:name=".activity.CarInfoActivity" />
-        <activity android:name=".activity.CarInfoEditActivity"></activity>
+        <activity android:name=".activity.CarInfoEditActivity" />
 
 
         <service
-            android:name=".activity.ObdBluetoothService"
+            android:name=".service.ObdBluetoothService"
             android:enabled="true"
             android:exported="false"
             android:description="@string/bt_service_description">
