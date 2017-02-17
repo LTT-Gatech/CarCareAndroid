@@ -25,6 +25,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.teamltt.carcare.R;
+import com.teamltt.carcare.database.DbHelper;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -42,8 +43,14 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     private static final String TAG = "SignInActivity";
     private static final int RC_SIGN_IN = 9001;
 
+    GoogleSignInAccount googleSignInAccount;
+
     private TextView tvStatus;
     ProgressDialog progress_dialog;
+
+    private DbHelper dbHelper;
+
+    public final static String EXTRA_MESSAGE = "com.teamltt.carcare.activity.LoginActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +68,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
                 .build();
 
         // Build a GoogleApiClient with access to the Google Sign-In API and the
@@ -116,8 +122,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         Log.d(TAG, "handleSignInResult:" + result.isSuccess());
         if (result.isSuccess()) {
             // Signed in successfully, show authenticated UI.
-            GoogleSignInAccount acct = result.getSignInAccount();
-            tvStatus.setText(getString(R.string.signed_in_fmt, acct.getDisplayName()));
+            googleSignInAccount = result.getSignInAccount();
+            tvStatus.setText(getString(R.string.signed_in_fmt, googleSignInAccount.getDisplayName()));
             updateUI(true);
         } else {
             // Signed out, show unauthenticated UI.
@@ -158,8 +164,20 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
     private void updateUI(boolean signedIn) {
         if (signedIn) {
-            findViewById(R.id.btnGoogleSignIn).setVisibility(View.GONE);
-            // TODO Go to Home Screen
+            String firstName = googleSignInAccount.getGivenName();
+            String lastName = googleSignInAccount.getFamilyName();
+            String google_id = googleSignInAccount.getId();
+
+            // Add user to database
+            dbHelper = new DbHelper(this);
+            // TODO Make sure you're not adding duplicates to the database
+            dbHelper.createNewUser(google_id, firstName, lastName);
+
+            // Go to Home Screen
+            Intent intent = new Intent(this, HomeActivity.class);
+            intent.putExtra(EXTRA_MESSAGE + ".FIRSTNAME", firstName);
+            intent.putExtra(EXTRA_MESSAGE + ".LASTNAME", lastName);
+            intent.putExtra(EXTRA_MESSAGE + ".USERID", google_id);
         } else {
             tvStatus.setText(R.string.please_sign_in);
 

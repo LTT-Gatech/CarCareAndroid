@@ -136,13 +136,13 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         return status;
     }
 
-    public long createNewUser(long userId, String googleApiKey, String firstName, String lastName) {
+    public long createNewUser(String google_user_id, String firstName, String lastName) {
         SQLiteDatabase db = getWritableDatabase();
         long status = DbHelper.errorChecks(db);
         if (status != DbHelper.DB_OK) {
             return status;
         }
-        status = UserContract.insert(db, userId, googleApiKey, firstName, lastName);
+        status = UserContract.insert(db, google_user_id, firstName, lastName);
         return status;
     }
 
