@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.teamltt.carcare.activity;
+package com.teamltt.carcare.service;
 
 /**
  * This interface the bluetooth service to activities about bluetooth related state.
  */
-interface BtStatusDisplay {
+public interface BtStatusDisplay {
     /**
      * Called on an Activity in the BluetoothService instance when the bluetooth state changes.
      * Must be called on the made thread.

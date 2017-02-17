@@ -39,6 +39,8 @@ import com.teamltt.carcare.fragment.MyObdResponseRecyclerViewAdapter;
 import com.teamltt.carcare.fragment.ObdResponseFragment;
 import com.teamltt.carcare.fragment.SimpleDividerItemDecoration;
 import com.teamltt.carcare.model.ObdContent;
+import com.teamltt.carcare.service.BtStatusDisplay;
+import com.teamltt.carcare.service.ObdBluetoothService;
 
 import java.util.ArrayList;
 import java.util.List;

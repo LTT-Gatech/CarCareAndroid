@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.teamltt.carcare.activity;
+package com.teamltt.carcare.service;
 
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
@@ -414,7 +414,7 @@ public class ObdBluetoothService extends Service {
     }
 
     public class ObdServiceBinder extends Binder {
-        ObdBluetoothService getService() {
+        public ObdBluetoothService getService() {
             // Return this instance of LocalService so clients can call public methods
             return ObdBluetoothService.this;
         }

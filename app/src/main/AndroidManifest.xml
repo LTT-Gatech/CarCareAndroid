@@ -28,15 +28,14 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.DemoActivity"></activity>
-        <activity android:name=".activity.HomeActivity">
-        </activity>
+        <activity android:name=".activity.DemoActivity" />
+        <activity android:name=".activity.HomeActivity" />
 
         <service
-            android:name=".activity.ObdBluetoothService"
+            android:name=".service.ObdBluetoothService"
             android:description="@string/bt_service_description"
             android:enabled="true"
-            android:exported="false"></service>
+            android:exported="false" />
 
         <activity android:name=".activity.TripsActivity">
             <intent-filter>
