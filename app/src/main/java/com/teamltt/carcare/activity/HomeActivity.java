@@ -70,7 +70,8 @@ public class HomeActivity extends AppCompatActivity implements IObserver, ObdRes
         String lastName = intent.getStringExtra(LoginActivity.EXTRA_MESSAGE + ".LASTNAME");
         String userId = intent.getStringExtra(LoginActivity.EXTRA_MESSAGE + ".USERID");
 
-        // TODO Add user's name to the screen to show successful sign-in for demo
+        // Add user's name to the screen to show successful sign-in for demo
+        ((TextView) findViewById(R.id.tvWelcome)).setText(getString(R.string.welcome_text, firstName));
 
         btServiceIntent = new Intent(this, ObdBluetoothService.class);
         // Stop any existing services, we don't need more than one running
@@ -195,29 +196,12 @@ public class HomeActivity extends AppCompatActivity implements IObserver, ObdRes
         startActivity(intent);
     }
 
-    /*protected void openDrawer(View view) {
-        if (drawer.isDrawerOpen(findViewById(android.R.id.home))) {
-            drawer.closeDrawer(Gravity.LEFT);
-        }
-        else {
-            drawer.openDrawer(Gravity.RIGHT);
-        }
-    }*/
-    public boolean onOptionsItemSelected(MenuItem item) {
-        Intent intent;
-        switch (item.getItemId()) {
-            case (R.id.action_carInfo):
-                intent = new Intent(this, CarInfoActivity.class);
-                startActivity(intent);
-                break;
-            case (R.id.action_demo):
-                intent = new Intent(this, DemoActivity.class);
-                startActivity(intent);
-                break;
-            case (R.id.action_trips):
-                intent = new Intent(this, TripsActivity.class);
-                startActivity(intent);
-        }
-        return super.onOptionsItemSelected(item);
+    /**
+     * From the android:onClick parameter of R.id.readData in R.layout.activity_home
+     *
+     * @param view the R.id.readData button
+     */
+    public void readData(View view) {
+        // Log.i(TAG, "readData");
     }
 }
