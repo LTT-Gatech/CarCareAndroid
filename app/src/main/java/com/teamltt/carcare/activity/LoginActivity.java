@@ -38,7 +38,7 @@ import android.widget.TextView;
 
 public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
 
-    GoogleApiClient google_api_client;
+    GoogleApiClient googleApiClient;
 
     private static final String TAG = "SignInActivity";
     private static final int RC_SIGN_IN = 9001;
@@ -46,11 +46,14 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     GoogleSignInAccount googleSignInAccount;
 
     private TextView tvStatus;
-    ProgressDialog progress_dialog;
+    ProgressDialog progressDialog;
 
     private DbHelper dbHelper;
 
-    public final static String EXTRA_MESSAGE = "com.teamltt.carcare.activity.LoginActivity";
+    public final static String EXTRA_FIRST_NAME = "com.teamltt.carcare.activity.LoginActivity.FIRSTNAME";
+    public final static String EXTRA_LAST_NAME = "com.teamltt.carcare.activity.LoginActivity.LASTNAME";
+    public final static String EXTRA_USER_ID = "com.teamltt.carcare.activity.LoginActivity.USERID";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +75,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
         // Build a GoogleApiClient with access to the Google Sign-In API and the
         // options specified by gso.
-        google_api_client = new GoogleApiClient.Builder(this)
+        googleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this, this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
@@ -85,7 +88,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     @Override
     protected void onStart() {
         super.onStart();
-        OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(google_api_client);
+        OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(googleApiClient);
         if (opr.isDone()) {
             // If the user's cached credentials are valid, the OptionalPendingResult will be "done"
             // and the GoogleSignInResult will be available instantly.
@@ -132,7 +135,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     }
 
     private void signIn() {
-        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(google_api_client);
+        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient);
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
@@ -145,19 +148,19 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
 
     private void showProgressDialog() {
-        if (progress_dialog == null) {
-            progress_dialog = new ProgressDialog(this);
-            progress_dialog.setMessage(getString(R.string.loading));
-            progress_dialog.setIndeterminate(true);
+        if (progressDialog == null) {
+            progressDialog = new ProgressDialog(this);
+            progressDialog.setMessage(getString(R.string.loading));
+            progressDialog.setIndeterminate(true);
         }
 
-        progress_dialog.show();
+        progressDialog.show();
     }
 
 
     private void hideProgressDialog() {
-        if (progress_dialog != null && progress_dialog.isShowing()) {
-            progress_dialog.hide();
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.hide();
         }
     }
 
@@ -177,9 +180,9 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
             // Go to Home Screen
             Intent intent = new Intent(this, HomeActivity.class);
-            intent.putExtra(EXTRA_MESSAGE + ".FIRSTNAME", firstName);
-            intent.putExtra(EXTRA_MESSAGE + ".LASTNAME", lastName);
-            intent.putExtra(EXTRA_MESSAGE + ".USERID", google_id);
+            intent.putExtra(EXTRA_FIRST_NAME, firstName);
+            intent.putExtra(EXTRA_LAST_NAME, lastName);
+            intent.putExtra(EXTRA_USER_ID, google_id);
         } else {
             tvStatus.setText(R.string.please_sign_in);
 
@@ -199,16 +202,16 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     @Override
     protected void onStop() {
         super.onStop();
-        if (google_api_client.isConnected()) {
-            google_api_client.disconnect();
+        if (googleApiClient.isConnected()) {
+            googleApiClient.disconnect();
         }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (google_api_client.isConnected()) {
-            google_api_client.connect();
+        if (!googleApiClient.isConnected()) {
+            googleApiClient.connect();
         }
     }
 
