@@ -29,6 +29,7 @@ import com.teamltt.carcare.database.contract.TripContract;
 import com.teamltt.carcare.database.contract.UserContract;
 import com.teamltt.carcare.database.contract.VehicleContract;
 import com.teamltt.carcare.model.ObdContent;
+import com.teamltt.carcare.model.Vehicle;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -48,7 +49,7 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
     public static final long DB_WRITE_ERROR = -1; // from SQLiteDatabase if an error occurred
     public static final long DB_OK = 0;
 
-    public static final int DATABASE_VERSION = 2;
+    public static final int DATABASE_VERSION = 3;
     public static final String DATABASE_NAME = "CarCare.db";
 
     private static final SimpleDateFormat sqlDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -86,6 +87,7 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         onUpgrade(db, oldVersion, newVersion);
     }
 
+
     private static long errorChecks(SQLiteDatabase db) {
         if (db == null) {
             return DB_ERROR_NULL;
@@ -98,12 +100,14 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         }
     }
 
+
     public static String convertDate(Date date) {
         if (date == null) {
             return null;
         }
         return sqlDateFormat.format(date);
     }
+
 
     public static String now() {
         // set the format to sql date time
@@ -132,6 +136,7 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
             return status;
         }
         status = TripContract.insert(db, vehicleId, startTime, endTime);
+        db.close();
         setChanged(status);
         return status;
     }
@@ -143,12 +148,21 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
             return status;
         }
         status = UserContract.insert(db, google_user_id, firstName, lastName);
+        db.close();
         return status;
+    }
+
+    public boolean containsUser(String google_user_id) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = UserContract.queryUserID(db, google_user_id);
+        db.close();
+        return cursor != null;
     }
 
     public List<Long> getAllTripIds() {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = TripContract.queryAll(db);
+        db.close();
         List<Long> tripIds = new ArrayList<>();
         while (cursor.moveToNext()) {
             tripIds.add(cursor.getLong(cursor.getColumnIndexOrThrow(TripContract.TripEntry.COLUMN_NAME_ID)));
@@ -160,6 +174,7 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
     public List<ObdContent.ObdResponse> getResponsesByTrip(long tripId) {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = ResponseContract.queryByTripId(db, tripId);
+        db.close();
         List<ObdContent.ObdResponse> responses = new ArrayList<>();
         while (cursor.moveToNext()) {
             long id = cursor.getLong(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_ID));
@@ -178,9 +193,24 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
             return status;
         }
         status = ResponseContract.insert(db, tripId, name, pId, value);
+        db.close();
         setChanged(status);
         return status;
     }
+
+    public Vehicle getVehicle(long vehicleId) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = VehicleContract.query(db, vehicleId);
+        long id = cursor.getLong(cursor.getColumnIndexOrThrow(VehicleContract.VehicleEntry.COLUMN_NAME_ID));
+        String nickname = cursor.getString(cursor.getColumnIndexOrThrow(VehicleContract.VehicleEntry.COLUMN_NAME_NICKNAME));
+        return new Vehicle(id, nickname);
+    }
+
+    public long updateVehicle(Vehicle vehicle) {
+        // TODO call VehicleContract.update(SQLiteDatabase, long vehicleId, String vin, String make, ...)
+        return 0L;
+    }
+
 
     @Override
     public void addObserver(IObserver observer) {
@@ -232,5 +262,6 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         } else {
             Log.e(TAG, "error occurred when writing: " + status);
         }
+
     }
 }

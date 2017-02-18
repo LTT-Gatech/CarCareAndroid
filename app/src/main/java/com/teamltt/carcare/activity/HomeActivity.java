@@ -21,13 +21,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.teamltt.carcare.R;
@@ -39,38 +45,20 @@ import com.teamltt.carcare.fragment.MyObdResponseRecyclerViewAdapter;
 import com.teamltt.carcare.fragment.ObdResponseFragment;
 import com.teamltt.carcare.fragment.SimpleDividerItemDecoration;
 import com.teamltt.carcare.model.ObdContent;
+import com.teamltt.carcare.service.ObdBluetoothService;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class HomeActivity extends AppCompatActivity implements IObserver, ObdResponseFragment.OnListFragmentInteractionListener {
 
-    private static final String TAG = "HomeActivity";
-
-    boolean bound = false;
-    // started in onCreate, bound in onStart, and unbound in onStop
-    private ObdBluetoothService btService;
-    private Intent btServiceIntent;
     // Used to keep track of the items in the RecyclerView
     private RecyclerView.Adapter responseListAdapter;
-    private TextView mStatusTextView;
-    private ServiceConnection mConnection = new ServiceConnection() {
 
-        @Override
-        public void onServiceConnected(ComponentName className,
-                                       IBinder service) {
-            // Bound to the bluetooth service, cast binder and get service instance
-            ObdBluetoothService.ObdServiceBinder binder = (ObdBluetoothService.ObdServiceBinder) service;
-            btService = binder.getService();
-            btService.observeDatabase(HomeActivity.this);
-            bound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            bound = false;
-        }
-    };
+    ObdBluetoothService btService;
+    Intent btServiceIntent;
+    boolean bound;
+    SQLiteDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,16 +73,10 @@ public class HomeActivity extends AppCompatActivity implements IObserver, ObdRes
         // TODO Add user's name to the screen to show successful sign-in for demo
 
         btServiceIntent = new Intent(this, ObdBluetoothService.class);
-
         // Stop any existing services, we don't need more than one running
         stopService(btServiceIntent); // is this immediate?
         // Now start the new service
         startService(btServiceIntent);
-
-        mStatusTextView = (TextView) findViewById(R.id.status_bt);
-        if (mStatusTextView != null) {
-            mStatusTextView.setText(R.string.connecting_bt);
-        }
 
         // Set up the list for responses
         responseListAdapter = new MyObdResponseRecyclerViewAdapter(ObdContent.ITEMS, this);
@@ -106,19 +88,81 @@ public class HomeActivity extends AppCompatActivity implements IObserver, ObdRes
             recyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
             recyclerView.setAdapter(responseListAdapter);
         }
+
+        DbHelper dbHelper = new DbHelper(HomeActivity.this);
+        db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.query(ResponseContract.ResponseEntry.TABLE_NAME, null, null, null, null, null,null);
+        //placeholder table making code
+
+        TableLayout table = (TableLayout) findViewById(R.id.table);
+
+        TableRow tr = new TableRow(this);
+        tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+        TextView tv = new TextView(this);
+        tv.setText("R1Col1");
+
+        TextView tv2 = new TextView(this);
+        tv2.setText("R1Col777");
+        tv2.setPadding(3,3,3,3);
+        TableRow.LayoutParams p = new TableRow.LayoutParams(TableLayout.LayoutParams.WRAP_CONTENT, TableLayout.LayoutParams.WRAP_CONTENT);
+        p.weight = 1;
+        tv.setLayoutParams(p);
+        p.weight = 3;
+        tv2.setLayoutParams(p);
+        tr.addView(tv);
+        tr.addView(tv2);
+        table.addView(tr);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (!bound) {
+            bindService(btServiceIntent, mConnection, Context.BIND_AUTO_CREATE);
+            bound = true;
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // Unbind from the service
+        if (bound) {
+            unbindService(mConnection); //TODO rebind in onContinue
+            bound = false;
+        }
     }
 
     @Override
     public void onListFragmentInteraction(ObdContent.ObdResponse item) {
-        Log.i(TAG, item.toString());
+        Log.i("ObdResponse Card", item.toString());
     }
+
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // Bound to the bluetooth service, cast binder and get service instance
+            ObdBluetoothService.ObdServiceBinder binder = (ObdBluetoothService.ObdServiceBinder) service;
+            btService = binder.getService();
+            btService.observeDatabase((HomeActivity.this));
+            bound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            bound = false;
+        }
+    };
 
     @Override
     public void update(IObservable o, Bundle args) {
         if (args != null && o instanceof DbHelper) {
             DbHelper dbHelper = (DbHelper) o;
             long[] responseIds = args.getLongArray(ResponseContract.ResponseEntry.COLUMN_NAME_ID + "_ARRAY");
-            Cursor cursor = ResponseContract.queryByIds(dbHelper.getReadableDatabase(), responseIds);
+            SQLiteDatabase db = dbHelper.getReadableDatabase();
+            Cursor cursor = ResponseContract.queryByIds(db, responseIds);
             List<ObdContent.ObdResponse> items = new ArrayList<>();
             while (cursor.moveToNext()) {
                 long id = cursor.getLong(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_ID));
@@ -132,30 +176,48 @@ public class HomeActivity extends AppCompatActivity implements IObserver, ObdRes
         }
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        if (!bound) {
-            bindService(btServiceIntent, mConnection, Context.BIND_AUTO_CREATE);
-        }
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return true;
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        // Unbind from the service
-        if (bound) {
-            unbindService(mConnection);
-            bound = false;
-        }
+    protected void goToDemo(View view) {
+        Intent intent = new Intent(this, DemoActivity.class);
+        startActivity(intent);
+    }
+    protected void goToStatic(View view) {
+        Intent intent = new Intent(this, DemoActivity.class);
+        startActivity(intent);
+    }
+    protected void goToDynamic(View view) {
+        Intent intent = new Intent(this, DemoActivity.class);
+        startActivity(intent);
     }
 
-    /**
-     * From the android:onClick parameter of R.id.readData in R.layout.activity_home
-     *
-     * @param view the R.id.readData button
-     */
-    public void readData(View view) {
-        Log.i(TAG, "readData");
+    /*protected void openDrawer(View view) {
+        if (drawer.isDrawerOpen(findViewById(android.R.id.home))) {
+            drawer.closeDrawer(Gravity.LEFT);
+        }
+        else {
+            drawer.openDrawer(Gravity.RIGHT);
+        }
+    }*/
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent;
+        switch (item.getItemId()) {
+            case (R.id.action_carInfo):
+                intent = new Intent(this, CarInfoActivity.class);
+                startActivity(intent);
+                break;
+            case (R.id.action_demo):
+                intent = new Intent(this, DemoActivity.class);
+                startActivity(intent);
+                break;
+            case (R.id.action_trips):
+                intent = new Intent(this, TripsActivity.class);
+                startActivity(intent);
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
