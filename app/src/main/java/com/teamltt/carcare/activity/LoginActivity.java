@@ -171,7 +171,9 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             // Add user to database
             dbHelper = new DbHelper(this);
             // TODO Make sure you're not adding duplicates to the database
-            dbHelper.createNewUser(google_id, firstName, lastName);
+            if (!dbHelper.containsUser(google_id)) {
+                dbHelper.createNewUser(google_id, firstName, lastName);
+            }
 
             // Go to Home Screen
             Intent intent = new Intent(this, HomeActivity.class);

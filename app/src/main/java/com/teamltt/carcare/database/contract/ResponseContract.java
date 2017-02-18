@@ -1,4 +1,5 @@
 /*
+<<<<<<< HEAD
  * Copyright 2017, Team LTT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,6 +13,21 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+=======
+ ** Copyright 2017, Team LTT
+ **
+ ** Licensed under the Apache License, Version 2.0 (the "License");
+ ** you may not use this file except in compliance with the License.
+ ** You may obtain a copy of the License at
+ **
+ **     http://www.apache.org/licenses/LICENSE-2.0
+ **
+ ** Unless required by applicable law or agreed to in writing, software
+ ** distributed under the License is distributed on an "AS IS" BASIS,
+ ** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ ** See the License for the specific language governing permissions and
+ ** limitations under the License.
+>>>>>>> giuliano/dev
  */
 
 package com.teamltt.carcare.database.contract;
@@ -59,6 +75,7 @@ public class ResponseContract {
         values.put(ResponseContract.ResponseEntry.COLUMN_NAME_TRIP_ID, tripId);
         values.put(ResponseContract.ResponseEntry.COLUMN_NAME_NAME, name);
         values.put(ResponseContract.ResponseEntry.COLUMN_NAME_PID, pId);
+
         values.put(ResponseContract.ResponseEntry.COLUMN_NAME_VALUE, value);
         return db.insert(ResponseEntry.TABLE_NAME, null, values);
     }
@@ -91,6 +108,7 @@ public class ResponseContract {
                 ResponseEntry.COLUMN_NAME_VALUE
         };
         String selection = DbHelper.inClauseBuilder(ResponseEntry.COLUMN_NAME_ID, rowIds.length);
+
         String[] selectionArgs = new String[rowIds.length];
         for (int i = 0; i < rowIds.length; i++) {
             selectionArgs[i] = Long.toString(rowIds[i]);

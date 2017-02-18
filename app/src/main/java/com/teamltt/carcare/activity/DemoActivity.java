@@ -30,6 +30,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Spinner;
@@ -340,5 +343,48 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
     @Override
     public void onListFragmentInteraction(ObdContent.ObdResponse item) {
         Log.i("ObdResponse Card", item.toString());
+    }
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    protected void goToDemo(View view) {
+        Intent intent = new Intent(this, DemoActivity.class);
+        startActivity(intent);
+    }
+    protected void goToStatic(View view) {
+        Intent intent = new Intent(this, DemoActivity.class);
+        startActivity(intent);
+    }
+    protected void goToDynamic(View view) {
+        Intent intent = new Intent(this, DemoActivity.class);
+        startActivity(intent);
+    }
+    /*protected void openDrawer(View view) {
+        if (drawer.isDrawerOpen(findViewById(android.R.id.home))) {
+            drawer.closeDrawer(Gravity.LEFT);
+        }
+        else {
+            drawer.openDrawer(Gravity.RIGHT);
+        }
+    }*/
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent;
+        switch (item.getItemId()) {
+            case (R.id.action_carInfo):
+                intent = new Intent(this, CarInfoActivity.class);
+                startActivity(intent);
+                break;
+            case (R.id.action_demo):
+                intent = new Intent(this, DemoActivity.class);
+                startActivity(intent);
+                break;
+            case (R.id.action_trips):
+                intent = new Intent(this, TripsActivity.class);
+                startActivity(intent);
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
