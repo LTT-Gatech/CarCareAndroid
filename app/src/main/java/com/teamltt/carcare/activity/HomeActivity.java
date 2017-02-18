@@ -24,6 +24,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -45,12 +46,13 @@ import com.teamltt.carcare.fragment.MyObdResponseRecyclerViewAdapter;
 import com.teamltt.carcare.fragment.ObdResponseFragment;
 import com.teamltt.carcare.fragment.SimpleDividerItemDecoration;
 import com.teamltt.carcare.model.ObdContent;
+import com.teamltt.carcare.service.BtStatusDisplay;
 import com.teamltt.carcare.service.ObdBluetoothService;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeActivity extends AppCompatActivity implements IObserver, ObdResponseFragment.OnListFragmentInteractionListener {
+public class HomeActivity extends AppCompatActivity implements BtStatusDisplay, IObserver, ObdResponseFragment.OnListFragmentInteractionListener {
 
     // Used to keep track of the items in the RecyclerView
     private RecyclerView.Adapter responseListAdapter;
@@ -68,7 +70,7 @@ public class HomeActivity extends AppCompatActivity implements IObserver, ObdRes
 
         btServiceIntent = new Intent(this, ObdBluetoothService.class);
         // Stop any existing services, we don't need more than one running
-        stopService(btServiceIntent); // is this immediate?
+        stopService(btServiceIntent);
         // Now start the new service
         startService(btServiceIntent);
 
@@ -141,6 +143,7 @@ public class HomeActivity extends AppCompatActivity implements IObserver, ObdRes
             ObdBluetoothService.ObdServiceBinder binder = (ObdBluetoothService.ObdServiceBinder) service;
             btService = binder.getService();
             btService.observeDatabase((HomeActivity.this));
+            btService.addDisplay(HomeActivity.this);
             bound = true;
         }
 
@@ -155,17 +158,8 @@ public class HomeActivity extends AppCompatActivity implements IObserver, ObdRes
         if (args != null && o instanceof DbHelper) {
             DbHelper dbHelper = (DbHelper) o;
             long[] responseIds = args.getLongArray(ResponseContract.ResponseEntry.COLUMN_NAME_ID + "_ARRAY");
-            SQLiteDatabase db = dbHelper.getReadableDatabase();
-            Cursor cursor = ResponseContract.queryByIds(db, responseIds);
-            List<ObdContent.ObdResponse> items = new ArrayList<>();
-            while (cursor.moveToNext()) {
-                long id = cursor.getLong(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_ID));
-                String name = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_NAME));
-                String value = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_VALUE));
-                items.add(ObdContent.createItemWithResponse(((Long) id).intValue(), name, value));
-            }
-            cursor.close();
-            ObdContent.addItems(items);
+            List<ObdContent.ObdResponse> items = dbHelper.getResponsesById(responseIds);
+            ObdContent.setItems(items);
             responseListAdapter.notifyDataSetChanged();
         }
     }
@@ -213,5 +207,27 @@ public class HomeActivity extends AppCompatActivity implements IObserver, ObdRes
                 startActivity(intent);
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void displayStatus(String status) {
+        ((TextView) findViewById(R.id.status_bt)).setText(status);
+    }
+
+    /**
+     * Starts a new trip or finishes the current one
+     * @param item The button that was pressed
+     */
+    public void toggleLogging(MenuItem item) {
+        if (item.getTitle().equals(getString(R.string.stop_logging))) {
+            // Stop the service's work
+            item.setTitle(getString(R.string.start_logging));
+            btService.stopTrip();
+        } else {
+            // Make service start doing work
+            item.setTitle(getString(R.string.stop_logging));
+            btService.startNewTrip();
+        }
+
     }
 }
