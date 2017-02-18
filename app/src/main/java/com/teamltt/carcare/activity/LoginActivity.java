@@ -88,6 +88,9 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     @Override
     protected void onStart() {
         super.onStart();
+        if (!googleApiClient.isConnected()) {
+            googleApiClient.connect();
+        }
         OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(googleApiClient);
         if (opr.isDone()) {
             // If the user's cached credentials are valid, the OptionalPendingResult will be "done"
@@ -173,7 +176,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
             // Add user to database
             dbHelper = new DbHelper(this);
-            // TODO Make sure you're not adding duplicates to the database
+            // Make sure you're not adding duplicates to the database
             if (!dbHelper.containsUser(google_id)) {
                 dbHelper.createNewUser(google_id, firstName, lastName);
             }
@@ -183,6 +186,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             intent.putExtra(EXTRA_FIRST_NAME, firstName);
             intent.putExtra(EXTRA_LAST_NAME, lastName);
             intent.putExtra(EXTRA_USER_ID, google_id);
+            startActivity(intent);
         } else {
             tvStatus.setText(R.string.please_sign_in);
 
