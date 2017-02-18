@@ -22,7 +22,7 @@
     <string name="connect_bt">Connect</string>
     <string name="connected_bt">Connected</string>
     <string name="connecting_bt">Connecting&#8230;</string>
-    <string name="not_connecting_bt">Not connecting&#8230;</string>
+    <string name="not_connecting_bt">Not connected</string>
     <string name="status_bt">Bluetooth status:</string>
     <string name="request_selector">Request Selector:</string>
     <string name="send_request">Send Request</string>
@@ -36,4 +36,6 @@
     <string name="error_null_person">Error: Returned null.</string>
     <string name="loading">Loading</string>
     <string name="please_sign_in">Please sign in.</string>
+    <string name="start_logging">Start logging</string>
+    <string name="stop_logging">Stop Logging</string>
 </resources>

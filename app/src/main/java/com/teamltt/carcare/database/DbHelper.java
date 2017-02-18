@@ -198,6 +198,20 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         return status;
     }
 
+    public List<ObdContent.ObdResponse> getResponsesById(long[] responseIds) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = ResponseContract.queryByIds(db, responseIds);
+        List<ObdContent.ObdResponse> items = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            long id = cursor.getLong(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_ID));
+            String name = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_NAME));
+            String value = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_VALUE));
+            items.add(ObdContent.createItemWithResponse(((Long) id).intValue(), name, value));
+        }
+        cursor.close();
+        return items;
+    }
+
     public Vehicle getVehicle(long vehicleId) {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = VehicleContract.query(db, vehicleId);
