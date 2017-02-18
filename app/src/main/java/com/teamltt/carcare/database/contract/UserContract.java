@@ -40,8 +40,9 @@ public class UserContract {
                 UserEntry.COLUMN_NAME_FIRST_NAME,
                 UserEntry.COLUMN_NAME_LAST_NAME
         };
-        String where_cond = "UserEntry.COLUMN_GOOGLE_USER_ID = " + google_user_id;
-        return db.query(table, columns, where_cond, null, null, null, null);
+        String where_cond = UserEntry.COLUMN_NAME_GOOGLE_USER_ID + " = ?";
+        String[] args = {google_user_id};
+        return db.query(table, columns, where_cond, args, null, null, null);
     }
 
     public static long insert(SQLiteDatabase db, String google_user_id, String firstName, String lastName) {
