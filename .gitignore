@@ -23,3 +23,5 @@ build/
 # Maven
 target/
 
+/google-services.json
+
