@@ -282,17 +282,29 @@ public class ObdBluetoothService extends Service {
         try {
             socket = new DeviceSocket(obdDevice.createRfcommSocketToServiceRecord(uuid));
             sendToDisplays(getString(R.string.connecting_bt));
-            connectTask.execute();
+            new ConnectTask().execute();
 
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    public void stopTrip() {
+        try {
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void startNewTrip () {
+        new ConnectTask().execute();
+    }
+
     /**
      * This task takes control of the device's bluetooth and opens a socket to the OBD adapter.
      */
-    AsyncTask<Void, Void, Void> connectTask = new AsyncTask<Void, Void, Void>() {
+    private class ConnectTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
             try {
@@ -322,10 +334,11 @@ public class ObdBluetoothService extends Service {
         protected void onPostExecute(Void result) {
             // TODO Add user feedback with Messenger and Handler
             // change R.id.status_bt to display connected
-            Log.i(TAG, "bluetooth connected");
             if (dbHelper != null && socket.isConnected()) {
+                Log.i(TAG, "bluetooth connected");
                 queryTask.execute();
             } else {
+                Log.i(TAG, "bluetooth not connected");
                 sendToDisplays(getString(R.string.retry_connect));
             }
         }
