@@ -39,11 +39,10 @@ import android.widget.TextView;
 public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
 
     GoogleApiClient googleApiClient;
+    GoogleSignInAccount googleSignInAccount;
 
     private static final String TAG = "SignInActivity";
     private static final int RC_SIGN_IN = 9001;
-
-    GoogleSignInAccount googleSignInAccount;
 
     private TextView tvStatus;
     ProgressDialog progressDialog;
