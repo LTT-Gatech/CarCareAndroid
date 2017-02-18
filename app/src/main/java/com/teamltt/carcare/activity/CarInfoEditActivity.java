@@ -56,6 +56,7 @@ public class CarInfoEditActivity extends AppCompatActivity {
         tv.setText(info.getString(info.getColumnIndex(VehicleContract.VehicleEntry.COLUMN_NAME_COLOR)));
         tv = (TextView)findViewById(R.id.fieldPlate);
         tv.setText(info.getString(info.getColumnIndex(VehicleContract.VehicleEntry.COLUMN_NAME_PLATE_NUMBER)));
+        info.close();
 
 
     }
@@ -92,7 +93,7 @@ public class CarInfoEditActivity extends AppCompatActivity {
 
             String input;
             ContentValues values = new ContentValues();
-            int id = 1;//this id is hardcoded until we have somewhere to store preferences
+            int id = 777;//this id is hardcoded until we have somewhere to store preferences
 
             TextView tv = (TextView)findViewById(R.id.fieldVIN);
             input = tv.getText().toString();
@@ -115,9 +116,10 @@ public class CarInfoEditActivity extends AppCompatActivity {
             long newRowId = db.update(VehicleContract.VehicleEntry.TABLE_NAME, values, "vehicle_id="+id, null);
 
 
+            //i have no idea why this is here but im going to keep it until i can test it
+            //Cursor cursor = db.query(VehicleContract.VehicleEntry.TABLE_NAME, null, null, null, null, null,null);
+            //cursor.moveToFirst();
 
-            Cursor cursor = db.query(VehicleContract.VehicleEntry.TABLE_NAME, null, null, null, null, null,null);
-            cursor.moveToFirst();
 
         }
         db.close();

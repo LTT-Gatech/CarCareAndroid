@@ -33,7 +33,8 @@ public class CarInfoActivity extends AppCompatActivity {
 
         Cursor info = db.query(VehicleContract.VehicleEntry.TABLE_NAME, null, null, null, null, null,null);
         Log.i("count", ""+info.getCount());
-        if (info.getCount() < 2) {
+        //HACK auto populates the database with 1 vehicle
+        if (info.getCount() < 1) {
             ContentValues values = new ContentValues();
             values.put(VehicleContract.VehicleEntry.COLUMN_NAME_ID, 777);
             values.put(VehicleContract.VehicleEntry.COLUMN_NAME_VIN, "123123");
@@ -61,6 +62,7 @@ public class CarInfoActivity extends AppCompatActivity {
         tv = (TextView)findViewById(R.id.fieldPlate);
         tv.setText(info.getString(info.getColumnIndex(VehicleContract.VehicleEntry.COLUMN_NAME_PLATE_NUMBER)));
         db.close();
+        info.close();
 
 
     }
