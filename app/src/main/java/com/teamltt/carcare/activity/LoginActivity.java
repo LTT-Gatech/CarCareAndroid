@@ -210,13 +210,5 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (!googleApiClient.isConnected()) {
-            googleApiClient.connect();
-        }
-    }
-
 
 }
