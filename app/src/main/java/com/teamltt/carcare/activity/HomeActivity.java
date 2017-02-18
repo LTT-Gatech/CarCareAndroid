@@ -52,7 +52,7 @@ import com.teamltt.carcare.service.ObdBluetoothService;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeActivity extends AppCompatActivity implements BtStatusDisplay, IObserver, ObdResponseFragment.OnListFragmentInteractionListener {
+public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObserver, ObdResponseFragment.OnListFragmentInteractionListener {
 
     // Used to keep track of the items in the RecyclerView
     private RecyclerView.Adapter responseListAdapter;
@@ -64,8 +64,8 @@ public class HomeActivity extends AppCompatActivity implements BtStatusDisplay, 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        activityContent = R.layout.activity_home;
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
 
 
         btServiceIntent = new Intent(this, ObdBluetoothService.class);
@@ -107,7 +107,7 @@ public class HomeActivity extends AppCompatActivity implements BtStatusDisplay, 
         tv2.setLayoutParams(p);
         tr.addView(tv);
         tr.addView(tv2);
-        table.addView(tr);
+        //table.addView(tr);
     }
 
     @Override
