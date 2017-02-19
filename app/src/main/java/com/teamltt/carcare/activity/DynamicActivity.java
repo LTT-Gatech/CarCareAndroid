@@ -94,6 +94,10 @@ public class DynamicActivity extends AppCompatActivity {
                 intent = new Intent(this, DynamicActivity.class);
                 startActivity(intent);
                 break;
+            case (R.id.action_reminder):
+                intent = new Intent(this, ReminderActivity.class);
+                startActivity(intent);
+                break;
         }
         return super.onOptionsItemSelected(item);
     }

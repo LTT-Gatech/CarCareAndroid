@@ -43,6 +43,8 @@
         android:id="@+id/listAlert">
 
     </ListView>
+    <!--This view is the placeholder divisor you see between alerts
+     and the next thing when the app runs-->
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"

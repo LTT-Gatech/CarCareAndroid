@@ -21,6 +21,11 @@
         android:title="Dynamic"
         />
     <item
+        android:id="@+id/action_reminder"
+        android:orderInCategory="3"
+        android:title="Reminders"
+        />
+    <item
         android:id="@+id/action_bluetooth"
         android:orderInCategory="3"
         android:title="@string/stop_logging"

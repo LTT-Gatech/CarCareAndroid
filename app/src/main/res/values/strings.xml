@@ -42,10 +42,16 @@
     <string name="text_from">Starting Date</string>
     <string name="text_to">Ending Date</string>
     <string name="data_value">Current data type value: placeholder</string>
+    <string name="text_reminder_title">Maintenance Reminders</string>
+    <string name="text_reminder">Placeholder reminder text</string>
+    <string name="button_create_new">Create New</string>
+    <string name="button_back">Back</string>
     <!---Dynamic activity strings-->
     <string name="title_dynamic">Dynamic title visual placeholder</string>
     <string name="button_from">From</string>
     <string name="button_to">To</string>
+
+    <string name="field_reminder_name">Reminder Name</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
