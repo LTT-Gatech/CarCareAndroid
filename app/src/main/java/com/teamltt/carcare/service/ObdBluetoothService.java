@@ -71,8 +71,6 @@ public class ObdBluetoothService extends Service {
 
     private int numBound = 0;
 
-    private Set<IObserver> dbObservers = new HashSet<>();
-
     private boolean bluetoothReceiverRegistered = false;
     private boolean discoveryReceiverRegistered = false;
 
@@ -132,6 +130,7 @@ public class ObdBluetoothService extends Service {
     public void onCreate(){
         super.onCreate();
         btActivities = new HashSet<>();
+        dbHelper = new DbHelper(ObdBluetoothService.this);
     }
 
     /**
@@ -158,15 +157,12 @@ public class ObdBluetoothService extends Service {
      * @param observer An observer entity, like an Activity that shows data from the Response table
      */
     public void observeDatabase(IObserver observer) {
-        dbObservers.add(observer);
+        dbHelper.addObserver(observer);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "onStartCommand");
-
-        // Connect to the database
-        dbHelper = new DbHelper(ObdBluetoothService.this);
 
 
         // Register the BroadcastReceiver
@@ -285,11 +281,6 @@ public class ObdBluetoothService extends Service {
     private class ConnectTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
-            // Connect the activities to the writable database
-            for (IObserver observer : dbObservers) {
-                Log.i("test", "finally adding observer to database helper");
-                dbHelper.addObserver(observer);
-            }
             // Connect the device's bluetooth to the OBD adapter
             try {
                 // Android advises to cancel discovery before using socket.connect()
