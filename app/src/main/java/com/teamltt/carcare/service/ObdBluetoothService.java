@@ -337,7 +337,6 @@ public class ObdBluetoothService extends Service {
 
         @Override
         protected Void doInBackground(Void... ignore) {
-            Log.i("test", "query running");
             try {
                 if (socket.isConnected()) {
                     EchoOffCommand echo = new EchoOffCommand();
@@ -402,7 +401,6 @@ public class ObdBluetoothService extends Service {
         protected void onProgressUpdate(Void... ignore) {
             super.onProgressUpdate(ignore);
             if (!newResponseIds.isEmpty()) {
-                Log.i("test", "publish in service");
                 Bundle args = new Bundle();
                 args.putLong(TripContract.TripEntry.COLUMN_NAME_ID, tripId);
 
