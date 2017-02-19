@@ -16,11 +16,11 @@
   -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.teamltt.carcare">
+          package="com.teamltt.carcare">
 
-    <uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
         android:allowBackup="true"
@@ -30,26 +30,26 @@
         android:theme="@style/AppTheme">
         <activity android:name=".activity.LoginActivity">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".activity.DemoActivity" />
-        <activity android:name=".activity.HomeActivity" />
-        <activity android:name=".activity.TripsActivity" />
-        <activity android:name=".activity.StaticActivity" />
-        <activity android:name=".activity.DynamicActivity" />
+        <activity android:name=".activity.DemoActivity"/>
+        <activity android:name=".activity.HomeActivity"/>
+        <activity android:name=".activity.TripsActivity"/>
+        <activity android:name=".activity.StaticActivity"/>
+        <activity android:name=".activity.DynamicActivity"/>
         <activity android:name=".activity.CarInfoActivity">
 
         </activity>
-        <activity android:name=".activity.CarInfoEditActivity" />
+        <activity android:name=".activity.CarInfoEditActivity"/>
 
 
         <service
             android:name=".service.ObdBluetoothService"
+            android:description="@string/bt_service_description"
             android:enabled="true"
-            android:exported="false"
-            android:description="@string/bt_service_description">
+            android:exported="false">
         </service>
 
     </application>
