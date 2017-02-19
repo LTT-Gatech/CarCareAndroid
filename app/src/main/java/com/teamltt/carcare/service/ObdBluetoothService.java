@@ -133,6 +133,23 @@ public class ObdBluetoothService extends Service {
         dbHelper = new DbHelper(ObdBluetoothService.this);
     }
 
+    @Override
+    public void onDestroy() {
+        // release resources
+        Log.i(TAG, "onDestroy");
+        if (discoveryReceiverRegistered) {
+            unregisterReceiver(discoveryReceiver);
+        }
+        if (bluetoothReceiverRegistered) {
+            unregisterReceiver(bluetoothReceiver);
+        }
+        if (dbHelper != null) {
+            dbHelper.deleteObservers();
+            dbHelper.close();
+        }
+
+    }
+
     /**
      * Activities wanting to use this service will bind with it, but it will also be started, so in the absence of
      * activities, data should still be logged.
@@ -149,15 +166,6 @@ public class ObdBluetoothService extends Service {
         numBound--;
         Log.i(TAG, "onUnbind " + numBound);
         return super.onUnbind(intent);
-    }
-
-
-    /**
-     * Registers an Observer with the database
-     * @param observer An observer entity, like an Activity that shows data from the Response table
-     */
-    public void observeDatabase(IObserver observer) {
-        dbHelper.addObserver(observer);
     }
 
     @Override
@@ -201,21 +209,17 @@ public class ObdBluetoothService extends Service {
 
     }
 
-    @Override
-    public void onDestroy() {
-        // release resources
-        Log.i(TAG, "onDestroy");
-        if (discoveryReceiverRegistered) {
-            unregisterReceiver(discoveryReceiver);
-        }
-        if (bluetoothReceiverRegistered) {
-            unregisterReceiver(bluetoothReceiver);
-        }
-        if (dbHelper != null) {
-            dbHelper.deleteObservers();
-            dbHelper.close();
-        }
+    /**
+     * Registers an Observer with the database
+     *
+     * @param observer An observer entity, like an Activity that shows data from the Response table
+     */
+    public void observeDatabase(IObserver observer) {
+        dbHelper.addObserver(observer);
+    }
 
+    public void unobserveDatabaset(IObserver observer) {
+        dbHelper.deleteObserver(observer);
     }
 
     /**

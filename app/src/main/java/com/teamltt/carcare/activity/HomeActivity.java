@@ -100,7 +100,8 @@ public class HomeActivity extends AppCompatActivity implements BtStatusDisplay, 
         super.onStop();
         // Unbind from the service
         if (bound) {
-            unbindService(mConnection); //TODO rebind in onContinue
+            btService.unobserveDatabaset(HomeActivity.this);
+            unbindService(mConnection);
             bound = false;
         }
     }
