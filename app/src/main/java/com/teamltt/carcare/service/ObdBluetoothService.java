@@ -1,5 +1,4 @@
 /*
-<<<<<<< HEAD
  * Copyright 2017, Team LTT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,21 +12,6 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-=======
- ** Copyright 2017, Team LTT
- **
- ** Licensed under the Apache License, Version 2.0 (the "License");
- ** you may not use this file except in compliance with the License.
- ** You may obtain a copy of the License at
- **
- **     http://www.apache.org/licenses/LICENSE-2.0
- **
- ** Unless required by applicable law or agreed to in writing, software
- ** distributed under the License is distributed on an "AS IS" BASIS,
- ** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- ** See the License for the specific language governing permissions and
- ** limitations under the License.
->>>>>>> giuliano/dev
  */
 
 package com.teamltt.carcare.service;
@@ -42,7 +26,6 @@ import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Bundle;
-import android.os.Debug;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -61,8 +44,6 @@ import com.teamltt.carcare.database.contract.TripContract;
 
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -95,7 +76,7 @@ public class ObdBluetoothService extends Service {
     private boolean bluetoothReceiverRegistered = false;
     private boolean discoveryReceiverRegistered = false;
 
-    private List<BtStatusDisplay> btActivities;
+    private Set<BtStatusDisplay> btActivities;
 
     /**
      * Used to catch bluetooth status related events.
@@ -109,13 +90,11 @@ public class ObdBluetoothService extends Service {
             if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
                 int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1);
 
-                switch (state){
+                switch (state) {
                     case BluetoothAdapter.STATE_ON:
                         //Indicates the local Bluetooth adapter is on, and ready for use.
-                        sendToDisplays(getString(R.string.connecting_bt));
                         getObdDevice();
                         break;
-
                 }
             }
         }
@@ -152,7 +131,7 @@ public class ObdBluetoothService extends Service {
     @Override
     public void onCreate(){
         super.onCreate();
-        btActivities = new LinkedList<>();
+        btActivities = new HashSet<>();
     }
 
     /**
@@ -229,7 +208,6 @@ public class ObdBluetoothService extends Service {
     @Override
     public void onDestroy() {
         // release resources
-
         Log.i(TAG, "onDestroy");
         if (discoveryReceiverRegistered) {
             unregisterReceiver(discoveryReceiver);
@@ -283,9 +261,7 @@ public class ObdBluetoothService extends Service {
         Log.i(TAG, "trying socket creation");
         try {
             socket = new DeviceSocket(obdDevice.createRfcommSocketToServiceRecord(uuid));
-            sendToDisplays(getString(R.string.connecting_bt));
-            new ConnectTask().execute();
-
+            startNewTrip();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -324,8 +300,10 @@ public class ObdBluetoothService extends Service {
                         bluetoothAdapter.cancelDiscovery();
                     }
                     socket.connect();
+                    sendToDisplays(getString(R.string.connected_bt));
                 } else {
                     Log.i(TAG, "Bluetooth is not on");
+                    sendToDisplays(getString(R.string.not_connecting_bt));
                 }
 
 
@@ -347,7 +325,7 @@ public class ObdBluetoothService extends Service {
                 sendToDisplays(getString(R.string.retry_connect));
             }
         }
-    };
+    }
 
     /**
      * This task checks periodically if the car is on, then starts cycling through commands that CarCare tracks and
@@ -367,7 +345,6 @@ public class ObdBluetoothService extends Service {
             Log.i("test", "query running");
             try {
                 if (socket.isConnected()) {
-
                     EchoOffCommand echo = new EchoOffCommand();
                     echo.run(socket.getInputStream(), socket.getOutputStream());
                 }

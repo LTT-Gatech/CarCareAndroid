@@ -20,11 +20,8 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -33,8 +30,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.teamltt.carcare.R;
@@ -49,7 +44,6 @@ import com.teamltt.carcare.model.ObdContent;
 import com.teamltt.carcare.service.BtStatusDisplay;
 import com.teamltt.carcare.service.ObdBluetoothService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class HomeActivity extends AppCompatActivity implements BtStatusDisplay, IObserver, ObdResponseFragment.OnListFragmentInteractionListener {
@@ -60,7 +54,6 @@ public class HomeActivity extends AppCompatActivity implements BtStatusDisplay, 
     ObdBluetoothService btService;
     Intent btServiceIntent;
     boolean bound;
-    SQLiteDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,10 +84,6 @@ public class HomeActivity extends AppCompatActivity implements BtStatusDisplay, 
             recyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
             recyclerView.setAdapter(responseListAdapter);
         }
-
-        DbHelper dbHelper = new DbHelper(HomeActivity.this);
-        db = dbHelper.getReadableDatabase();
-
     }
 
     @Override

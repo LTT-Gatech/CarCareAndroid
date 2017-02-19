@@ -156,7 +156,11 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = UserContract.queryUserID(db, google_user_id);
         db.close();
-        return cursor != null;
+        if (cursor != null) {
+            cursor.close();
+            return true;
+        }
+        return false;
     }
 
     public List<Long> getAllTripIds() {

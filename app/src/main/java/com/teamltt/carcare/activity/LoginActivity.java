@@ -16,6 +16,14 @@
 
 package com.teamltt.carcare.activity;
 
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
+
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -26,14 +34,6 @@ import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.teamltt.carcare.R;
 import com.teamltt.carcare.database.DbHelper;
-
-import android.app.ProgressDialog;
-import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.TextView;
 
 
 public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
@@ -46,8 +46,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
     private TextView tvStatus;
     ProgressDialog progressDialog;
-
-    private DbHelper dbHelper;
 
     public final static String EXTRA_FIRST_NAME = "com.teamltt.carcare.activity.LoginActivity.FIRSTNAME";
     public final static String EXTRA_LAST_NAME = "com.teamltt.carcare.activity.LoginActivity.LASTNAME";
@@ -174,11 +172,12 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             String google_id = googleSignInAccount.getId();
 
             // Add user to database
-            dbHelper = new DbHelper(this);
+            DbHelper dbHelper = new DbHelper(this);
             // Make sure you're not adding duplicates to the database
             if (!dbHelper.containsUser(google_id)) {
                 dbHelper.createNewUser(google_id, firstName, lastName);
             }
+            dbHelper.close();
 
             // Go to Home Screen
             Intent intent = new Intent(this, HomeActivity.class);
