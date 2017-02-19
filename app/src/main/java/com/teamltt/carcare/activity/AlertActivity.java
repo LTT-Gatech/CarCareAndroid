@@ -25,12 +25,12 @@ import android.view.MenuItem;
 
 import com.teamltt.carcare.R;
 
-public class StaticActivity extends AppCompatActivity {
+public class AlertActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_static);
+        setContentView(R.layout.activity_alert);
     }
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -51,10 +51,6 @@ public class StaticActivity extends AppCompatActivity {
             case (R.id.action_trips):
                 intent = new Intent(this, TripsActivity.class);
                 startActivity(intent);
-            case (R.id.action_dynamic):
-                intent = new Intent(this, DynamicActivity.class);
-                startActivity(intent);
-                break;
         }
         return super.onOptionsItemSelected(item);
     }

@@ -212,6 +212,11 @@ public class HomeActivity extends AppCompatActivity implements BtStatusDisplay, 
             case (R.id.action_trips):
                 intent = new Intent(this, TripsActivity.class);
                 startActivity(intent);
+                break;
+            case (R.id.action_dynamic):
+                intent = new Intent(this, DynamicActivity.class);
+                startActivity(intent);
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
