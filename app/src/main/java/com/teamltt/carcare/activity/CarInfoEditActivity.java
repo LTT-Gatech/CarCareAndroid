@@ -1,12 +1,8 @@
 package com.teamltt.carcare.activity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
@@ -88,9 +84,7 @@ public class CarInfoEditActivity extends AppCompatActivity {
         String plateNumber = ((TextView) findViewById(R.id.fieldPlate)).getText().toString();
 
         Vehicle vehicle = new Vehicle(vin, make, model, year, color, nickname, plateNumber);
-
         int numAffected = dbHelper.updateVehicle(vehicleId, vehicle);
-
         return numAffected > 0;
     }
 }

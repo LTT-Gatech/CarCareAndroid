@@ -39,8 +39,7 @@ public class CarInfoActivity extends AppCompatActivity {
         vehicleId = 1;
         //HACK auto populates the database with 1 vehicle
         if (info.getCount() == 0) {
-            Vehicle foo = new Vehicle("123123", "Toyota", "Yaris", "2000", "Silver", "Car name", "BVL3636");
-            vehicleId = dbHelper.createNewVehicle(foo);
+            vehicleId = dbHelper.createNewVehicle(new Vehicle("", "", "", "", "", "", ""));
             if (vehicleId == -1) {
                 Log.e(TAG, "problem creating new vehicle");
                 finish();
