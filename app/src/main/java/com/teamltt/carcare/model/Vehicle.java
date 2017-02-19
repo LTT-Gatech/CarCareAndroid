@@ -17,21 +17,72 @@
 package com.teamltt.carcare.model;
 
 public class Vehicle {
+    private String vin, make, model, year, color, nickname, plateNumber;
 
-    private long vehicleId;
-    private String nickname;
-
-    public Vehicle(long vehicleId, String nickname) {
-        // TODO complete vehicle class
-        this.vehicleId = vehicleId;
+    public Vehicle(String vin, String make, String model, String year, String color,
+                   String nickname, String plateNumber) {
+        this.vin = vin;
+        this.make = make;
+        this.model = model;
+        this.year = year;
+        this.color = color;
         this.nickname = nickname;
+        this.plateNumber = plateNumber;
     }
 
-    public long getVehicleId() {
-        return vehicleId;
+    public String getVin() {
+        return vin;
+    }
+
+    public void setVin(String vin) {
+        this.vin = vin;
+    }
+
+    public String getMake() {
+        return make;
+    }
+
+    public void setMake(String make) {
+        this.make = make;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
+    public String getYear() {
+        return year;
+    }
+
+    public void setYear(String year) {
+        this.year = year;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
     }
 
     public String getNickname() {
         return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public String getPlateNumber() {
+        return plateNumber;
+    }
+
+    public void setPlateNumber(String plateNumber) {
+        this.plateNumber = plateNumber;
     }
 }
