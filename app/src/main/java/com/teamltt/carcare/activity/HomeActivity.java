@@ -94,27 +94,7 @@ public class HomeActivity extends AppCompatActivity implements BtStatusDisplay, 
 
         DbHelper dbHelper = new DbHelper(HomeActivity.this);
         db = dbHelper.getReadableDatabase();
-        Cursor cursor = db.query(ResponseContract.ResponseEntry.TABLE_NAME, null, null, null, null, null,null);
-        //placeholder table making code
 
-        TableLayout table = (TableLayout) findViewById(R.id.table);
-
-        TableRow tr = new TableRow(this);
-        tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-        TextView tv = new TextView(this);
-        tv.setText("R1Col1");
-
-        TextView tv2 = new TextView(this);
-        tv2.setText("R1Col777");
-        tv2.setPadding(3,3,3,3);
-        TableRow.LayoutParams p = new TableRow.LayoutParams(TableLayout.LayoutParams.WRAP_CONTENT, TableLayout.LayoutParams.WRAP_CONTENT);
-        p.weight = 1;
-        tv.setLayoutParams(p);
-        p.weight = 3;
-        tv2.setLayoutParams(p);
-        tr.addView(tv);
-        tr.addView(tv2);
-        table.addView(tr);
     }
 
     @Override

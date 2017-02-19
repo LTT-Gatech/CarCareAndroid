@@ -162,19 +162,18 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
     public List<Long> getAllTripIds() {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = TripContract.queryAll(db);
-        db.close();
         List<Long> tripIds = new ArrayList<>();
         while (cursor.moveToNext()) {
             tripIds.add(cursor.getLong(cursor.getColumnIndexOrThrow(TripContract.TripEntry.COLUMN_NAME_ID)));
         }
         cursor.close();
+        db.close();
         return tripIds;
     }
 
     public List<ObdContent.ObdResponse> getResponsesByTrip(long tripId) {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = ResponseContract.queryByTripId(db, tripId);
-        db.close();
         List<ObdContent.ObdResponse> responses = new ArrayList<>();
         while (cursor.moveToNext()) {
             long id = cursor.getLong(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_ID));
@@ -183,6 +182,7 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
             responses.add(ObdContent.createItemWithResponse(((Long) id).intValue(), name, value));
         }
         cursor.close();
+        db.close();
         return responses;
     }
 
@@ -209,6 +209,7 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
             items.add(ObdContent.createItemWithResponse(((Long) id).intValue(), name, value));
         }
         cursor.close();
+        db.close();
         return items;
     }
 
@@ -217,6 +218,8 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         Cursor cursor = VehicleContract.query(db, vehicleId);
         long id = cursor.getLong(cursor.getColumnIndexOrThrow(VehicleContract.VehicleEntry.COLUMN_NAME_ID));
         String nickname = cursor.getString(cursor.getColumnIndexOrThrow(VehicleContract.VehicleEntry.COLUMN_NAME_NICKNAME));
+        cursor.close();
+        db.close();
         return new Vehicle(id, nickname);
     }
 

@@ -42,6 +42,7 @@ import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Bundle;
+import android.os.Debug;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -49,6 +50,7 @@ import com.github.pires.obd.commands.ObdCommand;
 import com.github.pires.obd.commands.SpeedCommand;
 import com.github.pires.obd.commands.engine.RPMCommand;
 import com.github.pires.obd.commands.engine.RuntimeCommand;
+import com.github.pires.obd.commands.protocol.EchoOffCommand;
 import com.teamltt.carcare.R;
 import com.teamltt.carcare.adapter.IObdSocket;
 import com.teamltt.carcare.adapter.bluetooth.DeviceSocket;
@@ -307,6 +309,12 @@ public class ObdBluetoothService extends Service {
     private class ConnectTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
+            // Connect the activities to the writable database
+            for (IObserver observer : dbObservers) {
+                Log.i("test", "finally adding observer to database helper");
+                dbHelper.addObserver(observer);
+            }
+            // Connect the device's bluetooth to the OBD adapter
             try {
                 // Android advises to cancel discovery before using socket.connect()
                 if (bluetoothAdapter.isEnabled()) {
@@ -320,10 +328,7 @@ public class ObdBluetoothService extends Service {
                     Log.i(TAG, "Bluetooth is not on");
                 }
 
-                for (IObserver observer : dbObservers) {
 
-                    dbHelper.addObserver(observer);
-                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -359,7 +364,14 @@ public class ObdBluetoothService extends Service {
 
         @Override
         protected Void doInBackground(Void... ignore) {
+            Log.i("test", "query running");
             try {
+                if (socket.isConnected()) {
+
+                    EchoOffCommand echo = new EchoOffCommand();
+                    echo.run(socket.getInputStream(), socket.getOutputStream());
+                }
+
                 while (socket.isConnected()) {
                     // Check for can's "heartbeat"
                     ObdCommand heartbeat = new RPMCommand();
@@ -384,6 +396,7 @@ public class ObdBluetoothService extends Service {
                     // TODO get these classes from somewhere else
                     commands.add(RuntimeCommand.class);
                     commands.add(SpeedCommand.class);
+                    commands.add(RPMCommand.class);
 
                     for (Class<? extends ObdCommand> commandClass : commands) {
                         ObdCommand sendCommand = commandClass.newInstance();
@@ -393,8 +406,11 @@ public class ObdBluetoothService extends Service {
                             // In case the Bluetooth connection breaks suddenly
                             break;
                         }
-                        long responseId = dbHelper.insertResponse(tripId, sendCommand.getName(),
-                                sendCommand.getCommandPID(), sendCommand.getFormattedResult());
+                        String name = sendCommand.getName();
+                        String commandPID = sendCommand.getCommandPID();
+                        String formattedResult = sendCommand.getFormattedResult();
+                        long responseId = dbHelper.insertResponse(tripId, name,
+                                commandPID, formattedResult);
                         if (responseId > DbHelper.DB_OK) {
                             newResponseIds.add(responseId);
                         }
@@ -414,6 +430,7 @@ public class ObdBluetoothService extends Service {
         protected void onProgressUpdate(Void... ignore) {
             super.onProgressUpdate(ignore);
             if (!newResponseIds.isEmpty()) {
+                Log.i("test", "publish in service");
                 Bundle args = new Bundle();
                 args.putLong(TripContract.TripEntry.COLUMN_NAME_ID, tripId);
 
