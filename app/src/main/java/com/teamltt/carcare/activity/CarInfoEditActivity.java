@@ -20,7 +20,6 @@ public class CarInfoEditActivity extends AppCompatActivity {
 
     private boolean edited = false;
     private DbHelper dbHelper;
-    Cursor info;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,7 +40,7 @@ public class CarInfoEditActivity extends AppCompatActivity {
         long newRowId = db.insert(VehicleContract.VehicleEntry.TABLE_NAME, null, values);
         Log.i("table printing", ""+newRowId);*/
 
-        info = db.query(VehicleContract.VehicleEntry.TABLE_NAME, null, null, null, null, null,null);
+        Cursor info = db.query(VehicleContract.VehicleEntry.TABLE_NAME, null, null, null, null, null, null);
 
         info.moveToFirst();
 
@@ -125,6 +124,12 @@ public class CarInfoEditActivity extends AppCompatActivity {
 
 
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        dbHelper.close();
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
