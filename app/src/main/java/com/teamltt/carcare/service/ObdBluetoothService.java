@@ -127,7 +127,7 @@ public class ObdBluetoothService extends Service {
     };
 
     @Override
-    public void onCreate() {
+    public void onCreate(){
         super.onCreate();
         btActivities = new HashSet<>();
         dbHelper = new DbHelper(ObdBluetoothService.this);
@@ -275,7 +275,7 @@ public class ObdBluetoothService extends Service {
         }
     }
 
-    public void startNewTrip() {
+    public void startNewTrip () {
         new ConnectTask().execute();
     }
 
@@ -294,7 +294,7 @@ public class ObdBluetoothService extends Service {
                         // Return value of cancelDiscovery will always be true here because bluetoothAdapter.isEnabled() is true
                         bluetoothAdapter.cancelDiscovery();
                     }
-                    //socket.connect();
+                    socket.connect();
                     sendToDisplays(getString(R.string.connected_bt));
                 } else {
                     Log.i(TAG, "Bluetooth is not on");
@@ -302,7 +302,7 @@ public class ObdBluetoothService extends Service {
                 }
 
 
-            } catch (Exception e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
             return null;
@@ -312,7 +312,7 @@ public class ObdBluetoothService extends Service {
         protected void onPostExecute(Void result) {
             // TODO Add user feedback with Messenger and Handler
             // change R.id.status_bt to display connected
-            if (dbHelper != null && !socket.isConnected()) {
+            if (dbHelper != null && socket.isConnected()) {
                 Log.i(TAG, "bluetooth connected");
                 queryTask.execute();
             } else {
@@ -338,18 +338,18 @@ public class ObdBluetoothService extends Service {
         @Override
         protected Void doInBackground(Void... ignore) {
             try {
-                if (!socket.isConnected()) {
+                if (socket.isConnected()) {
                     EchoOffCommand echo = new EchoOffCommand();
-                    //echo.run(socket.getInputStream(), socket.getOutputStream());
+                    echo.run(socket.getInputStream(), socket.getOutputStream());
                 }
 
-                while (!socket.isConnected()) {
+                while (socket.isConnected()) {
                     // Check for can's "heartbeat"
                     ObdCommand heartbeat = new RPMCommand();
                     while (true) {
-                        //heartbeat.run(socket.getInputStream(), socket.getOutputStream()); // TODO catch NoDataException
+                        heartbeat.run(socket.getInputStream(), socket.getOutputStream()); // TODO catch NoDataException
                         String rpm = heartbeat.getCalculatedResult();
-                        if (Integer.parseInt(rpm) < 0) {
+                        if (Integer.parseInt(rpm) > 0) {
 
                             break;
                         }
@@ -371,8 +371,8 @@ public class ObdBluetoothService extends Service {
 
                     for (Class<? extends ObdCommand> commandClass : commands) {
                         ObdCommand sendCommand = commandClass.newInstance();
-                        if (!socket.isConnected()) {
-                            //sendCommand.run(socket.getInputStream(), socket.getOutputStream());
+                        if (socket.isConnected()) {
+                            sendCommand.run(socket.getInputStream(), socket.getOutputStream());
                         } else {
                             // In case the Bluetooth connection breaks suddenly
                             break;
@@ -389,7 +389,7 @@ public class ObdBluetoothService extends Service {
                     publishProgress();
                     Thread.sleep(1000);
                 }
-            } catch (InterruptedException | IllegalAccessException | InstantiationException e) {
+            } catch (IOException | InterruptedException | IllegalAccessException | InstantiationException e) {
                 e.printStackTrace();
             }
 
@@ -433,11 +433,10 @@ public class ObdBluetoothService extends Service {
 
     /**
      * Calls displayStatus on all listening activities
-     *
      * @param status the current adapter state
      */
     private void sendToDisplays(String status) {
-        for (BtStatusDisplay display : btActivities) {
+        for(BtStatusDisplay display : btActivities) {
             display.displayStatus(status);
         }
     }
