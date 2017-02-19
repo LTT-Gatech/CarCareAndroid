@@ -63,6 +63,35 @@ public class CarInfoActivity extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent;
+        switch (item.getItemId()) {
+            case (R.id.action_carInfo):
+                intent = new Intent(this, CarInfoActivity.class);
+                startActivity(intent);
+                break;
+            case (R.id.action_demo):
+                intent = new Intent(this, DemoActivity.class);
+                startActivity(intent);
+                break;
+            case (R.id.action_trips):
+                intent = new Intent(this, TripsActivity.class);
+                startActivity(intent);
+            case (R.id.action_dynamic):
+                intent = new Intent(this, DynamicActivity.class);
+                startActivity(intent);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     public void editInfo(View view) {
         //go to the car info edit screen
         Intent intent = new Intent(this, CarInfoEditActivity.class);
