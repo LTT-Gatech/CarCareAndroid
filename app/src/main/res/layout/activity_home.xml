@@ -59,6 +59,7 @@
         android:textColor="@color/colorPrimary"
         android:textStyle="normal|bold"
         android:textAllCaps="false"
+        android:layout_gravity="start"
         android:textAlignment="viewStart" />
 
     <LinearLayout

@@ -35,9 +35,13 @@ import com.teamltt.carcare.fragment.MyObdResponseRecyclerViewAdapter;
 import com.teamltt.carcare.fragment.ObdResponseFragment;
 import com.teamltt.carcare.fragment.SimpleDividerItemDecoration;
 import com.teamltt.carcare.model.ObdContent;
+import com.teamltt.carcare.model.Trip;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TripsActivity extends AppCompatActivity implements ObdResponseFragment.OnListFragmentInteractionListener {
 
@@ -46,8 +50,9 @@ public class TripsActivity extends AppCompatActivity implements ObdResponseFragm
     private DbHelper dbHelper;
 
     private Spinner spinner;
-    private List<String> trips;
-    private ArrayAdapter<String> spinnerAdapter;
+    private Map<Trip, Long> tripLongMap;
+    private List<Trip> trips;
+    private ArrayAdapter<Trip> spinnerAdapter;
 
     // Used to keep track of the items in the RecyclerView
     private RecyclerView.Adapter responseListAdapter;
@@ -58,6 +63,7 @@ public class TripsActivity extends AppCompatActivity implements ObdResponseFragm
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trips);
         spinner = (Spinner) findViewById(R.id.tripsSpinner);
+        tripLongMap = new HashMap<>();
         trips = new ArrayList<>();
         spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, trips);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -80,9 +86,12 @@ public class TripsActivity extends AppCompatActivity implements ObdResponseFragm
     protected void onStart() {
         super.onStart();
         dbHelper = new DbHelper(this);
+        tripLongMap.clear();
         trips.clear();
         // TODO order these values chronologically or by key
-        trips.addAll(dbHelper.getAllTripTimes().keySet());
+        tripLongMap.putAll(dbHelper.getAllTrips());
+        trips.addAll(tripLongMap.keySet());
+        Collections.sort(trips);
         spinnerAdapter.notifyDataSetChanged();
     }
 
@@ -102,7 +111,8 @@ public class TripsActivity extends AppCompatActivity implements ObdResponseFragm
      */
     public void readData(View view) {
         Log.i(TAG, "readData");
-        long tripId = dbHelper.getAllTripTimes().get(spinner.getSelectedItem());
+        Trip trip = (Trip) spinner.getSelectedItem();
+        long tripId = tripLongMap.get(trip);
         responses.clear();
         responses.addAll(dbHelper.getResponsesByTrip(tripId));
         responseListAdapter.notifyDataSetChanged();
