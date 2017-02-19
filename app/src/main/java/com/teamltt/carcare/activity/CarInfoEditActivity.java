@@ -66,14 +66,13 @@ public class CarInfoEditActivity extends AppCompatActivity {
         return true;
     }
 
-    protected void saveInfo(View view) {
+    public void saveInfo(View view) {
         edited = true;
         back(view);
     }
 
-    protected void back(View view) {
-        Intent intent = new Intent(this, CarInfoActivity.class);
-        startActivity(intent);
+    public void back(View view) {
+        finish();
     }
 
     //on exit: write to database from all fields
@@ -151,6 +150,7 @@ public class CarInfoEditActivity extends AppCompatActivity {
                 startActivity(intent);
                 break;
         }
+        finish();
         return super.onOptionsItemSelected(item);
     }
 

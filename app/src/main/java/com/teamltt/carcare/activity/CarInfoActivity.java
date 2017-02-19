@@ -22,8 +22,8 @@ public class CarInfoActivity extends AppCompatActivity {
     private SQLiteDatabase db;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onStart() {
+        super.onStart();
         setContentView(R.layout.activity_car_info);
         //grab info from database or whatever and put it on the text views
         DbHelper dbHelper = new DbHelper(CarInfoActivity.this);
@@ -66,39 +66,10 @@ public class CarInfoActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu, menu);
-        return true;
-    }
-
-    protected void editInfo(View view) {
+    public void editInfo(View view) {
         //go to the car info edit screen
         Intent intent = new Intent(this, CarInfoEditActivity.class);
         startActivity(intent);
-    }
-
-    public boolean onOptionsItemSelected(MenuItem item) {
-        Intent intent;
-        switch (item.getItemId()) {
-            case (R.id.action_carInfo):
-                intent = new Intent(this, CarInfoActivity.class);
-                startActivity(intent);
-                break;
-            case (R.id.action_demo):
-                intent = new Intent(this, DemoActivity.class);
-                startActivity(intent);
-                break;
-            case (R.id.action_trips):
-                intent = new Intent(this, TripsActivity.class);
-                startActivity(intent);
-            case (R.id.action_dynamic):
-                intent = new Intent(this, DynamicActivity.class);
-                startActivity(intent);
-                break;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     public void toggleLogging(MenuItem item) {
