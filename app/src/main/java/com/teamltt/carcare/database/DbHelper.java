@@ -49,7 +49,7 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
     public static final long DB_WRITE_ERROR = -1; // from SQLiteDatabase if an error occurred
     public static final long DB_OK = 0;
 
-    public static final int DATABASE_VERSION = 3;
+    public static final int DATABASE_VERSION = 4;
     public static final String DATABASE_NAME = "CarCare.db";
 
     private static final SimpleDateFormat sqlDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -127,6 +127,58 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         }
         res.append(')');
         return res.toString();
+    }
+
+    private String getCursorColumn(Cursor cursor, String column) {
+        return cursor.getString(cursor.getColumnIndexOrThrow(column));
+    }
+
+    public long createNewVehicle(Vehicle vehicle) {
+        SQLiteDatabase db = getWritableDatabase();
+        long status = DbHelper.errorChecks(db);
+        if (status != DbHelper.DB_OK) {
+            return status;
+        }
+        status = VehicleContract.insert(db, vehicle.getVin(), vehicle.getMake(), vehicle.getModel(),
+                vehicle.getYear(), vehicle.getColor(), vehicle.getNickname(), vehicle.getPlateNumber());
+        db.close();
+        setChanged(status);
+        return status;
+    }
+
+    public Vehicle getVehicle(long vehicleId) {
+        if (vehicleId == -1) {
+            return null;
+        }
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = VehicleContract.query(db, vehicleId);
+//        long id = cursor.getLong(cursor.getColumnIndexOrThrow(VehicleContract.VehicleEntry.COLUMN_NAME_ID));
+        String vin = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_VIN);
+        String make = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_MAKE);
+        String model = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_MODEL);
+        String year = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_YEAR);
+        String color = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_COLOR);
+        String nickname = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_NICKNAME);
+        String plateNumber = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_PLATE_NUMBER);
+        cursor.close();
+        db.close();
+        return new Vehicle(vin, make, model, year, color, nickname, plateNumber);
+    }
+
+    public int updateVehicle(long vehicleId, Vehicle vehicle) {
+        SQLiteDatabase db = getWritableDatabase();
+        long status = DbHelper.errorChecks(db);
+        if (status != DbHelper.DB_OK) {
+            return (int) status;
+        }
+        if (vehicleId == -1) {
+            return -1;
+        }
+        int numAffected = VehicleContract.update(db, vehicleId, vehicle.getVin(),
+                vehicle.getMake(), vehicle.getModel(), vehicle.getYear(), vehicle.getColor(),
+                vehicle.getNickname(), vehicle.getPlateNumber());
+        db.close();
+        return numAffected;
     }
 
     public long createNewTrip(long vehicleId, Date startTime, Date endTime) {
@@ -216,22 +268,6 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         db.close();
         return items;
     }
-
-    public Vehicle getVehicle(long vehicleId) {
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = VehicleContract.query(db, vehicleId);
-        long id = cursor.getLong(cursor.getColumnIndexOrThrow(VehicleContract.VehicleEntry.COLUMN_NAME_ID));
-        String nickname = cursor.getString(cursor.getColumnIndexOrThrow(VehicleContract.VehicleEntry.COLUMN_NAME_NICKNAME));
-        cursor.close();
-        db.close();
-        return new Vehicle(id, nickname);
-    }
-
-    public long updateVehicle(Vehicle vehicle) {
-        // TODO call VehicleContract.update(SQLiteDatabase, long vehicleId, String vin, String make, ...)
-        return 0L;
-    }
-
 
     @Override
     public void addObserver(IObserver observer) {
