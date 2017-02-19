@@ -33,7 +33,6 @@ public class CarInfoActivity extends AppCompatActivity {
         //grab info from database or whatever and put it on the text views
         dbHelper = new DbHelper(CarInfoActivity.this);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        j
 
         Cursor info = db.query(VehicleContract.VehicleEntry.TABLE_NAME, null, null, null, null, null,null);
         Log.i(TAG, "count: " + info.getCount());
