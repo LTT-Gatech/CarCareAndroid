@@ -31,7 +31,6 @@ public class CarInfoActivity extends AppCompatActivity {
 
 
         Cursor info = db.query(VehicleContract.VehicleEntry.TABLE_NAME, null, null, null, null, null,null);
-        Log.i("count", ""+info.getCount());
         //HACK auto populates the database with 1 vehicle
         if (info.getCount() < 1) {
             ContentValues values = new ContentValues();
