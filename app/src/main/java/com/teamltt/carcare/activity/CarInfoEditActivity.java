@@ -64,9 +64,6 @@ public class CarInfoEditActivity extends AppCompatActivity {
         dbHelper.close();
     }
 
-<<<<<<< HEAD
-
-=======
     private void updateUi(Vehicle vehicle) {
         ((TextView) findViewById(R.id.fieldYear)).setText(vehicle.getYear());
         ((TextView) findViewById(R.id.fieldVIN)).setText(vehicle.getVin());
@@ -90,5 +87,4 @@ public class CarInfoEditActivity extends AppCompatActivity {
         int numAffected = dbHelper.updateVehicle(vehicleId, vehicle);
         return numAffected > 0;
     }
->>>>>>> origin/simulator
 }
