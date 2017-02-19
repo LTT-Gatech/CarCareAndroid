@@ -31,11 +31,14 @@ import com.teamltt.carcare.database.contract.VehicleContract;
 import com.teamltt.carcare.model.ObdContent;
 import com.teamltt.carcare.model.Vehicle;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class DbHelper extends SQLiteOpenHelper implements IObservable {
@@ -52,7 +55,10 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
     public static final int DATABASE_VERSION = 4;
     public static final String DATABASE_NAME = "CarCare.db";
 
+    // Format in which the database stores DateTimes. Example: 2004-12-13 13:14:15
     private static final SimpleDateFormat sqlDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    // Format in which dates are displayed to the user. Example: Tue 07/14/02, 21:40
+    private static final SimpleDateFormat readableFormat = new SimpleDateFormat("EEE MM/dd/yy, HH:mm");
 
     // for observer pattern to notify when data has been updated
     private Set<IObserver> observers = new HashSet<>();
@@ -225,6 +231,29 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         cursor.close();
         db.close();
         return tripIds;
+    }
+
+    /**
+     * Returns a map of start times to trip ids. Includes all trip ids in the database.
+     */
+    public Map<String, Long> getAllTripTimes() {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = TripContract.queryAll(db);
+        Map<String, Long> tripStartTimes = new HashMap<>();
+        while (cursor.moveToNext()) {
+            long id = cursor.getLong(cursor.getColumnIndexOrThrow(TripContract.TripEntry.COLUMN_NAME_ID));
+            String time = cursor.getString(cursor.getColumnIndexOrThrow(TripContract.TripEntry.COLUMN_NAME_START_TIME));
+            Date startDate = null;
+            try {
+                startDate = sqlDateFormat.parse(time);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            tripStartTimes.put(readableFormat.format(startDate), id);
+        }
+        cursor.close();
+        db.close();
+        return tripStartTimes;
     }
 
     public List<ObdContent.ObdResponse> getResponsesByTrip(long tripId) {

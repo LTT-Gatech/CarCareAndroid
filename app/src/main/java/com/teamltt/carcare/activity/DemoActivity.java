@@ -184,7 +184,9 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
         } catch (IOException e) {
             e.printStackTrace();
         }
-        db.close();
+        if (db != null) {
+            db.close();
+        }
         unregisterReceiver(bluetoothReceiver);
     }
 
@@ -329,7 +331,6 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
                 String result = command.getFormattedResult();
 
 
-
                 int nextId = mAdapter.getItemCount() + 1;
                 ObdContent.addItem(ObdContent.createItemWithResponse(nextId, commandEnglish, result));
                 mAdapter.notifyDataSetChanged();
@@ -344,6 +345,7 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
     public void onListFragmentInteraction(ObdContent.ObdResponse item) {
         Log.i("ObdResponse Card", item.toString());
     }
+
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu, menu);
@@ -354,14 +356,17 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
         Intent intent = new Intent(this, DemoActivity.class);
         startActivity(intent);
     }
+
     protected void goToStatic(View view) {
         Intent intent = new Intent(this, DemoActivity.class);
         startActivity(intent);
     }
+
     protected void goToDynamic(View view) {
         Intent intent = new Intent(this, DemoActivity.class);
         startActivity(intent);
     }
+
     /*protected void openDrawer(View view) {
         if (drawer.isDrawerOpen(findViewById(android.R.id.home))) {
             drawer.closeDrawer(Gravity.LEFT);
@@ -391,6 +396,7 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
         }
         return super.onOptionsItemSelected(item);
     }
+
     public void toggleLogging(MenuItem item) {
         //
     }
