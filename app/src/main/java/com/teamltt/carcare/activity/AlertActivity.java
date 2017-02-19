@@ -54,4 +54,7 @@ public class AlertActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+    public void toggleLogging(MenuItem item) {
+        //
+    }
 }

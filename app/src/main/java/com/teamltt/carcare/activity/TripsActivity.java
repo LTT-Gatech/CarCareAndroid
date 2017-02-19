@@ -146,7 +146,14 @@ public class TripsActivity extends AppCompatActivity implements ObdResponseFragm
             case (R.id.action_trips):
                 intent = new Intent(this, TripsActivity.class);
                 startActivity(intent);
+            case (R.id.action_dynamic):
+                intent = new Intent(this, DynamicActivity.class);
+                startActivity(intent);
+                break;
         }
         return super.onOptionsItemSelected(item);
+    }
+    public void toggleLogging(MenuItem item) {
+        //
     }
 }
