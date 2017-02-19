@@ -16,32 +16,19 @@
 
 package com.teamltt.carcare.activity;
 
-        import java.util.Calendar;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
-        import android.app.Activity;
-        import android.app.DatePickerDialog;
-        import android.app.Dialog;
-
-        import android.app.DialogFragment;
-        import android.app.Fragment;
-        import android.app.FragmentManager;
-        import android.content.Intent;
-        import android.os.Bundle;
-
-        import android.support.v7.app.AppCompatActivity;
-        import android.view.LayoutInflater;
-        import android.view.Menu;
-        import android.view.MenuInflater;
-        import android.view.MenuItem;
-        import android.view.View;
-
-        import android.view.ViewGroup;
-        import android.widget.DatePicker;
-        import android.widget.TextView;
-        import android.widget.Toast;
-
-        import com.teamltt.carcare.R;
-        import com.teamltt.carcare.fragment.DatePickerFragment;
+import com.teamltt.carcare.R;
+import com.teamltt.carcare.fragment.DatePickerFragment;
 
 public class DynamicActivity extends AppCompatActivity {
     private boolean from;
@@ -58,11 +45,7 @@ public class DynamicActivity extends AppCompatActivity {
     }
 
     public void showDatePickerDialog(View v) {
-        if (findViewById(R.id.buttonTo) == v) {
-            from = false;
-        } else {
-            from = true;
-        }
+        from = findViewById(R.id.buttonTo) != v;
         DatePickerFragment dialog = new DatePickerFragment();
         dialog.show(getFragmentManager(), "DateFragment");
     }
@@ -76,9 +59,9 @@ public class DynamicActivity extends AppCompatActivity {
     public void setDate(int year, int month, int day) {
         TextView tv;
         if (from) {
-            tv = (TextView)findViewById(R.id.textFrom);
+            tv = (TextView) findViewById(R.id.textFrom);
         } else {
-            tv = (TextView)findViewById(R.id.textTo);
+            tv = (TextView) findViewById(R.id.textTo);
         }
         String date = month + "/" + day + "/" + year;
         tv.setText(date);
@@ -116,6 +99,5 @@ public class DynamicActivity extends AppCompatActivity {
     }
 
     public void toggleLogging(MenuItem item) {
-        //
     }
 }

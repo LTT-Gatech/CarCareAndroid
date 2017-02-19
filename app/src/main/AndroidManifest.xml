@@ -34,9 +34,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.DemoActivity"></activity>
-        <activity android:name=".activity.HomeActivity"></activity>
-
+        <activity android:name=".activity.DemoActivity" />
+        <activity android:name=".activity.HomeActivity" />
         <activity android:name=".activity.TripsActivity" />
         <activity android:name=".activity.StaticActivity" />
         <activity android:name=".activity.DynamicActivity" />

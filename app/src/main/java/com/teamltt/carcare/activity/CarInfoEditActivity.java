@@ -4,31 +4,30 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import com.teamltt.carcare.*;
+import com.teamltt.carcare.R;
 import com.teamltt.carcare.database.DbHelper;
 import com.teamltt.carcare.database.contract.VehicleContract;
 
 public class CarInfoEditActivity extends AppCompatActivity {
 
     private boolean edited = false;
-    private SQLiteDatabase db;
+    private DbHelper dbHelper;
     Cursor info;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_car_info_edit);
 
-        DbHelper dbHelper = new DbHelper(CarInfoEditActivity.this);
-        db = dbHelper.getWritableDatabase();
+        dbHelper = new DbHelper(CarInfoEditActivity.this);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         /*ContentValues values = new ContentValues();
         values.put(VehicleContract.VehicleEntry.COLUMN_NAME_ID, 777);
@@ -57,9 +56,10 @@ public class CarInfoEditActivity extends AppCompatActivity {
         tv = (TextView)findViewById(R.id.fieldPlate);
         tv.setText(info.getString(info.getColumnIndex(VehicleContract.VehicleEntry.COLUMN_NAME_PLATE_NUMBER)));
         info.close();
-
+        db.close();
 
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -71,10 +71,12 @@ public class CarInfoEditActivity extends AppCompatActivity {
         edited = true;
         back(view);
     }
+
     protected void back(View view) {
         Intent intent = new Intent(this, CarInfoActivity.class);
         startActivity(intent);
     }
+
     //on exit: write to database from all fields
     protected void onPause() {
         super.onPause();
@@ -113,8 +115,9 @@ public class CarInfoEditActivity extends AppCompatActivity {
             values.put(VehicleContract.VehicleEntry.COLUMN_NAME_PLATE_NUMBER, input);
             //values.put(VehicleContract.VehicleEntry.COLUMN_NAME_ID, id);
 
+            SQLiteDatabase db = dbHelper.getWritableDatabase();
             long newRowId = db.update(VehicleContract.VehicleEntry.TABLE_NAME, values, "vehicle_id="+id, null);
-
+            db.close();
 
             //i have no idea why this is here but im going to keep it until i can test it
             //Cursor cursor = db.query(VehicleContract.VehicleEntry.TABLE_NAME, null, null, null, null, null,null);
@@ -122,8 +125,8 @@ public class CarInfoEditActivity extends AppCompatActivity {
 
 
         }
-        db.close();
     }
+
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent intent;
         switch (item.getItemId()) {
@@ -145,6 +148,7 @@ public class CarInfoEditActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
     public void toggleLogging(MenuItem item) {
         //
     }

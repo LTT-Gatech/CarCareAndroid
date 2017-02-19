@@ -4,8 +4,8 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,7 +15,6 @@ import android.widget.TextView;
 
 import com.teamltt.carcare.R;
 import com.teamltt.carcare.database.DbHelper;
-import com.teamltt.carcare.database.contract.ResponseContract;
 import com.teamltt.carcare.database.contract.VehicleContract;
 
 public class CarInfoActivity extends AppCompatActivity {
@@ -66,6 +65,7 @@ public class CarInfoActivity extends AppCompatActivity {
 
 
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -78,6 +78,7 @@ public class CarInfoActivity extends AppCompatActivity {
         Intent intent = new Intent(this, CarInfoEditActivity.class);
         startActivity(intent);
     }
+
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent intent;
         switch (item.getItemId()) {
@@ -99,6 +100,7 @@ public class CarInfoActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
     public void toggleLogging(MenuItem item) {
         //
     }
