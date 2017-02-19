@@ -38,6 +38,7 @@
 
         <activity android:name=".activity.TripsActivity" />
         <activity android:name=".activity.StaticActivity" />
+        <activity android:name=".activity.DynamicActivity" />
         <activity android:name=".activity.CarInfoActivity" />
         <activity android:name=".activity.CarInfoEditActivity" />
 
