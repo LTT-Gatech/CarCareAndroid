@@ -28,7 +28,7 @@ public class VehicleContract {
             VehicleEntry.COLUMN_NAME_VIN + " TEXT," +
             VehicleEntry.COLUMN_NAME_MAKE + " TEXT," +
             VehicleEntry.COLUMN_NAME_MODEL + " TEXT," +
-            VehicleEntry.COLUMN_NAME_YEAR + " DATE," +
+            VehicleEntry.COLUMN_NAME_YEAR + " TEXT," +
             VehicleEntry.COLUMN_NAME_COLOR + " TEXT," +
             VehicleEntry.COLUMN_NAME_NICKNAME + " TEXT," +
             VehicleEntry.COLUMN_NAME_PLATE_NUMBER + " TEXT" +

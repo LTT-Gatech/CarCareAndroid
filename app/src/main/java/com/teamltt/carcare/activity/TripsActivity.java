@@ -46,8 +46,8 @@ public class TripsActivity extends AppCompatActivity implements ObdResponseFragm
     private DbHelper dbHelper;
 
     private Spinner spinner;
-    private List<Long> trips;
-    private ArrayAdapter<Long> spinnerAdapter;
+    private List<String> trips;
+    private ArrayAdapter<String> spinnerAdapter;
 
     // Used to keep track of the items in the RecyclerView
     private RecyclerView.Adapter responseListAdapter;
@@ -81,7 +81,8 @@ public class TripsActivity extends AppCompatActivity implements ObdResponseFragm
         super.onStart();
         dbHelper = new DbHelper(this);
         trips.clear();
-        trips.addAll(dbHelper.getAllTripIds());
+        // TODO order these values chronologically or by key
+        trips.addAll(dbHelper.getAllTripTimes().keySet());
         spinnerAdapter.notifyDataSetChanged();
     }
 
@@ -101,11 +102,12 @@ public class TripsActivity extends AppCompatActivity implements ObdResponseFragm
      */
     public void readData(View view) {
         Log.i(TAG, "readData");
-        long tripId = trips.get(spinner.getSelectedItemPosition());
+        long tripId = dbHelper.getAllTripTimes().get(spinner.getSelectedItem());
         responses.clear();
         responses.addAll(dbHelper.getResponsesByTrip(tripId));
         responseListAdapter.notifyDataSetChanged();
     }
+
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu, menu);
@@ -116,14 +118,17 @@ public class TripsActivity extends AppCompatActivity implements ObdResponseFragm
         Intent intent = new Intent(this, DemoActivity.class);
         startActivity(intent);
     }
+
     protected void goToStatic(View view) {
         Intent intent = new Intent(this, DemoActivity.class);
         startActivity(intent);
     }
+
     protected void goToDynamic(View view) {
         Intent intent = new Intent(this, DemoActivity.class);
         startActivity(intent);
     }
+
     /*protected void openDrawer(View view) {
         if (drawer.isDrawerOpen(findViewById(android.R.id.home))) {
             drawer.closeDrawer(Gravity.LEFT);
@@ -157,6 +162,7 @@ public class TripsActivity extends AppCompatActivity implements ObdResponseFragm
         }
         return super.onOptionsItemSelected(item);
     }
+
     public void toggleLogging(MenuItem item) {
         //
     }
