@@ -67,6 +67,13 @@ public class HomeActivity extends AppCompatActivity implements BtStatusDisplay, 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        Intent intent = getIntent();
+        String firstName = intent.getStringExtra(LoginActivity.EXTRA_FIRST_NAME);
+        String lastName = intent.getStringExtra(LoginActivity.EXTRA_LAST_NAME);
+        String userId = intent.getStringExtra(LoginActivity.EXTRA_USER_ID);
+
+        // Add user's name to the screen to show successful sign-in for demo
+        ((TextView) findViewById(R.id.tvWelcome)).setText(getString(R.string.welcome_text, firstName));
 
         btServiceIntent = new Intent(this, ObdBluetoothService.class);
         // Stop any existing services, we don't need more than one running
