@@ -91,7 +91,6 @@ public class HomeActivity extends AppCompatActivity implements BtStatusDisplay, 
         super.onStart();
         if (!bound) {
             bindService(btServiceIntent, mConnection, Context.BIND_AUTO_CREATE);
-            bound = true;
         }
     }
 

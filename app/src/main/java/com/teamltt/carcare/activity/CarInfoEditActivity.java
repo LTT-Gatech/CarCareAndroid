@@ -6,9 +6,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
@@ -59,12 +56,6 @@ public class CarInfoEditActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu, menu);
-        return true;
-    }
 
     public void saveInfo(View view) {
         edited = true;
@@ -129,32 +120,5 @@ public class CarInfoEditActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         dbHelper.close();
-    }
-
-    public boolean onOptionsItemSelected(MenuItem item) {
-        Intent intent;
-        switch (item.getItemId()) {
-            case (R.id.action_carInfo):
-                intent = new Intent(this, CarInfoActivity.class);
-                startActivity(intent);
-                break;
-            case (R.id.action_demo):
-                intent = new Intent(this, DemoActivity.class);
-                startActivity(intent);
-                break;
-            case (R.id.action_trips):
-                intent = new Intent(this, TripsActivity.class);
-                startActivity(intent);
-            case (R.id.action_dynamic):
-                intent = new Intent(this, DynamicActivity.class);
-                startActivity(intent);
-                break;
-        }
-        finish();
-        return super.onOptionsItemSelected(item);
-    }
-
-    public void toggleLogging(MenuItem item) {
-        //
     }
 }
