@@ -32,7 +32,7 @@ public class CarInfoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_car_info);
         //grab info from database or whatever and put it on the text views
         dbHelper = new DbHelper(CarInfoActivity.this);
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         Cursor info = db.query(VehicleContract.VehicleEntry.TABLE_NAME, null, null, null, null, null,null);
         Log.i(TAG, "count: " + info.getCount());
@@ -41,19 +41,18 @@ public class CarInfoActivity extends AppCompatActivity {
         if (info.getCount() == 0) {
             Vehicle foo = new Vehicle("123123", "Toyota", "Yaris", "2000", "Silver", "Car name", "BVL3636");
             vehicleId = dbHelper.createNewVehicle(foo);
+            if (vehicleId == -1) {
+                Log.e(TAG, "problem creating new vehicle");
+                finish();
+            }
         }
         info.close();
         db.close();
 
-        Vehicle vehicle = dbHelper.getVehicle(vehicleId);
         Log.i(TAG, "id: " + vehicleId);
+        Vehicle vehicle = dbHelper.getVehicle(vehicleId);
 
-        ((TextView) findViewById(R.id.fieldVIN)).setText(vehicle.getVin());
-        ((TextView) findViewById(R.id.fieldMake)).setText(vehicle.getMake());
-        ((TextView) findViewById(R.id.fieldModel)).setText(vehicle.getModel());
-        ((TextView) findViewById(R.id.fieldColor)).setText(vehicle.getColor());
-        ((TextView) findViewById(R.id.fieldNickname)).setText(vehicle.getNickname());
-        ((TextView) findViewById(R.id.fieldPlate)).setText(vehicle.getPlateNumber());
+        updateUi(vehicle);
     }
 
     @Override
@@ -94,5 +93,15 @@ public class CarInfoActivity extends AppCompatActivity {
 
     public void toggleLogging(MenuItem item) {
         //
+    }
+
+    private void updateUi(Vehicle vehicle) {
+        ((TextView) findViewById(R.id.fieldYear)).setText(vehicle.getYear());
+        ((TextView) findViewById(R.id.fieldVIN)).setText(vehicle.getVin());
+        ((TextView) findViewById(R.id.fieldMake)).setText(vehicle.getMake());
+        ((TextView) findViewById(R.id.fieldModel)).setText(vehicle.getModel());
+        ((TextView) findViewById(R.id.fieldColor)).setText(vehicle.getColor());
+        ((TextView) findViewById(R.id.fieldNickname)).setText(vehicle.getNickname());
+        ((TextView) findViewById(R.id.fieldPlate)).setText(vehicle.getPlateNumber());
     }
 }

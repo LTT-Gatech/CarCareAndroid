@@ -159,6 +159,7 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = VehicleContract.query(db, vehicleId);
 //        long id = cursor.getLong(cursor.getColumnIndexOrThrow(VehicleContract.VehicleEntry.COLUMN_NAME_ID));
+        cursor.moveToFirst();
         String vin = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_VIN);
         String make = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_MAKE);
         String model = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_MODEL);
