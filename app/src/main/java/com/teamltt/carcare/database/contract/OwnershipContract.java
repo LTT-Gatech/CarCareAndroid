@@ -31,7 +31,7 @@ public class OwnershipContract {
             + "FOREIGN KEY(" + OwnershipEntry.COLUMN_NAME_USER_ID + ") REFERENCES "
             + UserContract.UserEntry.TABLE_NAME + "(" + UserContract.UserEntry.COLUMN_NAME_ID + ") "
             + "ON DELETE CASCADE ON UPDATE CASCADE,"
-            // FOREIGN KEY(vehicle_id) REFERENCES vehicles(vehicle_id)
+            // FOREIGN KEY(vehicle_id) REFERENCES vehicles(vehicle_id) ON DELETE CASCADE ON UPDATE CASCADE
             + "FOREIGN KEY(" + OwnershipEntry.COLUMN_NAME_VEHICLE_ID + ") REFERENCES "
             + VehicleContract.VehicleEntry.TABLE_NAME + "(" + VehicleContract.VehicleEntry.COLUMN_NAME_ID + ") "
             + "ON DELETE CASCADE ON UPDATE CASCADE"

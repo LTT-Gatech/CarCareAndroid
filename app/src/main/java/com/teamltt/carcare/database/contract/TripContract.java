@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -34,7 +34,7 @@ public class TripContract {
             + TripEntry.COLUMN_NAME_VEHICLE_ID + " INTEGER,"
             + TripEntry.COLUMN_NAME_START_TIME + " DATETIME,"
             + TripEntry.COLUMN_NAME_END_TIME + " DATETIME"
-            // FOREIGN KEY(vehicle_id) REFERENCES vehicles(vehicle_id)
+            // FOREIGN KEY(vehicle_id) REFERENCES vehicles(vehicle_id) ON DELETE CASCADE ON UPDATE CASCADE
             + "FOREIGN KEY(" + TripEntry.COLUMN_NAME_VEHICLE_ID + ") REFERENCES "
             + VehicleContract.VehicleEntry.TABLE_NAME + "(" + VehicleContract.VehicleEntry.COLUMN_NAME_ID + ") "
             + "ON DELETE CASCADE ON UPDATE CASCADE"
