@@ -46,6 +46,8 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
 
     private static final String TAG = "DbHelper";
 
+    private static final String SQL_INIT = "PRAGMA foreign_keys = on;";
+
     // errors are negative, ok is 0, anything else is positive.
     public static final long DB_ERROR_NULL = -6;
     public static final long DB_ERROR_NOT_OPEN = -5;
@@ -53,7 +55,7 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
     public static final long DB_WRITE_ERROR = -1; // from SQLiteDatabase if an error occurred
     public static final long DB_OK = 0;
 
-    public static final int DATABASE_VERSION = 4;
+    public static final int DATABASE_VERSION = 5;
     public static final String DATABASE_NAME = "CarCare.db";
 
     // Format in which the database stores DateTimes. Example: 2004-12-13 13:14:15
@@ -71,6 +73,7 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        db.execSQL(SQL_INIT);
         db.execSQL(OwnershipContract.SQL_CREATE_ENTRIES);
         db.execSQL(ResponseContract.SQL_CREATE_ENTRIES);
         db.execSQL(TripContract.SQL_CREATE_ENTRIES);

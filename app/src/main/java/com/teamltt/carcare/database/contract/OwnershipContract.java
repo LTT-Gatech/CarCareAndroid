@@ -24,14 +24,18 @@ package com.teamltt.carcare.database.contract;
  */
 public class OwnershipContract {
 
-    public static final String SQL_CREATE_ENTRIES = "CREATE TABLE " + OwnershipEntry.TABLE_NAME + " (" +
-            // user_id INTEGER REFERENCES users(user_id)
-            OwnershipEntry.COLUMN_NAME_USER_ID + " INTEGER REFERENCES " +
-            UserContract.UserEntry.TABLE_NAME + "(" + UserContract.UserEntry.COLUMN_NAME_ID + ")," +
-            // vehicle_id INTEGER REFERENCES vehicles(vehicle_id)
-            OwnershipEntry.COLUMN_NAME_VEHICLE_ID + " INTEGER REFERENCES " +
-            VehicleContract.VehicleEntry.TABLE_NAME + "(" + VehicleContract.VehicleEntry.COLUMN_NAME_ID + ")" +
-            ");";
+    public static final String SQL_CREATE_ENTRIES = "CREATE TABLE " + OwnershipEntry.TABLE_NAME + " ("
+            + OwnershipEntry.COLUMN_NAME_USER_ID + " INTEGER,"
+            + OwnershipEntry.COLUMN_NAME_VEHICLE_ID + " INTEGER,"
+            // FOREIGN KEY(user_id) REFERENCES users(user_id)
+            + "FOREIGN KEY(" + OwnershipEntry.COLUMN_NAME_USER_ID + ") REFERENCES "
+            + UserContract.UserEntry.TABLE_NAME + "(" + UserContract.UserEntry.COLUMN_NAME_ID + ") "
+            + "ON DELETE CASCADE ON UPDATE CASCADE,"
+            // FOREIGN KEY(vehicle_id) REFERENCES vehicles(vehicle_id)
+            + "FOREIGN KEY(" + OwnershipEntry.COLUMN_NAME_VEHICLE_ID + ") REFERENCES "
+            + VehicleContract.VehicleEntry.TABLE_NAME + "(" + VehicleContract.VehicleEntry.COLUMN_NAME_ID + ") "
+            + "ON DELETE CASCADE ON UPDATE CASCADE"
+            + ");";
 
     public static final String SQL_DROP_ENTRIES = "DROP TABLE IF EXISTS " + OwnershipEntry.TABLE_NAME;
 

@@ -22,17 +22,18 @@ import android.database.sqlite.SQLiteDatabase;
 
 public class VehicleContract {
 
-    public static final String SQL_CREATE_ENTRIES = "CREATE TABLE " + VehicleEntry.TABLE_NAME + " (" +
+    public static final String SQL_CREATE_ENTRIES = "CREATE TABLE " + VehicleEntry.TABLE_NAME + " ("
             // vehicle_id INTEGER PRIMARY KEY
-            VehicleEntry.COLUMN_NAME_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-            VehicleEntry.COLUMN_NAME_VIN + " TEXT," +
-            VehicleEntry.COLUMN_NAME_MAKE + " TEXT," +
-            VehicleEntry.COLUMN_NAME_MODEL + " TEXT," +
-            VehicleEntry.COLUMN_NAME_YEAR + " TEXT," +
-            VehicleEntry.COLUMN_NAME_COLOR + " TEXT," +
-            VehicleEntry.COLUMN_NAME_NICKNAME + " TEXT," +
-            VehicleEntry.COLUMN_NAME_PLATE_NUMBER + " TEXT" +
-            ");";
+            + VehicleEntry.COLUMN_NAME_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + VehicleEntry.COLUMN_NAME_VIN + " TEXT,"
+            + VehicleEntry.COLUMN_NAME_MAKE + " TEXT,"
+            + VehicleEntry.COLUMN_NAME_MODEL + " TEXT,"
+            + VehicleEntry.COLUMN_NAME_YEAR + " TEXT,"
+            + VehicleEntry.COLUMN_NAME_COLOR + " TEXT,"
+            + VehicleEntry.COLUMN_NAME_NICKNAME + " TEXT,"
+            + VehicleEntry.COLUMN_NAME_PLATE_NUMBER + " TEXT"
+            + ");";
+
     public static final String SQL_DROP_ENTRIES = "DROP TABLE IF EXISTS " + VehicleEntry.TABLE_NAME;
 
     public static Cursor query(SQLiteDatabase db, long vehicleId) {

@@ -22,13 +22,13 @@ import android.database.sqlite.SQLiteDatabase;
 
 public class UserContract {
 
-    public static final String SQL_CREATE_ENTRIES = "CREATE TABLE " + UserEntry.TABLE_NAME + " (" +
+    public static final String SQL_CREATE_ENTRIES = "CREATE TABLE " + UserEntry.TABLE_NAME + " ("
             // user_id INTEGER PRIMARY KEY
-            UserEntry.COLUMN_NAME_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-            UserEntry.COLUMN_NAME_GOOGLE_USER_ID + " TEXT," +
-            UserEntry.COLUMN_NAME_FIRST_NAME + " TEXT," +
-            UserEntry.COLUMN_NAME_LAST_NAME + " TEXT" +
-            ");";
+            + UserEntry.COLUMN_NAME_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + UserEntry.COLUMN_NAME_GOOGLE_USER_ID + " TEXT,"
+            + UserEntry.COLUMN_NAME_FIRST_NAME + " TEXT,"
+            + UserEntry.COLUMN_NAME_LAST_NAME + " TEXT"
+            + ");";
 
     public static final String SQL_DROP_ENTRIES = "DROP TABLE IF EXISTS " + UserEntry.TABLE_NAME;
 
