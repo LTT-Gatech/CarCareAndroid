@@ -295,10 +295,6 @@ public class ObdBluetoothService extends Service {
                         bluetoothAdapter.cancelDiscovery();
                     }
                     socket.connect();
-                    sendToDisplays(getString(R.string.connected_bt));
-                } else {
-                    Log.i(TAG, "Bluetooth is not on");
-                    sendToDisplays(getString(R.string.not_connecting_bt));
                 }
 
 
@@ -314,8 +310,12 @@ public class ObdBluetoothService extends Service {
             // change R.id.status_bt to display connected
             if (dbHelper != null && socket.isConnected()) {
                 Log.i(TAG, "bluetooth connected");
+                sendToDisplays(getString(R.string.connected_bt));
                 queryTask.execute();
-            } else {
+            } else if (!bluetoothAdapter.isEnabled()) {
+                Log.i(TAG, "Bluetooth is not on");
+                sendToDisplays(getString(R.string.not_connecting_bt));
+            } else{
                 Log.i(TAG, "bluetooth not connected");
                 sendToDisplays(getString(R.string.retry_connect));
             }
@@ -387,7 +387,7 @@ public class ObdBluetoothService extends Service {
                         }
                     }
                     publishProgress();
-                    Thread.sleep(1000);
+                    Thread.sleep(500);
                 }
             } catch (IOException | InterruptedException | IllegalAccessException | InstantiationException e) {
                 e.printStackTrace();
