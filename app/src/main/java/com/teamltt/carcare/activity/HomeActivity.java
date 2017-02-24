@@ -20,11 +20,8 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -33,8 +30,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.teamltt.carcare.R;
@@ -49,7 +44,6 @@ import com.teamltt.carcare.model.ObdContent;
 import com.teamltt.carcare.service.BtStatusDisplay;
 import com.teamltt.carcare.service.ObdBluetoothService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObserver, ObdResponseFragment.OnListFragmentInteractionListener {
@@ -60,13 +54,19 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
     ObdBluetoothService btService;
     Intent btServiceIntent;
     boolean bound;
-    SQLiteDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         activityContent = R.layout.activity_home;
         super.onCreate(savedInstanceState);
 
+        Intent intent = getIntent();
+        String firstName = intent.getStringExtra(LoginActivity.EXTRA_FIRST_NAME);
+        String lastName = intent.getStringExtra(LoginActivity.EXTRA_LAST_NAME);
+        String userId = intent.getStringExtra(LoginActivity.EXTRA_USER_ID);
+
+        // Add user's name to the screen to show successful sign-in for demo
+        ((TextView) findViewById(R.id.tvWelcome)).setText(getString(R.string.welcome_text, firstName));
 
         btServiceIntent = new Intent(this, ObdBluetoothService.class);
         // Stop any existing services, we don't need more than one running
@@ -85,29 +85,6 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
             recyclerView.setAdapter(responseListAdapter);
         }
 
-        DbHelper dbHelper = new DbHelper(HomeActivity.this);
-        db = dbHelper.getReadableDatabase();
-        Cursor cursor = db.query(ResponseContract.ResponseEntry.TABLE_NAME, null, null, null, null, null,null);
-        //placeholder table making code
-
-        TableLayout table = (TableLayout) findViewById(R.id.table);
-
-        TableRow tr = new TableRow(this);
-        tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-        TextView tv = new TextView(this);
-        tv.setText("R1Col1");
-
-        TextView tv2 = new TextView(this);
-        tv2.setText("R1Col777");
-        tv2.setPadding(3,3,3,3);
-        TableRow.LayoutParams p = new TableRow.LayoutParams(TableLayout.LayoutParams.WRAP_CONTENT, TableLayout.LayoutParams.WRAP_CONTENT);
-        p.weight = 1;
-        tv.setLayoutParams(p);
-        p.weight = 3;
-        tv2.setLayoutParams(p);
-        tr.addView(tv);
-        tr.addView(tv2);
-        //table.addView(tr);
     }
 
     @Override
@@ -115,7 +92,6 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
         super.onStart();
         if (!bound) {
             bindService(btServiceIntent, mConnection, Context.BIND_AUTO_CREATE);
-            bound = true;
         }
     }
 
@@ -124,7 +100,8 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
         super.onStop();
         // Unbind from the service
         if (bound) {
-            unbindService(mConnection); //TODO rebind in onContinue
+            btService.unobserveDatabaset(HomeActivity.this);
+            unbindService(mConnection);
             bound = false;
         }
     }
@@ -205,6 +182,15 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
             case (R.id.action_trips):
                 intent = new Intent(this, TripsActivity.class);
                 startActivity(intent);
+                break;
+            case (R.id.action_dynamic):
+                intent = new Intent(this, DynamicActivity.class);
+                startActivity(intent);
+                break;
+            case (R.id.action_reminder):
+                intent = new Intent(this, ReminderActivity.class);
+                startActivity(intent);
+                break;
         }
         return super.onOptionsItemSelected(item);
     }

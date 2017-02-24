@@ -17,21 +17,44 @@
 package com.teamltt.carcare.model;
 
 public class Vehicle {
+    private String vin, make, model, year, color, nickname, plateNumber;
 
-    private long vehicleId;
-    private String nickname;
-
-    public Vehicle(long vehicleId, String nickname) {
-        // TODO complete vehicle class
-        this.vehicleId = vehicleId;
+    public Vehicle(String vin, String make, String model, String year, String color,
+                   String nickname, String plateNumber) {
+        this.vin = vin;
+        this.make = make;
+        this.model = model;
+        this.year = year;
+        this.color = color;
         this.nickname = nickname;
+        this.plateNumber = plateNumber;
     }
 
-    public long getVehicleId() {
-        return vehicleId;
+    public String getVin() {
+        return vin;
+    }
+
+    public String getMake() {
+        return make;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public String getYear() {
+        return year;
+    }
+
+    public String getColor() {
+        return color;
     }
 
     public String getNickname() {
         return nickname;
+    }
+
+    public String getPlateNumber() {
+        return plateNumber;
     }
 }

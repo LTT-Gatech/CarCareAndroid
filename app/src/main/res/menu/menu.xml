@@ -16,6 +16,16 @@
         android:orderInCategory="2"
         android:title="Trips"/>
     <item
+        android:id="@+id/action_dynamic"
+        android:orderInCategory="3"
+        android:title="Dynamic"
+        />
+    <item
+        android:id="@+id/action_reminder"
+        android:orderInCategory="3"
+        android:title="Reminders"
+        />
+    <item
         android:id="@+id/action_bluetooth"
         android:orderInCategory="3"
         android:title="@string/stop_logging"

@@ -27,19 +27,21 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.DemoActivity"/>
-        <activity android:name=".activity.HomeActivity">
+        <activity android:name=".activity.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".activity.TripsActivity"/>
-        <activity android:name=".activity.StaticActivity"/>
-        <activity android:name=".activity.CarInfoActivity"/>
-        <activity android:name=".activity.CarInfoEditActivity"/>
-
+        <activity android:name=".activity.DemoActivity" />
+        <activity android:name=".activity.HomeActivity" />
+        <activity android:name=".activity.TripsActivity" />
+        <activity android:name=".activity.StaticActivity" />
+        <activity android:name=".activity.DynamicActivity" />
+        <activity android:name=".activity.CarInfoActivity" />
+        <activity android:name=".activity.CarInfoEditActivity" />
+        <activity android:name=".activity.ReminderActivity"/>
+        <activity android:name=".activity.ReminderEditActivity"/>
         <service
             android:name=".service.ObdBluetoothService"
             android:description="@string/bt_service_description"

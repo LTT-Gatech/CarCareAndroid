@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,22 +16,24 @@
 
 package com.teamltt.carcare.database.contract;
 
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 public class VehicleContract {
 
-    public static final String SQL_CREATE_ENTRIES = "CREATE TABLE " + VehicleEntry.TABLE_NAME + " (" +
+    public static final String SQL_CREATE_ENTRIES = "CREATE TABLE " + VehicleEntry.TABLE_NAME + " ("
             // vehicle_id INTEGER PRIMARY KEY
-            VehicleEntry.COLUMN_NAME_ID + " INTEGER PRIMARY KEY," +
-            VehicleEntry.COLUMN_NAME_VIN + " TEXT," +
-            VehicleEntry.COLUMN_NAME_MAKE + " TEXT," +
-            VehicleEntry.COLUMN_NAME_MODEL + " TEXT," +
-            VehicleEntry.COLUMN_NAME_YEAR + " DATE," +
-            VehicleEntry.COLUMN_NAME_COLOR + " TEXT," +
-            VehicleEntry.COLUMN_NAME_NICKNAME + " TEXT," +
-            VehicleEntry.COLUMN_NAME_PLATE_NUMBER + " TEXT" +
-            ");";
+            + VehicleEntry.COLUMN_NAME_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + VehicleEntry.COLUMN_NAME_VIN + " TEXT,"
+            + VehicleEntry.COLUMN_NAME_MAKE + " TEXT,"
+            + VehicleEntry.COLUMN_NAME_MODEL + " TEXT,"
+            + VehicleEntry.COLUMN_NAME_YEAR + " TEXT,"
+            + VehicleEntry.COLUMN_NAME_COLOR + " TEXT,"
+            + VehicleEntry.COLUMN_NAME_NICKNAME + " TEXT,"
+            + VehicleEntry.COLUMN_NAME_PLATE_NUMBER + " TEXT"
+            + ");";
+
     public static final String SQL_DROP_ENTRIES = "DROP TABLE IF EXISTS " + VehicleEntry.TABLE_NAME;
 
     public static Cursor query(SQLiteDatabase db, long vehicleId) {
@@ -52,9 +54,55 @@ public class VehicleContract {
         return db.query(table, columns, selection, selectionArgs, null, null, null);
     }
 
-    public static long update(SQLiteDatabase db, long vehicleId) {
-        // TODO update using db.update
-        return 0L;
+    /**
+     * @param db the writabtle SQLiteDatabase
+     * @param vin a String
+     * @param make a String
+     * @param model a String
+     * @param year a String
+     * @param color a String
+     * @param nickname a String
+     * @param plateNumber a String
+     * @return the new vehicle's primary key
+     */
+    public static long insert(SQLiteDatabase db, String vin, String make, String model, String year,
+                              String color, String nickname, String plateNumber) {
+        ContentValues values = new ContentValues();
+        values.put(VehicleEntry.COLUMN_NAME_VIN, vin);
+        values.put(VehicleEntry.COLUMN_NAME_MAKE, make);
+        values.put(VehicleEntry.COLUMN_NAME_MODEL, model);
+        values.put(VehicleEntry.COLUMN_NAME_YEAR, year);
+        values.put(VehicleEntry.COLUMN_NAME_COLOR, color);
+        values.put(VehicleEntry.COLUMN_NAME_NICKNAME, nickname);
+        values.put(VehicleEntry.COLUMN_NAME_PLATE_NUMBER, plateNumber);
+        return db.insert(VehicleEntry.TABLE_NAME, null, values);
+    }
+
+    /**
+     * @param db the writable SQLiteDatabase
+     * @param vehicleId a long
+     * @param vin a String
+     * @param make a String
+     * @param model a String
+     * @param year a String
+     * @param color a String
+     * @param nickname a String
+     * @param plateNumber a String
+     * @return the number of rows affected
+     */
+    public static int update(SQLiteDatabase db, long vehicleId, String vin, String make, String model, String year,
+                             String color, String nickname, String plateNumber) {
+        ContentValues values = new ContentValues();
+        values.put(VehicleEntry.COLUMN_NAME_VIN, vin);
+        values.put(VehicleEntry.COLUMN_NAME_MAKE, make);
+        values.put(VehicleEntry.COLUMN_NAME_MODEL, model);
+        values.put(VehicleEntry.COLUMN_NAME_YEAR, year);
+        values.put(VehicleEntry.COLUMN_NAME_COLOR, color);
+        values.put(VehicleEntry.COLUMN_NAME_NICKNAME, nickname);
+        values.put(VehicleEntry.COLUMN_NAME_PLATE_NUMBER, plateNumber);
+        String whereClause = VehicleEntry.COLUMN_NAME_ID + " = ?";
+        String[] whereArgs = {Long.toString(vehicleId)};
+        return db.update(VehicleEntry.TABLE_NAME, values, whereClause, whereArgs);
     }
 
     // HACK: private to prevent someone from accidentally instantiating a contract

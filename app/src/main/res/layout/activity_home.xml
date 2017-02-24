@@ -18,10 +18,49 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/drawer_layout"
+    android:id="@+id/main_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textAlert"
+        android:text="Alerts"
+        android:textSize="30dp"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="No Alerts"
+        />
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/listAlert">
+
+    </ListView>
+    <!--This view is the placeholder divisor you see between alerts
+     and the next thing when the app runs-->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray"/>
+
+    <TextView
+        android:text="Welcome"
+        android:layout_width="match_parent"
+        android:layout_height="31dp"
+        android:id="@+id/tvWelcome"
+        android:textSize="24sp"
+        android:textColor="@color/colorPrimary"
+        android:textStyle="normal|bold"
+        android:textAllCaps="false"
+        android:layout_gravity="start"
+        android:textAlignment="viewStart" />
 
     <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -75,18 +114,6 @@
             android:layout_height="match_parent"
             layout="@layout/fragment_obdresponse_list" />
 
-    </LinearLayout>
-    <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <TableLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/table"
-            android:padding="6dp">
-        </TableLayout>
     </LinearLayout>
 </LinearLayout>
 

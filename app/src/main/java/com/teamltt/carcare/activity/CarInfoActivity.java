@@ -1,11 +1,9 @@
 package com.teamltt.carcare.activity;
 
-import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,55 +13,47 @@ import android.widget.TextView;
 
 import com.teamltt.carcare.R;
 import com.teamltt.carcare.database.DbHelper;
-import com.teamltt.carcare.database.contract.ResponseContract;
 import com.teamltt.carcare.database.contract.VehicleContract;
+import com.teamltt.carcare.model.Vehicle;
 
 public class CarInfoActivity extends AppCompatActivity {
 
-    private SQLiteDatabase db;
+    private static final String TAG = "CarInfoActivity";
+
+    static final String EXTRA_VEHICLE_ID = "vehicle_id";
+
+    private DbHelper dbHelper;
+    private long vehicleId;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onStart() {
+        super.onStart();
+        Log.i(TAG, "onStart");
         setContentView(R.layout.activity_car_info);
         //grab info from database or whatever and put it on the text views
-        DbHelper dbHelper = new DbHelper(CarInfoActivity.this);
-        db = dbHelper.getWritableDatabase();
-
+        dbHelper = new DbHelper(CarInfoActivity.this);
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         Cursor info = db.query(VehicleContract.VehicleEntry.TABLE_NAME, null, null, null, null, null,null);
-        Log.i("count", ""+info.getCount());
-        if (info.getCount() < 2) {
-            ContentValues values = new ContentValues();
-            values.put(VehicleContract.VehicleEntry.COLUMN_NAME_ID, 777);
-            values.put(VehicleContract.VehicleEntry.COLUMN_NAME_VIN, "123123");
-            values.put(VehicleContract.VehicleEntry.COLUMN_NAME_MAKE, "Toyota");
-            values.put(VehicleContract.VehicleEntry.COLUMN_NAME_MODEL, "Yaris");
-            //values.put(VehicleContract.VehicleEntry.COLUMN_NAME_YEAR, );
-            values.put(VehicleContract.VehicleEntry.COLUMN_NAME_COLOR, "Silver");
-            values.put(VehicleContract.VehicleEntry.COLUMN_NAME_NICKNAME, "CarName");
-            values.put(VehicleContract.VehicleEntry.COLUMN_NAME_PLATE_NUMBER, "BVL3636");
-            long newRowId = db.insert(VehicleContract.VehicleEntry.TABLE_NAME, null, values);
-            Log.i("table printing", ""+newRowId);
+        Log.i(TAG, "count: " + info.getCount());
+        vehicleId = 1;
+        //HACK auto populates the database with 1 vehicle
+        if (info.getCount() == 0) {
+            vehicleId = dbHelper.createNewVehicle(new Vehicle("", "", "", "", "", "", ""));
+            if (vehicleId == -1) {
+                Log.e(TAG, "problem creating new vehicle");
+                finish();
+            }
         }
-
-        info.moveToFirst();
-        Log.i("id", info.getString(info.getColumnIndex(VehicleContract.VehicleEntry.COLUMN_NAME_ID)));
-
-        TextView tv = (TextView)findViewById(R.id.fieldVIN);
-        tv.setText(info.getString(info.getColumnIndex(VehicleContract.VehicleEntry.COLUMN_NAME_VIN)));
-        tv = (TextView)findViewById(R.id.fieldMake);
-        tv.setText(info.getString(info.getColumnIndex(VehicleContract.VehicleEntry.COLUMN_NAME_MAKE)));
-        tv = (TextView)findViewById(R.id.fieldModel);
-        tv.setText(info.getString(info.getColumnIndex(VehicleContract.VehicleEntry.COLUMN_NAME_MODEL)));
-        tv = (TextView)findViewById(R.id.fieldColor);
-        tv.setText(info.getString(info.getColumnIndex(VehicleContract.VehicleEntry.COLUMN_NAME_COLOR)));
-        tv = (TextView)findViewById(R.id.fieldPlate);
-        tv.setText(info.getString(info.getColumnIndex(VehicleContract.VehicleEntry.COLUMN_NAME_PLATE_NUMBER)));
+        info.close();
         db.close();
 
+        Log.i(TAG, "id: " + vehicleId);
+        Vehicle vehicle = dbHelper.getVehicle(vehicleId);
 
+        updateUi(vehicle);
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -71,11 +61,6 @@ public class CarInfoActivity extends AppCompatActivity {
         return true;
     }
 
-    protected void editInfo(View view) {
-        //go to the car info edit screen
-        Intent intent = new Intent(this, CarInfoEditActivity.class);
-        startActivity(intent);
-    }
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent intent;
         switch (item.getItemId()) {
@@ -90,7 +75,36 @@ public class CarInfoActivity extends AppCompatActivity {
             case (R.id.action_trips):
                 intent = new Intent(this, TripsActivity.class);
                 startActivity(intent);
+            case (R.id.action_dynamic):
+                intent = new Intent(this, DynamicActivity.class);
+                startActivity(intent);
+                break;
+            case (R.id.action_reminder):
+                intent = new Intent(this, ReminderActivity.class);
+                startActivity(intent);
+                break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void editInfo(View view) {
+        //go to the car info edit screen
+        Intent intent = new Intent(this, CarInfoEditActivity.class);
+        intent.putExtra(EXTRA_VEHICLE_ID, vehicleId);
+        startActivity(intent);
+    }
+
+    public void toggleLogging(MenuItem item) {
+        //
+    }
+
+    private void updateUi(Vehicle vehicle) {
+        ((TextView) findViewById(R.id.fieldYear)).setText(vehicle.getYear());
+        ((TextView) findViewById(R.id.fieldVIN)).setText(vehicle.getVin());
+        ((TextView) findViewById(R.id.fieldMake)).setText(vehicle.getMake());
+        ((TextView) findViewById(R.id.fieldModel)).setText(vehicle.getModel());
+        ((TextView) findViewById(R.id.fieldColor)).setText(vehicle.getColor());
+        ((TextView) findViewById(R.id.fieldNickname)).setText(vehicle.getNickname());
+        ((TextView) findViewById(R.id.fieldPlate)).setText(vehicle.getPlateNumber());
     }
 }
