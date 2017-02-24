@@ -19,15 +19,10 @@ package com.teamltt.carcare.database.contract;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import com.teamltt.carcare.database.DbHelper;
 
-import java.util.Arrays;
-
 public class ResponseContract {
-
-    private static final String TAG = "ResponseContract";
 
     public static final String SQL_CREATE_ENTRIES = "CREATE TABLE " + ResponseEntry.TABLE_NAME + " ("
             // response_id INTEGER PRIMARY KEY AUTOINCREMENT
@@ -37,7 +32,7 @@ public class ResponseContract {
             + ResponseEntry.COLUMN_NAME_TIMESTAMP + " DATETIME DEFAULT CURRENT_TIMESTAMP,"
             + ResponseEntry.COLUMN_NAME_NAME + " TEXT,"
             + ResponseEntry.COLUMN_NAME_PID + " TEXT,"
-            + ResponseEntry.COLUMN_NAME_VALUE + " TEXT"
+            + ResponseEntry.COLUMN_NAME_VALUE + " TEXT,"
             // FOREIGN KEY(trip_id) REFERENCES trips(trip_id) ON DELETE CASCADE ON UPDATE CASCADE
             + "FOREIGN KEY(" + ResponseEntry.COLUMN_NAME_TRIP_ID + ") REFERENCES "
             + TripContract.TripEntry.TABLE_NAME + "(" + TripContract.TripEntry.COLUMN_NAME_ID + ") "
@@ -99,9 +94,6 @@ public class ResponseContract {
         for (int i = 0; i < rowIds.length; i++) {
             selectionArgs[i] = Long.toString(rowIds[i]);
         }
-        Log.i(TAG, "printing selection, selectionArgs. assertTrue(num(?) == selectionArgs.length)");
-        Log.i(TAG, selection);
-        Log.i(TAG, Arrays.toString(selectionArgs));
         String orderBy = ResponseEntry.COLUMN_NAME_TIMESTAMP + " ASC";
 
         return db.query(table, columns, selection, selectionArgs, null, null, orderBy);

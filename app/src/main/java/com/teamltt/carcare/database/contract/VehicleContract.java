@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -55,14 +55,14 @@ public class VehicleContract {
     }
 
     /**
-     * @param db
-     * @param vin
-     * @param make
-     * @param model
-     * @param year
-     * @param color
-     * @param nickname
-     * @param plateNumber
+     * @param db the writabtle SQLiteDatabase
+     * @param vin a String
+     * @param make a String
+     * @param model a String
+     * @param year a String
+     * @param color a String
+     * @param nickname a String
+     * @param plateNumber a String
      * @return the new vehicle's primary key
      */
     public static long insert(SQLiteDatabase db, String vin, String make, String model, String year,
@@ -79,15 +79,15 @@ public class VehicleContract {
     }
 
     /**
-     * @param db
-     * @param vehicleId
-     * @param vin
-     * @param make
-     * @param model
-     * @param year
-     * @param color
-     * @param nickname
-     * @param plateNumber
+     * @param db the writable SQLiteDatabase
+     * @param vehicleId a long
+     * @param vin a String
+     * @param make a String
+     * @param model a String
+     * @param year a String
+     * @param color a String
+     * @param nickname a String
+     * @param plateNumber a String
      * @return the number of rows affected
      */
     public static int update(SQLiteDatabase db, long vehicleId, String vin, String make, String model, String year,
