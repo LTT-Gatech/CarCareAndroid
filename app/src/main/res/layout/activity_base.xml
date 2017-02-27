@@ -19,30 +19,24 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:fitsSystemWindows="true"
-        app:headerLayout="@layout/nav_header_base"
-        app:menu="@menu/activity_base_drawer"/>
+        android:fitsSystemWindows="true">
+
+        <android.support.design.widget.NavigationView
+            android:id="@+id/nav_view_top"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            app:headerLayout="@layout/nav_header_base"
+            app:menu="@menu/menu_navigation_drawer"
+            app:elevation="0dp"/>
+
+        <android.support.design.widget.NavigationView
+            android:id="@+id/nav_view_bottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:menu="@menu/menu_navigation_drawer_bottom"
+            android:layout_gravity="bottom"
+            app:elevation="0dp"/>
+
+    </android.support.design.widget.NavigationView>
 
 </android.support.v4.widget.DrawerLayout>
-
-    <!--<?xml version="1.0" encoding="utf-8"?>-->
-    <!--<android.support.v4.widget.DrawerLayout-->
-    <!--xmlns:android="http://schemas.android.com/apk/res/android"-->
-    <!--android:id="@+id/drawer_layout"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent">-->
-    <!--&lt;!&ndash; The main content view &ndash;&gt;-->
-    <!--<FrameLayout-->
-    <!--android:id="@+id/content_frame"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent" />-->
-    <!--&lt;!&ndash; The navigation drawer &ndash;&gt;-->
-    <!--<ListView android:id="@+id/left_drawer"-->
-    <!--android:layout_width="240dp"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:layout_gravity="start"-->
-    <!--android:choiceMode="singleChoice"-->
-    <!--android:divider="@android:color/transparent"-->
-    <!--android:dividerHeight="0dp"-->
-    <!--android:background="#111"/>-->
-    <!--</android.support.v4.widget.DrawerLayout>-->

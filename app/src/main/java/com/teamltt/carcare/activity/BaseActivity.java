@@ -2,23 +2,30 @@ package com.teamltt.carcare.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.view.View;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewStub;
 
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.teamltt.carcare.R;
 
 public class BaseActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener {
+    // Logging tag
+    String TAG = "Base Activity";
 
     /**
      * The layout resource id that determines the content of the activity other than the drawer and toolbar
@@ -31,6 +38,16 @@ public class BaseActivity extends AppCompatActivity
      */
     boolean includeDrawer = false;
 
+    /**
+     * The actual navigation drawer view
+     */
+    DrawerLayout drawer;
+
+    /**
+     * Used for signing out
+     */
+    private GoogleApiClient googleApiClient;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,26 +59,36 @@ public class BaseActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        if (includeDrawer) {
-            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer != null) {
             ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                     this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
             drawer.addDrawerListener(toggle);
             toggle.syncState();
 
-            NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-            navigationView.setNavigationItemSelectedListener(this);
+            NavigationView navigationViewTop = (NavigationView) findViewById(R.id.nav_view_top);
+            NavigationView navigationViewBottom = (NavigationView) findViewById(R.id.nav_view_bottom);
+            if (navigationViewTop != null && navigationViewBottom != null) {
+                navigationViewTop.setNavigationItemSelectedListener(this);
+                navigationViewBottom.setNavigationItemSelectedListener(this);
+            }
+
+            drawer.findViewById(R.id.nav_view_top).bringToFront();
+            drawer.findViewById(R.id.nav_view_bottom).bringToFront();
         }
 
         ViewStub stub = (ViewStub) findViewById(R.id.content_base);
-        stub.setLayoutResource(activityContent);
-        stub.inflate();
+        if (stub != null) {
+            stub.setLayoutResource(activityContent);
+            stub.inflate();
+        }
+
+        buildNewGoogleApiClient();
     }
 
     @Override
     public void onBackPressed() {
-        if(includeDrawer) {
-            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer != null) {
             if (drawer.isDrawerOpen(GravityCompat.START)) {
                 drawer.closeDrawer(GravityCompat.START);
             } else {
@@ -90,20 +117,54 @@ public class BaseActivity extends AppCompatActivity
 
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        Intent intent = new Intent(this, HomeActivity.class);
+        final Intent intent;
 
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (id == R.id.nav_car_information) {
             intent = new Intent(this, CarInfoActivity.class);
+            startActivity(intent);
+        } else if (id == R.id.nav_search) {
+            intent = new Intent(this, StaticActivity.class);
+            startActivity(intent);
+        } else if (id == R.id.sign_out) {
+            Auth.GoogleSignInApi.signOut(googleApiClient).setResultCallback(
+                    new ResultCallback<Status>() {
+                        @Override
+                        public void onResult(Status status) {
+                            if (status.isSuccess()) {
+                                Intent intent = new Intent(BaseActivity.this, LoginActivity.class);
+                                startActivity(intent);
+                            }
+                        }
+                    });
+
         }
-        startActivity(intent);
+
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void buildNewGoogleApiClient() {
+        // Configure sign-in to request the user's ID, email address, and basic
+        // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .build();
+
+        // Build a GoogleApiClient with access to the Google Sign-In API and the
+        // options specified by gso.
+        googleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this, this)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+        googleApiClient.connect();
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.i(TAG, "google api connection failed");
     }
 }
