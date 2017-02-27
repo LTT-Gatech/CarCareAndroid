@@ -58,6 +58,7 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         activityContent = R.layout.activity_home;
+        includeDrawer = true;
         super.onCreate(savedInstanceState);
 
         Intent intent = getIntent();

@@ -3,6 +3,7 @@ package com.teamltt.carcare.activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -16,7 +17,7 @@ import com.teamltt.carcare.database.DbHelper;
 import com.teamltt.carcare.database.contract.VehicleContract;
 import com.teamltt.carcare.model.Vehicle;
 
-public class CarInfoActivity extends AppCompatActivity {
+public class CarInfoActivity extends BaseActivity {
 
     private static final String TAG = "CarInfoActivity";
 
@@ -26,10 +27,18 @@ public class CarInfoActivity extends AppCompatActivity {
     private long vehicleId;
 
     @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        activityContent = R.layout.activity_car_info;
+        includeDrawer = false;
+        super.onCreate(savedInstanceState);
+    }
+
+
+
+    @Override
     protected void onStart() {
         super.onStart();
         Log.i(TAG, "onStart");
-        setContentView(R.layout.activity_car_info);
         //grab info from database or whatever and put it on the text views
         dbHelper = new DbHelper(CarInfoActivity.this);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
