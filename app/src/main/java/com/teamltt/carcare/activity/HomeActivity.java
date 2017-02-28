@@ -28,7 +28,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.TextView;
 
 import com.teamltt.carcare.R;
@@ -147,6 +146,7 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
         return true;
     }
 
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent intent;
         switch (item.getItemId()) {

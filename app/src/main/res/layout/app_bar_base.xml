@@ -14,7 +14,6 @@
         android:theme="@style/AppTheme.AppBarOverlay">
 
 
-
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
@@ -23,12 +22,13 @@
             app:popupTheme="@style/AppTheme.PopupOverlay"/>
 
     </android.support.design.widget.AppBarLayout>
+
     <ViewStub
-    android:id="@+id/content_base"
-    android:inflatedId="@+id/message_layout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-        android:layout_marginTop="?attr/actionBarSize">
+        android:id="@+id/content_base"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:inflatedId="@+id/message_layout">
 
     </ViewStub>
 

@@ -47,7 +47,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-/**a
+/**
  * Any Activity can start this service to request for the bluetooth to start logging OBD data to the database
  */
 public class ObdBluetoothService extends Service {
