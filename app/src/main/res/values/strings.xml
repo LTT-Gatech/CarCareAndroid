@@ -1,3 +1,19 @@
+<!--
+  ~ Copyright 2017, Team LTT
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <resources>
     <string name="app_name">Car Care</string>
     <string name="retry_connect">Retry Connect</string>
@@ -13,4 +29,30 @@
     <string name="response">Response</string>
     <string name="bt_service_description">Handles Bluetooth connection to your OBD adapter for the CarCare application.</string>
     <string name="read_data">Read data</string>
+    <string name="login">Login</string>
+    <string name="password">Password</string>
+    <string name="google_plus_email">GooglePlus Email</string>
+    <string name="signed_in_fmt">Signed in as: %s</string>
+    <string name="error_null_person">Error: Returned null.</string>
+    <string name="loading">Loading</string>
+    <string name="please_sign_in">Please sign in.</string>
+    <string name="start_logging">Start logging</string>
+    <string name="stop_logging">Stop Logging</string>
+    <string name="welcome_text">Welcome, %s!</string>
+    <string name="text_from">Starting Date</string>
+    <string name="text_to">Ending Date</string>
+    <string name="data_value">Current data type value: placeholder</string>
+    <string name="text_reminder_title">Maintenance Reminders</string>
+    <string name="text_reminder">Placeholder reminder text</string>
+    <string name="button_create_new">Create New</string>
+    <string name="button_back">Back</string>
+    <!---Dynamic activity strings-->
+    <string name="title_dynamic">Dynamic title visual placeholder</string>
+    <string name="button_from">From</string>
+    <string name="button_to">To</string>
+
+    <string name="field_reminder_name">Reminder Name</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

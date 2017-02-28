@@ -16,12 +16,8 @@
 
 package com.teamltt.carcare.activity;
 
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -30,52 +26,46 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 
 import com.teamltt.carcare.R;
 import com.teamltt.carcare.database.DbHelper;
-import com.teamltt.carcare.database.IObservable;
-import com.teamltt.carcare.database.IObserver;
-import com.teamltt.carcare.database.contract.ResponseContract;
 import com.teamltt.carcare.fragment.MyObdResponseRecyclerViewAdapter;
 import com.teamltt.carcare.fragment.ObdResponseFragment;
 import com.teamltt.carcare.fragment.SimpleDividerItemDecoration;
 import com.teamltt.carcare.model.ObdContent;
-import com.teamltt.carcare.service.BtStatusDisplay;
-import com.teamltt.carcare.service.ObdBluetoothService;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class HomeActivity extends AppCompatActivity implements BtStatusDisplay, IObserver, ObdResponseFragment.OnListFragmentInteractionListener {
+public class TripsActivity extends AppCompatActivity implements ObdResponseFragment.OnListFragmentInteractionListener {
+
+    private static final String TAG = "TripsActivity";
+
+    private DbHelper dbHelper;
+
+    private Spinner spinner;
+    private List<String> trips;
+    private ArrayAdapter<String> spinnerAdapter;
 
     // Used to keep track of the items in the RecyclerView
     private RecyclerView.Adapter responseListAdapter;
-
-    ObdBluetoothService btService;
-    Intent btServiceIntent;
-    boolean bound;
+    private List<ObdContent.ObdResponse> responses;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
+        setContentView(R.layout.activity_trips);
+        spinner = (Spinner) findViewById(R.id.tripsSpinner);
+        trips = new ArrayList<>();
+        spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, trips);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(spinnerAdapter);
 
-        Intent intent = getIntent();
-        String firstName = intent.getStringExtra(LoginActivity.EXTRA_FIRST_NAME);
-        String lastName = intent.getStringExtra(LoginActivity.EXTRA_LAST_NAME);
-        String userId = intent.getStringExtra(LoginActivity.EXTRA_USER_ID);
-
-        // Add user's name to the screen to show successful sign-in for demo
-        ((TextView) findViewById(R.id.tvWelcome)).setText(getString(R.string.welcome_text, firstName));
-
-        btServiceIntent = new Intent(this, ObdBluetoothService.class);
-        // Stop any existing services, we don't need more than one running
-        stopService(btServiceIntent);
-        // Now start the new service
-        startService(btServiceIntent);
-
+        responses = new ArrayList<>();
         // Set up the list for responses
-        responseListAdapter = new MyObdResponseRecyclerViewAdapter(ObdContent.ITEMS, this);
+        responseListAdapter = new MyObdResponseRecyclerViewAdapter(responses, this);
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.obd_reponse_list);
         if (recyclerView != null) {
             recyclerView.setHasFixedSize(true);
@@ -89,55 +79,33 @@ public class HomeActivity extends AppCompatActivity implements BtStatusDisplay, 
     @Override
     protected void onStart() {
         super.onStart();
-        if (!bound) {
-            bindService(btServiceIntent, mConnection, Context.BIND_AUTO_CREATE);
-        }
+        dbHelper = new DbHelper(this);
+        trips.clear();
+        // TODO order these values chronologically or by key
+        trips.addAll(dbHelper.getAllTripTimes().keySet());
+        spinnerAdapter.notifyDataSetChanged();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        // Unbind from the service
-        if (bound) {
-            btService.unobserveDatabaset(HomeActivity.this);
-            unbindService(mConnection);
-            bound = false;
-        }
+        dbHelper.close();
     }
 
     @Override
     public void onListFragmentInteraction(ObdContent.ObdResponse item) {
-        Log.i("ObdResponse Card", item.toString());
+        Log.i(TAG, item.toString());
     }
 
-    private ServiceConnection mConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName className,
-                                       IBinder service) {
-            // Bound to the bluetooth service, cast binder and get service instance
-            ObdBluetoothService.ObdServiceBinder binder = (ObdBluetoothService.ObdServiceBinder) service;
-            btService = binder.getService();
-            btService.observeDatabase((HomeActivity.this));
-            btService.addDisplay(HomeActivity.this);
-            bound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            bound = false;
-        }
-    };
-
-    @Override
-    public void update(IObservable o, Bundle args) {
-        if (args != null && o instanceof DbHelper) {
-            DbHelper dbHelper = (DbHelper) o;
-            long[] responseIds = args.getLongArray(ResponseContract.ResponseEntry.COLUMN_NAME_ID + "_ARRAY");
-            List<ObdContent.ObdResponse> items = dbHelper.getResponsesById(responseIds);
-            ObdContent.setItems(items);
-            responseListAdapter.notifyDataSetChanged();
-        }
+    /**
+     * @param view from R.id.readData in R.layout.activity_trips
+     */
+    public void readData(View view) {
+        Log.i(TAG, "readData");
+        long tripId = dbHelper.getAllTripTimes().get(spinner.getSelectedItem());
+        responses.clear();
+        responses.addAll(dbHelper.getResponsesByTrip(tripId));
+        responseListAdapter.notifyDataSetChanged();
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -150,10 +118,12 @@ public class HomeActivity extends AppCompatActivity implements BtStatusDisplay, 
         Intent intent = new Intent(this, DemoActivity.class);
         startActivity(intent);
     }
+
     protected void goToStatic(View view) {
         Intent intent = new Intent(this, DemoActivity.class);
         startActivity(intent);
     }
+
     protected void goToDynamic(View view) {
         Intent intent = new Intent(this, DemoActivity.class);
         startActivity(intent);
@@ -181,7 +151,6 @@ public class HomeActivity extends AppCompatActivity implements BtStatusDisplay, 
             case (R.id.action_trips):
                 intent = new Intent(this, TripsActivity.class);
                 startActivity(intent);
-                break;
             case (R.id.action_dynamic):
                 intent = new Intent(this, DynamicActivity.class);
                 startActivity(intent);
@@ -194,25 +163,7 @@ public class HomeActivity extends AppCompatActivity implements BtStatusDisplay, 
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void displayStatus(String status) {
-        ((TextView) findViewById(R.id.status_bt)).setText(status);
-    }
-
-    /**
-     * Starts a new trip or finishes the current one
-     * @param item The button that was pressed
-     */
     public void toggleLogging(MenuItem item) {
-        if (item.getTitle().equals(getString(R.string.stop_logging))) {
-            // Stop the service's work
-            item.setTitle(getString(R.string.start_logging));
-            btService.stopTrip();
-        } else {
-            // Make service start doing work
-            item.setTitle(getString(R.string.stop_logging));
-            btService.startNewTrip();
-        }
-
+        //
     }
 }

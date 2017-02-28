@@ -1,4 +1,19 @@
 /*
+<<<<<<< HEAD
+ * Copyright 2017, Team LTT
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+=======
  ** Copyright 2017, Team LTT
  **
  ** Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,6 +27,7 @@
  ** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  ** See the License for the specific language governing permissions and
  ** limitations under the License.
+>>>>>>> giuliano/dev
  */
 
 package com.teamltt.carcare.database.contract;
@@ -19,10 +35,15 @@ package com.teamltt.carcare.database.contract;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.teamltt.carcare.database.DbHelper;
 
+import java.util.Arrays;
+
 public class ResponseContract {
+
+    private static final String TAG = "ResponseContract";
 
     public static final String SQL_CREATE_ENTRIES = "CREATE TABLE " + ResponseEntry.TABLE_NAME + " (" +
             // response_id INTEGER PRIMARY KEY AUTOINCREMENT
@@ -45,19 +66,16 @@ public class ResponseContract {
      * @param db      the writable db
      * @param tripId the trip_id from {@link TripContract.TripEntry}
      * @param name    the name of the command
-     * @param pid     the process id of the command
+     * @param pId     the process id of the command
      * @param value   the formatted result after the command returns
      * @return the new row id or a {@link DbHelper} error code
      */
-    public static long insert(SQLiteDatabase db, long tripId, String name, String pid, String value) {
-        long status = DbHelper.errorChecks(db);
-        if (status != DbHelper.DB_OK) {
-            return status;
-        }
+    public static long insert(SQLiteDatabase db, long tripId, String name, String pId, String value) {
         ContentValues values = new ContentValues();
         values.put(ResponseContract.ResponseEntry.COLUMN_NAME_TRIP_ID, tripId);
         values.put(ResponseContract.ResponseEntry.COLUMN_NAME_NAME, name);
-        values.put(ResponseContract.ResponseEntry.COLUMN_NAME_PID, pid);
+        values.put(ResponseContract.ResponseEntry.COLUMN_NAME_PID, pId);
+
         values.put(ResponseContract.ResponseEntry.COLUMN_NAME_VALUE, value);
         return db.insert(ResponseEntry.TABLE_NAME, null, values);
     }
@@ -89,11 +107,15 @@ public class ResponseContract {
                 ResponseEntry.COLUMN_NAME_PID,
                 ResponseEntry.COLUMN_NAME_VALUE
         };
-        String selection = ResponseEntry.COLUMN_NAME_ID + " = ?";
+        String selection = DbHelper.inClauseBuilder(ResponseEntry.COLUMN_NAME_ID, rowIds.length);
+
         String[] selectionArgs = new String[rowIds.length];
         for (int i = 0; i < rowIds.length; i++) {
             selectionArgs[i] = Long.toString(rowIds[i]);
         }
+        Log.i(TAG, "printing selection, selectionArgs. assertTrue(num(?) == selectionArgs.length)");
+        Log.i(TAG, selection);
+        Log.i(TAG, Arrays.toString(selectionArgs));
         String orderBy = ResponseEntry.COLUMN_NAME_TIMESTAMP + " ASC";
 
         return db.query(table, columns, selection, selectionArgs, null, null, orderBy);

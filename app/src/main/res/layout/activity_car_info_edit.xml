@@ -23,7 +23,7 @@
             android:textSize="32dp"
             >
         </TextView>
-        ></LinearLayout>
+        </LinearLayout>
 
     <TableLayout
         android:layout_width="match_parent"
@@ -125,6 +125,23 @@
                 android:textSize="20dp"
                 android:padding="3dp"/>
         </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:layout_weight="1"
+                android:id="@+id/textNickname"
+                android:text="Nickname"
+                android:textSize="20dp"
+                android:padding="3dp" />
+
+            <EditText
+                android:layout_weight="3"
+                android:id="@+id/fieldNickname"
+                android:text="your nickname goes here"
+                android:textSize="20dp"
+                android:padding="3dp" />
+        </TableRow>
         <TableRow>
             <TextView
                 android:layout_weight="1"
@@ -150,13 +167,13 @@
             android:layout_weight="1"
             android:text="Back"
             android:onClick="back"
-            android:layout_gravity="left"/>
+            android:layout_gravity="start" />
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Save"
             android:onClick="saveInfo"
-            android:layout_gravity="right"/>
+            android:layout_gravity="end" />
     </LinearLayout>
 </LinearLayout>

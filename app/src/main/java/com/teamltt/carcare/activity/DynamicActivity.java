@@ -19,18 +19,35 @@ package com.teamltt.carcare.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.teamltt.carcare.R;
+import com.teamltt.carcare.fragment.DatePickerFragment;
 
-public class StaticActivity extends AppCompatActivity {
+public class DynamicActivity extends AppCompatActivity {
+    private boolean from;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_static);
+        setContentView(R.layout.activity_dynamic);
+        from = true;
+    }
+
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.activity_dynamic, container, false);
+        return view;
+    }
+
+    public void showDatePickerDialog(View v) {
+        from = findViewById(R.id.buttonTo) != v;
+        DatePickerFragment dialog = new DatePickerFragment();
+        dialog.show(getFragmentManager(), "DateFragment");
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -39,6 +56,25 @@ public class StaticActivity extends AppCompatActivity {
         return true;
     }
 
+    public void setDate(int year, int month, int day) {
+        TextView tv;
+        if (from) {
+            tv = (TextView) findViewById(R.id.textFrom);
+        } else {
+            tv = (TextView) findViewById(R.id.textTo);
+        }
+        String date = month + "/" + day + "/" + year;
+        tv.setText(date);
+    }
+
+    /*protected void openDrawer(View view) {
+        if (drawer.isDrawerOpen(findViewById(android.R.id.home))) {
+            drawer.closeDrawer(Gravity.LEFT);
+        }
+        else {
+            drawer.openDrawer(Gravity.RIGHT);
+        }
+    }*/
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent intent;
         switch (item.getItemId()) {
@@ -53,6 +89,7 @@ public class StaticActivity extends AppCompatActivity {
             case (R.id.action_trips):
                 intent = new Intent(this, TripsActivity.class);
                 startActivity(intent);
+                break;
             case (R.id.action_dynamic):
                 intent = new Intent(this, DynamicActivity.class);
                 startActivity(intent);
@@ -66,6 +103,5 @@ public class StaticActivity extends AppCompatActivity {
     }
 
     public void toggleLogging(MenuItem item) {
-        //
     }
 }

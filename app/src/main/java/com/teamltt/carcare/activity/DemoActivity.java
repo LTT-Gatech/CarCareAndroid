@@ -184,7 +184,9 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
         } catch (IOException e) {
             e.printStackTrace();
         }
-        db.close();
+        if (db != null) {
+            db.close();
+        }
         unregisterReceiver(bluetoothReceiver);
     }
 
@@ -329,7 +331,6 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
                 String result = command.getFormattedResult();
 
 
-
                 int nextId = mAdapter.getItemCount() + 1;
                 ObdContent.addItem(ObdContent.createItemWithResponse(nextId, commandEnglish, result));
                 mAdapter.notifyDataSetChanged();
@@ -350,6 +351,30 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
         inflater.inflate(R.menu.menu, menu);
         return true;
     }
+
+    protected void goToDemo(View view) {
+        Intent intent = new Intent(this, DemoActivity.class);
+        startActivity(intent);
+    }
+
+    protected void goToStatic(View view) {
+        Intent intent = new Intent(this, DemoActivity.class);
+        startActivity(intent);
+    }
+
+    protected void goToDynamic(View view) {
+        Intent intent = new Intent(this, DemoActivity.class);
+        startActivity(intent);
+    }
+
+    /*protected void openDrawer(View view) {
+        if (drawer.isDrawerOpen(findViewById(android.R.id.home))) {
+            drawer.closeDrawer(Gravity.LEFT);
+        }
+        else {
+            drawer.openDrawer(Gravity.RIGHT);
+        }
+    }*/
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent intent;
         switch (item.getItemId()) {
@@ -361,7 +386,22 @@ public class DemoActivity extends AppCompatActivity implements ObdResponseFragme
                 intent = new Intent(this, DemoActivity.class);
                 startActivity(intent);
                 break;
+            case (R.id.action_trips):
+                intent = new Intent(this, TripsActivity.class);
+                startActivity(intent);
+            case (R.id.action_dynamic):
+                intent = new Intent(this, DynamicActivity.class);
+                startActivity(intent);
+                break;
+            case (R.id.action_reminder):
+                intent = new Intent(this, ReminderActivity.class);
+                startActivity(intent);
+                break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void toggleLogging(MenuItem item) {
+        //
     }
 }
