@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,6 +29,7 @@ import com.teamltt.carcare.database.contract.TripContract;
 import com.teamltt.carcare.database.contract.UserContract;
 import com.teamltt.carcare.database.contract.VehicleContract;
 import com.teamltt.carcare.model.ObdContent;
+import com.teamltt.carcare.model.Trip;
 import com.teamltt.carcare.model.Vehicle;
 
 import java.text.ParseException;
@@ -45,6 +46,8 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
 
     private static final String TAG = "DbHelper";
 
+    private static final String SQL_INIT = "PRAGMA foreign_keys = on;";
+
     // errors are negative, ok is 0, anything else is positive.
     public static final long DB_ERROR_NULL = -6;
     public static final long DB_ERROR_NOT_OPEN = -5;
@@ -52,13 +55,11 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
     public static final long DB_WRITE_ERROR = -1; // from SQLiteDatabase if an error occurred
     public static final long DB_OK = 0;
 
-    public static final int DATABASE_VERSION = 4;
+    public static final int DATABASE_VERSION = 5;
     public static final String DATABASE_NAME = "CarCare.db";
 
     // Format in which the database stores DateTimes. Example: 2004-12-13 13:14:15
     private static final SimpleDateFormat sqlDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    // Format in which dates are displayed to the user. Example: Tue 07/14/02, 21:40
-    private static final SimpleDateFormat readableFormat = new SimpleDateFormat("EEE MM/dd/yy, HH:mm");
 
     // for observer pattern to notify when data has been updated
     private Set<IObserver> observers = new HashSet<>();
@@ -70,6 +71,7 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        db.execSQL(SQL_INIT);
         db.execSQL(OwnershipContract.SQL_CREATE_ENTRIES);
         db.execSQL(ResponseContract.SQL_CREATE_ENTRIES);
         db.execSQL(TripContract.SQL_CREATE_ENTRIES);
@@ -235,26 +237,28 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
     }
 
     /**
-     * Returns a map of start times to trip ids. Includes all trip ids in the database.
+     * Returns a map of Trip objects to trip id's
      */
-    public Map<String, Long> getAllTripTimes() {
+    public Map<Trip, Long> getAllTrips() {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = TripContract.queryAll(db);
-        Map<String, Long> tripStartTimes = new HashMap<>();
+        Map<Trip, Long> trips = new HashMap<>();
         while (cursor.moveToNext()) {
-            long id = cursor.getLong(cursor.getColumnIndexOrThrow(TripContract.TripEntry.COLUMN_NAME_ID));
-            String time = cursor.getString(cursor.getColumnIndexOrThrow(TripContract.TripEntry.COLUMN_NAME_START_TIME));
-            Date startDate = null;
+            long tripId = cursor.getLong(cursor.getColumnIndexOrThrow(TripContract.TripEntry.COLUMN_NAME_ID));
+            String startTime = getCursorColumn(cursor, TripContract.TripEntry.COLUMN_NAME_START_TIME);
+            String endTime = getCursorColumn(cursor, TripContract.TripEntry.COLUMN_NAME_END_TIME);
+            Date startDate, endDate;
             try {
-                startDate = sqlDateFormat.parse(time);
+                startDate = sqlDateFormat.parse(startTime);
+                endDate = sqlDateFormat.parse(endTime);
+                trips.put(new Trip(startDate, endDate), tripId);
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            tripStartTimes.put(readableFormat.format(startDate), id);
         }
         cursor.close();
         db.close();
-        return tripStartTimes;
+        return trips;
     }
 
     public List<ObdContent.ObdResponse> getResponsesByTrip(long tripId) {

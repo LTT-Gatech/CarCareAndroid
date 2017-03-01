@@ -22,14 +22,12 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.TextView;
 
 import com.teamltt.carcare.R;
@@ -46,7 +44,7 @@ import com.teamltt.carcare.service.ObdBluetoothService;
 
 import java.util.List;
 
-public class HomeActivity extends AppCompatActivity implements BtStatusDisplay, IObserver, ObdResponseFragment.OnListFragmentInteractionListener {
+public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObserver, ObdResponseFragment.OnListFragmentInteractionListener {
 
     // Used to keep track of the items in the RecyclerView
     private RecyclerView.Adapter responseListAdapter;
@@ -57,8 +55,9 @@ public class HomeActivity extends AppCompatActivity implements BtStatusDisplay, 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        activityContent = R.layout.activity_home;
+        includeDrawer = true;
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
 
         Intent intent = getIntent();
         String firstName = intent.getStringExtra(LoginActivity.EXTRA_FIRST_NAME);
@@ -84,6 +83,7 @@ public class HomeActivity extends AppCompatActivity implements BtStatusDisplay, 
             recyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
             recyclerView.setAdapter(responseListAdapter);
         }
+
     }
 
     @Override
@@ -146,27 +146,7 @@ public class HomeActivity extends AppCompatActivity implements BtStatusDisplay, 
         return true;
     }
 
-    protected void goToDemo(View view) {
-        Intent intent = new Intent(this, DemoActivity.class);
-        startActivity(intent);
-    }
-    protected void goToStatic(View view) {
-        Intent intent = new Intent(this, DemoActivity.class);
-        startActivity(intent);
-    }
-    protected void goToDynamic(View view) {
-        Intent intent = new Intent(this, DemoActivity.class);
-        startActivity(intent);
-    }
-
-    /*protected void openDrawer(View view) {
-        if (drawer.isDrawerOpen(findViewById(android.R.id.home))) {
-            drawer.closeDrawer(Gravity.LEFT);
-        }
-        else {
-            drawer.openDrawer(Gravity.RIGHT);
-        }
-    }*/
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent intent;
         switch (item.getItemId()) {
