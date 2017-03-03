@@ -127,7 +127,7 @@ public class ObdBluetoothService extends Service {
     };
 
     @Override
-    public void onCreate(){
+    public void onCreate() {
         super.onCreate();
         btActivities = new HashSet<>();
         dbHelper = new DbHelper(ObdBluetoothService.this);
