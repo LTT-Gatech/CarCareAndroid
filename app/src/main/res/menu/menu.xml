@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/toolbar">
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      android:id="@+id/toolbar">
 
     <item
         android:id="@+id/action_carInfo"
@@ -27,13 +27,8 @@
         />
     <item
         android:id="@+id/action_bluetooth"
+        android:onClick="toggleLogging"
         android:orderInCategory="3"
         android:title="@string/stop_logging"
-        android:onClick="toggleLogging"
         />
-    <!--<item
-        android:id="@+id/drawer_button"
-        android:title="Drawer"
-        app:showAsAction="always"
-        />-->
 </menu>
