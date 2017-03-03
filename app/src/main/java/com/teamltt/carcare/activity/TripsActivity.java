@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -88,7 +88,6 @@ public class TripsActivity extends AppCompatActivity implements ObdResponseFragm
         dbHelper = new DbHelper(this);
         tripLongMap.clear();
         trips.clear();
-        // TODO order these values chronologically or by key
         tripLongMap.putAll(dbHelper.getAllTrips());
         trips.addAll(tripLongMap.keySet());
         Collections.sort(trips);
@@ -161,6 +160,7 @@ public class TripsActivity extends AppCompatActivity implements ObdResponseFragm
             case (R.id.action_trips):
                 intent = new Intent(this, TripsActivity.class);
                 startActivity(intent);
+                break;
             case (R.id.action_dynamic):
                 intent = new Intent(this, DynamicActivity.class);
                 startActivity(intent);

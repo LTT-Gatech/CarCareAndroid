@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -99,8 +99,9 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
         super.onStop();
         // Unbind from the service
         if (bound) {
-            btService.unobserveDatabaset(HomeActivity.this);
+            btService.unobserveDatabase(HomeActivity.this);
             unbindService(mConnection);
+            // should this be removed from here since it is done in mConnection.onServiceDisconnected?
             bound = false;
         }
     }
