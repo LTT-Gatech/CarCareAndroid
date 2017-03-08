@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -127,7 +127,7 @@ public class ObdBluetoothService extends Service {
     };
 
     @Override
-    public void onCreate(){
+    public void onCreate() {
         super.onCreate();
         btActivities = new HashSet<>();
         dbHelper = new DbHelper(ObdBluetoothService.this);
@@ -218,7 +218,7 @@ public class ObdBluetoothService extends Service {
         dbHelper.addObserver(observer);
     }
 
-    public void unobserveDatabaset(IObserver observer) {
+    public void unobserveDatabase(IObserver observer) {
         dbHelper.deleteObserver(observer);
     }
 
@@ -295,10 +295,6 @@ public class ObdBluetoothService extends Service {
                         bluetoothAdapter.cancelDiscovery();
                     }
                     socket.connect();
-                    sendToDisplays(getString(R.string.connected_bt));
-                } else {
-                    Log.i(TAG, "Bluetooth is not on");
-                    sendToDisplays(getString(R.string.not_connecting_bt));
                 }
 
 
@@ -314,8 +310,12 @@ public class ObdBluetoothService extends Service {
             // change R.id.status_bt to display connected
             if (dbHelper != null && socket.isConnected()) {
                 Log.i(TAG, "bluetooth connected");
+                sendToDisplays(getString(R.string.connected_bt));
                 queryTask.execute();
-            } else {
+            } else if (!bluetoothAdapter.isEnabled()) {
+                Log.i(TAG, "Bluetooth is not on");
+                sendToDisplays(getString(R.string.not_connecting_bt));
+            } else{
                 Log.i(TAG, "bluetooth not connected");
                 sendToDisplays(getString(R.string.retry_connect));
             }
@@ -387,7 +387,7 @@ public class ObdBluetoothService extends Service {
                         }
                     }
                     publishProgress();
-                    Thread.sleep(1000);
+                    Thread.sleep(500);
                 }
             } catch (IOException | InterruptedException | IllegalAccessException | InstantiationException e) {
                 e.printStackTrace();

@@ -35,7 +35,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Visual Placeholder Alert Text"
+        android:text="No Alerts"
         />
     <ListView
         android:layout_width="match_parent"

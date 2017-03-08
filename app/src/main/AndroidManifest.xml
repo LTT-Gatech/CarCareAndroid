@@ -13,8 +13,7 @@
   ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
-  -->
-
+-->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.teamltt.carcare">
 
@@ -42,8 +41,11 @@
         <activity android:name=".activity.CarInfoEditActivity" />
         <activity android:name=".activity.ReminderActivity"/>
         <activity android:name=".activity.ReminderEditActivity"/>
-
-
+        <activity
+            android:name=".activity.BaseActivity"
+            android:label="@string/title_activity_base"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
         <service
             android:name=".service.ObdBluetoothService"
             android:description="@string/bt_service_description"

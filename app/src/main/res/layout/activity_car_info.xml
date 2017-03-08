@@ -1,4 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2017, Team LTT
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_car_info"
@@ -10,20 +26,14 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.teamltt.carcare.activity.CarInfoActivity">
-    <LinearLayout
-        android:layout_width="match_parent"
+
+    <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingBottom="32dp"
-            android:id="@+id/textCarInfo"
-            android:text="Car Info"
-            android:textSize="32dp"
-            >
-        </TextView>
-    </LinearLayout>
+        android:paddingBottom="32dp"
+        android:id="@+id/textCarInfo"
+        android:text="Car Info"
+        android:textSize="32dp" />
 
     <TableLayout
         android:layout_width="match_parent"
@@ -36,9 +46,7 @@
                 android:id="@+id/textYear"
                 android:text="Year"
                 android:textSize="20dp"
-                android:padding="3dp"
-                >
-            </TextView>
+                android:padding="3dp" />
             <TextView
 
                 android:layout_column="1"
@@ -46,8 +54,7 @@
                 android:id="@+id/fieldYear"
                 android:text="the year goes here"
                 android:textSize="20dp"
-                android:padding="3dp">
-            </TextView>
+                android:padding="3dp" />
         </TableRow>
         <TableRow>
             <TextView
@@ -55,9 +62,7 @@
                 android:id="@+id/textMake"
                 android:text="Make"
                 android:textSize="20dp"
-                android:padding="3dp"
-                >
-            </TextView>
+                android:padding="3dp" />
             <TextView
                 android:layout_weight="3"
                 android:id="@+id/fieldMake"
@@ -123,9 +128,7 @@
                 android:textSize="20dp"
                 android:padding="3dp"/>
         </TableRow>
-
         <TableRow>
-
             <TextView
                 android:layout_weight="1"
                 android:id="@+id/textNickname"
@@ -140,22 +143,8 @@
                 android:textSize="20dp"
                 android:padding="3dp" />
         </TableRow>
-        <TableRow>
-            <TextView
-                android:layout_weight="1"
-                android:id="@+id/textAdapter"
-                android:text="Adapter"
-                android:textSize="20dp"
-                android:padding="3dp"/>
-            <TextView
-                android:layout_weight="3"
-                android:id="@+id/fieldAdapter"
-                android:text="the adapter name goes here"
-                android:textSize="20dp"
-                android:padding="3dp"/>
-        </TableRow>
+    </TableLayout>
 
-    ></TableLayout>
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -163,6 +152,5 @@
         android:onClick="editInfo"
         android:layout_gravity="end"
         android:id="@+id/carInfoEdit"/>
-
 
 </LinearLayout>

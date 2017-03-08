@@ -16,33 +16,23 @@
 
 package com.teamltt.carcare.activity;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.teamltt.carcare.R;
 import com.teamltt.carcare.fragment.DatePickerFragment;
 
-public class DynamicActivity extends AppCompatActivity {
+public class DynamicActivity extends BaseActivity {
     private boolean from;
 
     public void onCreate(Bundle savedInstanceState) {
+        activityContent = R.layout.activity_dynamic;
+        includeDrawer = false;
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_dynamic);
         from = true;
     }
 
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.activity_dynamic, container, false);
-        return view;
-    }
 
     public void showDatePickerDialog(View v) {
         from = findViewById(R.id.buttonTo) != v;
@@ -50,19 +40,13 @@ public class DynamicActivity extends AppCompatActivity {
         dialog.show(getFragmentManager(), "DateFragment");
     }
 
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu, menu);
-        return true;
-    }
-
-
     /**
      * Called by a date picker fragment. TODO see DatePickerFragment
      * @param year
      * @param month
      * @param day
      */
+
     public void setDate(int year, int month, int day) {
         TextView tv;
         if (from) {
@@ -71,7 +55,9 @@ public class DynamicActivity extends AppCompatActivity {
             tv = (TextView) findViewById(R.id.textTo);
         }
         String date = month + "/" + day + "/" + year;
-        tv.setText(date);
-    }
 
+        if (tv != null) {
+            tv.setText(date);
+        }
+    }
 }

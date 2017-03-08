@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,14 +22,12 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.TextView;
 
 import com.teamltt.carcare.R;
@@ -46,7 +44,7 @@ import com.teamltt.carcare.service.ObdBluetoothService;
 
 import java.util.List;
 
-public class HomeActivity extends AppCompatActivity implements BtStatusDisplay, IObserver, ObdResponseFragment.OnListFragmentInteractionListener {
+public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObserver, ObdResponseFragment.OnListFragmentInteractionListener {
 
     // Used to keep track of the items in the RecyclerView
     private RecyclerView.Adapter responseListAdapter;
@@ -57,8 +55,9 @@ public class HomeActivity extends AppCompatActivity implements BtStatusDisplay, 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        activityContent = R.layout.activity_home;
+        includeDrawer = true;
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
 
         Intent intent = getIntent();
         String firstName = intent.getStringExtra(LoginActivity.EXTRA_FIRST_NAME);
@@ -84,6 +83,7 @@ public class HomeActivity extends AppCompatActivity implements BtStatusDisplay, 
             recyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
             recyclerView.setAdapter(responseListAdapter);
         }
+
     }
 
     @Override
@@ -99,8 +99,9 @@ public class HomeActivity extends AppCompatActivity implements BtStatusDisplay, 
         super.onStop();
         // Unbind from the service
         if (bound) {
-            btService.unobserveDatabaset(HomeActivity.this);
+            btService.unobserveDatabase(HomeActivity.this);
             unbindService(mConnection);
+            // should this be removed from here since it is done in mConnection.onServiceDisconnected?
             bound = false;
         }
     }
@@ -146,6 +147,7 @@ public class HomeActivity extends AppCompatActivity implements BtStatusDisplay, 
         return true;
     }
 
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent intent;
         switch (item.getItemId()) {
