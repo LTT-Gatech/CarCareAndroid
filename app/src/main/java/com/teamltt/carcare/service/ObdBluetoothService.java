@@ -287,7 +287,7 @@ public class ObdBluetoothService extends Service {
         protected Void doInBackground(Void... params) {
             // Connect the device's bluetooth to the OBD adapter
             try {
-                // Android advises to cancel discovery before using socket.connect()
+                // Android advises to back discovery before using socket.connect()
                 if (bluetoothAdapter.isEnabled()) {
 
                     if (bluetoothAdapter.isDiscovering()) {

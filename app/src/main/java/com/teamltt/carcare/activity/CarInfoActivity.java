@@ -68,10 +68,6 @@ public class CarInfoActivity extends AppCompatActivity {
                 intent = new Intent(this, CarInfoActivity.class);
                 startActivity(intent);
                 break;
-            case (R.id.action_demo):
-                intent = new Intent(this, DemoActivity.class);
-                startActivity(intent);
-                break;
             case (R.id.action_trips):
                 intent = new Intent(this, TripsActivity.class);
                 startActivity(intent);
@@ -87,15 +83,15 @@ public class CarInfoActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Launches a new activity CarInfoEditActivity to edit fields seen in this activity
+     * @param view The R.id.carInfoEdit button in the layout
+     */
     public void editInfo(View view) {
         //go to the car info edit screen
         Intent intent = new Intent(this, CarInfoEditActivity.class);
         intent.putExtra(EXTRA_VEHICLE_ID, vehicleId);
         startActivity(intent);
-    }
-
-    public void toggleLogging(MenuItem item) {
-        //
     }
 
     private void updateUi(Vehicle vehicle) {

@@ -37,7 +37,7 @@ public class ResponseContract {
             + ResponseEntry.COLUMN_NAME_TIMESTAMP + " DATETIME DEFAULT CURRENT_TIMESTAMP,"
             + ResponseEntry.COLUMN_NAME_NAME + " TEXT,"
             + ResponseEntry.COLUMN_NAME_PID + " TEXT,"
-            + ResponseEntry.COLUMN_NAME_VALUE + " TEXT"
+            + ResponseEntry.COLUMN_NAME_VALUE + " TEXT,"
             // FOREIGN KEY(trip_id) REFERENCES trips(trip_id)
             + "FOREIGN KEY(" + ResponseEntry.COLUMN_NAME_TRIP_ID + ") REFERENCES "
             + TripContract.TripEntry.TABLE_NAME + "(" + TripContract.TripEntry.COLUMN_NAME_ID + ") "

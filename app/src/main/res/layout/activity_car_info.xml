@@ -161,7 +161,8 @@
         android:layout_height="wrap_content"
         android:text="Edit"
         android:onClick="editInfo"
-        android:layout_gravity="end"/>
+        android:layout_gravity="end"
+        android:id="@+id/carInfoEdit"/>
 
 
 </LinearLayout>

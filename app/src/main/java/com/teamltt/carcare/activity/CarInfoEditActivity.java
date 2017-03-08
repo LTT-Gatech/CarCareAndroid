@@ -37,12 +37,22 @@ public class CarInfoEditActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * Marks the fields as data to be saved when the activity is Paused
+     * @param view The R.id.carInfoEditSave button in the view
+     */
     public void saveInfo(View view) {
         Log.i(TAG, "saveInfo");
+        // TODO should this method work this way? Right now, it waits until onPause is called to actually save, even
+        // though the use has clicked the "save" button
         edited = true;
         back(view);
     }
 
+    /**
+     * Returns to the previous activity. In this case, it should always be CarInfoActivity
+     * @param view The R.id.carInfoEditBack button in the view
+     */
     public void back(View view) {
         finish();
     }

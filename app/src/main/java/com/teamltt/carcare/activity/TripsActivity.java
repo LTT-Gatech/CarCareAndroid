@@ -124,38 +124,11 @@ public class TripsActivity extends AppCompatActivity implements ObdResponseFragm
         return true;
     }
 
-    protected void goToDemo(View view) {
-        Intent intent = new Intent(this, DemoActivity.class);
-        startActivity(intent);
-    }
-
-    protected void goToStatic(View view) {
-        Intent intent = new Intent(this, DemoActivity.class);
-        startActivity(intent);
-    }
-
-    protected void goToDynamic(View view) {
-        Intent intent = new Intent(this, DemoActivity.class);
-        startActivity(intent);
-    }
-
-    /*protected void openDrawer(View view) {
-        if (drawer.isDrawerOpen(findViewById(android.R.id.home))) {
-            drawer.closeDrawer(Gravity.LEFT);
-        }
-        else {
-            drawer.openDrawer(Gravity.RIGHT);
-        }
-    }*/
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent intent;
         switch (item.getItemId()) {
             case (R.id.action_carInfo):
                 intent = new Intent(this, CarInfoActivity.class);
-                startActivity(intent);
-                break;
-            case (R.id.action_demo):
-                intent = new Intent(this, DemoActivity.class);
                 startActivity(intent);
                 break;
             case (R.id.action_trips):

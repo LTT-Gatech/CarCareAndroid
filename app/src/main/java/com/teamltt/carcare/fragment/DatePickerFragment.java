@@ -18,12 +18,10 @@
 
 package com.teamltt.carcare.fragment;
 
-import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.widget.DatePicker;
 
 import com.teamltt.carcare.activity.DynamicActivity;
@@ -50,7 +48,7 @@ public class DatePickerFragment extends DialogFragment
     public void onDateSet(DatePicker view, int year, int month, int day) {
         //TODO if we keep this sort of calendar fragment we should make an interface for the activities
         //that use set date
-        ((DynamicActivity)getActivity()).setDate(year, month+1, day);
+        ((DynamicActivity) getActivity()).setDate(year, month + 1, day);
     }
 
 }

@@ -33,7 +33,7 @@ public class TripContract {
             + TripEntry.COLUMN_NAME_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
             + TripEntry.COLUMN_NAME_VEHICLE_ID + " INTEGER,"
             + TripEntry.COLUMN_NAME_START_TIME + " DATETIME,"
-            + TripEntry.COLUMN_NAME_END_TIME + " DATETIME"
+            + TripEntry.COLUMN_NAME_END_TIME + " DATETIME,"
             // FOREIGN KEY(vehicle_id) REFERENCES vehicles(vehicle_id)
             + "FOREIGN KEY(" + TripEntry.COLUMN_NAME_VEHICLE_ID + ") REFERENCES "
             + VehicleContract.VehicleEntry.TABLE_NAME + "(" + VehicleContract.VehicleEntry.COLUMN_NAME_ID + ") "

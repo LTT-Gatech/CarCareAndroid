@@ -56,6 +56,13 @@ public class DynamicActivity extends AppCompatActivity {
         return true;
     }
 
+
+    /**
+     * Called by a date picker fragment. TODO see DatePickerFragment
+     * @param year
+     * @param month
+     * @param day
+     */
     public void setDate(int year, int month, int day) {
         TextView tv;
         if (from) {
@@ -67,41 +74,4 @@ public class DynamicActivity extends AppCompatActivity {
         tv.setText(date);
     }
 
-    /*protected void openDrawer(View view) {
-        if (drawer.isDrawerOpen(findViewById(android.R.id.home))) {
-            drawer.closeDrawer(Gravity.LEFT);
-        }
-        else {
-            drawer.openDrawer(Gravity.RIGHT);
-        }
-    }*/
-    public boolean onOptionsItemSelected(MenuItem item) {
-        Intent intent;
-        switch (item.getItemId()) {
-            case (R.id.action_carInfo):
-                intent = new Intent(this, CarInfoActivity.class);
-                startActivity(intent);
-                break;
-            case (R.id.action_demo):
-                intent = new Intent(this, DemoActivity.class);
-                startActivity(intent);
-                break;
-            case (R.id.action_trips):
-                intent = new Intent(this, TripsActivity.class);
-                startActivity(intent);
-                break;
-            case (R.id.action_dynamic):
-                intent = new Intent(this, DynamicActivity.class);
-                startActivity(intent);
-                break;
-            case (R.id.action_reminder):
-                intent = new Intent(this, ReminderActivity.class);
-                startActivity(intent);
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    public void toggleLogging(MenuItem item) {
-    }
 }

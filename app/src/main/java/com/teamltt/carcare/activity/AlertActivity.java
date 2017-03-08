@@ -46,10 +46,6 @@ public class AlertActivity extends AppCompatActivity {
                 intent = new Intent(this, CarInfoActivity.class);
                 startActivity(intent);
                 break;
-            case (R.id.action_demo):
-                intent = new Intent(this, DemoActivity.class);
-                startActivity(intent);
-                break;
             case (R.id.action_trips):
                 intent = new Intent(this, TripsActivity.class);
                 startActivity(intent);
