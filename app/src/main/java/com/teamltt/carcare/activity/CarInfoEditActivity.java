@@ -45,7 +45,7 @@ public class CarInfoEditActivity extends AppCompatActivity {
         }
         dbHelper = new DbHelper(CarInfoEditActivity.this);
         Vehicle vehicle = dbHelper.getVehicle(vehicleId);
-        if (vehicle == null || vehicleId == -1) {
+        if (vehicle == null) {
             Log.e(TAG, "could not get vehicle properly");
         } else {
             updateUi(vehicle);

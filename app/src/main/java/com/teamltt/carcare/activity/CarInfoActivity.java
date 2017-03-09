@@ -56,25 +56,15 @@ public class CarInfoActivity extends BaseActivity {
         Log.i(TAG, "onStart");
         //grab info from database or whatever and put it on the text views
         dbHelper = new DbHelper(CarInfoActivity.this);
-        // TODO move this query to methods in DbHelper and VehicleContract
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        Cursor info = db.query(VehicleContract.VehicleEntry.TABLE_NAME, null, null, null, null, null,null);
-        Log.i(TAG, "count: " + info.getCount());
         vehicleId = 1;
-        //HACK auto populates the database with 1 vehicle
-        if (info.getCount() == 0) {
-            vehicleId = dbHelper.createNewVehicle(new Vehicle("", "", "", "", "", "", ""));
-            if (vehicleId == -1) {
-                Log.e(TAG, "problem creating new vehicle");
-                finish();
-            }
-        }
-        info.close();
-        db.close();
-
-        Log.i(TAG, "id: " + vehicleId);
         Vehicle vehicle = dbHelper.getVehicle(vehicleId);
+        if (vehicle == null) {
+            //HACK auto populates the database with 1 vehicle
+            vehicleId = dbHelper.createNewVehicle(new Vehicle("", "", "", "", "", "", ""));
+        }
+
+        vehicle = dbHelper.getVehicle(vehicleId);
 
         updateUi(vehicle);
     }
