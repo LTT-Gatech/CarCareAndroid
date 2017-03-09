@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,22 +14,16 @@
  * limitations under the License.
  */
 
-package com.teamltt.carcare.adapter;
+package com.teamltt.carcare.service;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
-public interface IObdSocket {
-
-    void connect() throws IOException;
-
-    InputStream getInputStream() throws IOException;
-
-    OutputStream getOutputStream() throws IOException;
-
-    boolean isConnected();
-
-    void close() throws IOException;
-
+/**
+ * This interface the bluetooth service to activities about bluetooth related state.
+ */
+public interface BtStatusDisplay {
+    /**
+     * Called on an Activity in the BluetoothService instance when the bluetooth state changes.
+     * Must be called on the made thread.
+     * @param status the new state that the bluetooth adapter is ingit s
+     */
+    void displayStatus(String status);
 }

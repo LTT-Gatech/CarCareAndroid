@@ -14,30 +14,19 @@
  * limitations under the License.
  */
 
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
+package com.teamltt.carcare.activity;
 
-buildscript {
-    repositories {
-        jcenter()
+import android.os.Bundle;
+
+import com.teamltt.carcare.R;
+
+public class StaticActivity extends BaseActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        activityContent = R.layout.activity_static;
+        includeDrawer = false;
+        super.onCreate(savedInstanceState);
     }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.0'
 
-        // Project level dependency for sign-in
-        classpath 'com.google.gms:google-services:3.0.0'
-
-
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
-    }
-}
-
-allprojects {
-    repositories {
-        jcenter()
-    }
-}
-
-task clean(type: Delete) {
-    delete rootProject.buildDir
 }

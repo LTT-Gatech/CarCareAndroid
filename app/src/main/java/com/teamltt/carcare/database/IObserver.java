@@ -14,22 +14,10 @@
  * limitations under the License.
  */
 
-package com.teamltt.carcare.adapter;
+package com.teamltt.carcare.database;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import android.os.Bundle;
 
-public interface IObdSocket {
-
-    void connect() throws IOException;
-
-    InputStream getInputStream() throws IOException;
-
-    OutputStream getOutputStream() throws IOException;
-
-    boolean isConnected();
-
-    void close() throws IOException;
-
+public interface IObserver {
+    void update(IObservable o, Bundle args);
 }
