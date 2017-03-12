@@ -22,15 +22,21 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.teamltt.carcare.R;
 
-public class AlertActivity extends AppCompatActivity {
+public class ReminderActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_alert);
+        setContentView(R.layout.activity_reminder);
+    }
+
+    protected void editReminder(View view) {
+        Intent intent = new Intent(this, ReminderEditActivity.class);
+        startActivity(intent);
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {

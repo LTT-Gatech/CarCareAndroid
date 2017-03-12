@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -35,9 +35,13 @@ import com.teamltt.carcare.fragment.MyObdResponseRecyclerViewAdapter;
 import com.teamltt.carcare.fragment.ObdResponseFragment;
 import com.teamltt.carcare.fragment.SimpleDividerItemDecoration;
 import com.teamltt.carcare.model.ObdContent;
+import com.teamltt.carcare.model.Trip;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TripsActivity extends AppCompatActivity implements ObdResponseFragment.OnListFragmentInteractionListener {
 
@@ -46,8 +50,9 @@ public class TripsActivity extends AppCompatActivity implements ObdResponseFragm
     private DbHelper dbHelper;
 
     private Spinner spinner;
-    private List<Long> trips;
-    private ArrayAdapter<Long> spinnerAdapter;
+    private Map<Trip, Long> tripLongMap;
+    private List<Trip> trips;
+    private ArrayAdapter<Trip> spinnerAdapter;
 
     // Used to keep track of the items in the RecyclerView
     private RecyclerView.Adapter responseListAdapter;
@@ -58,6 +63,7 @@ public class TripsActivity extends AppCompatActivity implements ObdResponseFragm
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trips);
         spinner = (Spinner) findViewById(R.id.tripsSpinner);
+        tripLongMap = new HashMap<>();
         trips = new ArrayList<>();
         spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, trips);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -80,8 +86,11 @@ public class TripsActivity extends AppCompatActivity implements ObdResponseFragm
     protected void onStart() {
         super.onStart();
         dbHelper = new DbHelper(this);
+        tripLongMap.clear();
         trips.clear();
-        trips.addAll(dbHelper.getAllTripIds());
+        tripLongMap.putAll(dbHelper.getAllTrips());
+        trips.addAll(tripLongMap.keySet());
+        Collections.sort(trips);
         spinnerAdapter.notifyDataSetChanged();
     }
 
@@ -101,37 +110,19 @@ public class TripsActivity extends AppCompatActivity implements ObdResponseFragm
      */
     public void readData(View view) {
         Log.i(TAG, "readData");
-        long tripId = trips.get(spinner.getSelectedItemPosition());
+        Trip trip = (Trip) spinner.getSelectedItem();
+        long tripId = tripLongMap.get(trip);
         responses.clear();
         responses.addAll(dbHelper.getResponsesByTrip(tripId));
         responseListAdapter.notifyDataSetChanged();
     }
+
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu, menu);
         return true;
     }
 
-    protected void goToDemo(View view) {
-        Intent intent = new Intent(this, DemoActivity.class);
-        startActivity(intent);
-    }
-    protected void goToStatic(View view) {
-        Intent intent = new Intent(this, DemoActivity.class);
-        startActivity(intent);
-    }
-    protected void goToDynamic(View view) {
-        Intent intent = new Intent(this, DemoActivity.class);
-        startActivity(intent);
-    }
-    /*protected void openDrawer(View view) {
-        if (drawer.isDrawerOpen(findViewById(android.R.id.home))) {
-            drawer.closeDrawer(Gravity.LEFT);
-        }
-        else {
-            drawer.openDrawer(Gravity.RIGHT);
-        }
-    }*/
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent intent;
         switch (item.getItemId()) {
@@ -139,20 +130,22 @@ public class TripsActivity extends AppCompatActivity implements ObdResponseFragm
                 intent = new Intent(this, CarInfoActivity.class);
                 startActivity(intent);
                 break;
-            case (R.id.action_demo):
-                intent = new Intent(this, DemoActivity.class);
-                startActivity(intent);
-                break;
             case (R.id.action_trips):
                 intent = new Intent(this, TripsActivity.class);
                 startActivity(intent);
+                break;
             case (R.id.action_dynamic):
                 intent = new Intent(this, DynamicActivity.class);
+                startActivity(intent);
+                break;
+            case (R.id.action_reminder):
+                intent = new Intent(this, ReminderActivity.class);
                 startActivity(intent);
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
+
     public void toggleLogging(MenuItem item) {
         //
     }

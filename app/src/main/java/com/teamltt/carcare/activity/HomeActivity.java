@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,21 +20,14 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.teamltt.carcare.R;
@@ -49,10 +42,9 @@ import com.teamltt.carcare.model.ObdContent;
 import com.teamltt.carcare.service.BtStatusDisplay;
 import com.teamltt.carcare.service.ObdBluetoothService;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class HomeActivity extends AppCompatActivity implements BtStatusDisplay, IObserver, ObdResponseFragment.OnListFragmentInteractionListener {
+public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObserver, ObdResponseFragment.OnListFragmentInteractionListener {
 
     // Used to keep track of the items in the RecyclerView
     private RecyclerView.Adapter responseListAdapter;
@@ -60,12 +52,12 @@ public class HomeActivity extends AppCompatActivity implements BtStatusDisplay, 
     ObdBluetoothService btService;
     Intent btServiceIntent;
     boolean bound;
-    SQLiteDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        activityContent = R.layout.activity_home;
+        includeDrawer = true;
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
 
         Intent intent = getIntent();
         String firstName = intent.getStringExtra(LoginActivity.EXTRA_FIRST_NAME);
@@ -92,29 +84,6 @@ public class HomeActivity extends AppCompatActivity implements BtStatusDisplay, 
             recyclerView.setAdapter(responseListAdapter);
         }
 
-        DbHelper dbHelper = new DbHelper(HomeActivity.this);
-        db = dbHelper.getReadableDatabase();
-        Cursor cursor = db.query(ResponseContract.ResponseEntry.TABLE_NAME, null, null, null, null, null,null);
-        //placeholder table making code
-
-        TableLayout table = (TableLayout) findViewById(R.id.table);
-
-        TableRow tr = new TableRow(this);
-        tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-        TextView tv = new TextView(this);
-        tv.setText("R1Col1");
-
-        TextView tv2 = new TextView(this);
-        tv2.setText("R1Col777");
-        tv2.setPadding(3,3,3,3);
-        TableRow.LayoutParams p = new TableRow.LayoutParams(TableLayout.LayoutParams.WRAP_CONTENT, TableLayout.LayoutParams.WRAP_CONTENT);
-        p.weight = 1;
-        tv.setLayoutParams(p);
-        p.weight = 3;
-        tv2.setLayoutParams(p);
-        tr.addView(tv);
-        tr.addView(tv2);
-        table.addView(tr);
     }
 
     @Override
@@ -122,7 +91,6 @@ public class HomeActivity extends AppCompatActivity implements BtStatusDisplay, 
         super.onStart();
         if (!bound) {
             bindService(btServiceIntent, mConnection, Context.BIND_AUTO_CREATE);
-            bound = true;
         }
     }
 
@@ -131,7 +99,9 @@ public class HomeActivity extends AppCompatActivity implements BtStatusDisplay, 
         super.onStop();
         // Unbind from the service
         if (bound) {
-            unbindService(mConnection); //TODO rebind in onContinue
+            btService.unobserveDatabase(HomeActivity.this);
+            unbindService(mConnection);
+            // should this be removed from here since it is done in mConnection.onServiceDisconnected?
             bound = false;
         }
     }
@@ -177,36 +147,12 @@ public class HomeActivity extends AppCompatActivity implements BtStatusDisplay, 
         return true;
     }
 
-    protected void goToDemo(View view) {
-        Intent intent = new Intent(this, DemoActivity.class);
-        startActivity(intent);
-    }
-    protected void goToStatic(View view) {
-        Intent intent = new Intent(this, DemoActivity.class);
-        startActivity(intent);
-    }
-    protected void goToDynamic(View view) {
-        Intent intent = new Intent(this, DemoActivity.class);
-        startActivity(intent);
-    }
-
-    /*protected void openDrawer(View view) {
-        if (drawer.isDrawerOpen(findViewById(android.R.id.home))) {
-            drawer.closeDrawer(Gravity.LEFT);
-        }
-        else {
-            drawer.openDrawer(Gravity.RIGHT);
-        }
-    }*/
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent intent;
         switch (item.getItemId()) {
             case (R.id.action_carInfo):
                 intent = new Intent(this, CarInfoActivity.class);
-                startActivity(intent);
-                break;
-            case (R.id.action_demo):
-                intent = new Intent(this, DemoActivity.class);
                 startActivity(intent);
                 break;
             case (R.id.action_trips):
@@ -215,6 +161,10 @@ public class HomeActivity extends AppCompatActivity implements BtStatusDisplay, 
                 break;
             case (R.id.action_dynamic):
                 intent = new Intent(this, DynamicActivity.class);
+                startActivity(intent);
+                break;
+            case (R.id.action_reminder):
+                intent = new Intent(this, ReminderActivity.class);
                 startActivity(intent);
                 break;
         }

@@ -16,106 +16,48 @@
 
 package com.teamltt.carcare.activity;
 
-        import java.util.Calendar;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.TextView;
 
-        import android.app.Activity;
-        import android.app.DatePickerDialog;
-        import android.app.Dialog;
+import com.teamltt.carcare.R;
+import com.teamltt.carcare.fragment.DatePickerFragment;
 
-        import android.app.DialogFragment;
-        import android.app.Fragment;
-        import android.app.FragmentManager;
-        import android.content.Intent;
-        import android.os.Bundle;
-
-        import android.support.v7.app.AppCompatActivity;
-        import android.view.LayoutInflater;
-        import android.view.Menu;
-        import android.view.MenuInflater;
-        import android.view.MenuItem;
-        import android.view.View;
-
-        import android.view.ViewGroup;
-        import android.widget.DatePicker;
-        import android.widget.TextView;
-        import android.widget.Toast;
-
-        import com.teamltt.carcare.R;
-        import com.teamltt.carcare.fragment.DatePickerFragment;
-
-public class DynamicActivity extends AppCompatActivity {
+public class DynamicActivity extends BaseActivity {
     private boolean from;
 
     public void onCreate(Bundle savedInstanceState) {
+        activityContent = R.layout.activity_dynamic;
+        includeDrawer = false;
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_dynamic);
         from = true;
     }
 
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.activity_dynamic, container, false);
-        return view;
-    }
 
     public void showDatePickerDialog(View v) {
-        if (findViewById(R.id.buttonTo) == v) {
-            from = false;
-        } else {
-            from = true;
-        }
+        from = findViewById(R.id.buttonTo) != v;
         DatePickerFragment dialog = new DatePickerFragment();
         dialog.show(getFragmentManager(), "DateFragment");
     }
 
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu, menu);
-        return true;
-    }
+    /**
+     * Called by a date picker fragment. TODO see DatePickerFragment
+     * @param year
+     * @param month
+     * @param day
+     */
 
     public void setDate(int year, int month, int day) {
         TextView tv;
         if (from) {
-            tv = (TextView)findViewById(R.id.textFrom);
+            tv = (TextView) findViewById(R.id.textFrom);
         } else {
-            tv = (TextView)findViewById(R.id.textTo);
+            tv = (TextView) findViewById(R.id.textTo);
         }
         String date = month + "/" + day + "/" + year;
-        tv.setText(date);
-    }
 
-    /*protected void openDrawer(View view) {
-        if (drawer.isDrawerOpen(findViewById(android.R.id.home))) {
-            drawer.closeDrawer(Gravity.LEFT);
+        if (tv != null) {
+            tv.setText(date);
         }
-        else {
-            drawer.openDrawer(Gravity.RIGHT);
-        }
-    }*/
-    public boolean onOptionsItemSelected(MenuItem item) {
-        Intent intent;
-        switch (item.getItemId()) {
-            case (R.id.action_carInfo):
-                intent = new Intent(this, CarInfoActivity.class);
-                startActivity(intent);
-                break;
-            case (R.id.action_demo):
-                intent = new Intent(this, DemoActivity.class);
-                startActivity(intent);
-                break;
-            case (R.id.action_trips):
-                intent = new Intent(this, TripsActivity.class);
-                startActivity(intent);
-                break;
-            case (R.id.action_dynamic):
-                intent = new Intent(this, DynamicActivity.class);
-                startActivity(intent);
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    public void toggleLogging(MenuItem item) {
-        //
     }
 }

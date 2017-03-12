@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,6 +15,14 @@
  */
 
 package com.teamltt.carcare.activity;
+
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -27,27 +35,17 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.teamltt.carcare.R;
 import com.teamltt.carcare.database.DbHelper;
 
-import android.app.ProgressDialog;
-import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.TextView;
-
 
 public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
 
-    GoogleApiClient googleApiClient;
-    GoogleSignInAccount googleSignInAccount;
+    private GoogleApiClient googleApiClient;
+    private GoogleSignInAccount googleSignInAccount;
 
     private static final String TAG = "SignInActivity";
     private static final int RC_SIGN_IN = 9001;
 
     private TextView tvStatus;
     ProgressDialog progressDialog;
-
-    private DbHelper dbHelper;
 
     public final static String EXTRA_FIRST_NAME = "com.teamltt.carcare.activity.LoginActivity.FIRSTNAME";
     public final static String EXTRA_LAST_NAME = "com.teamltt.carcare.activity.LoginActivity.LASTNAME";
@@ -113,6 +111,14 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        if (googleApiClient.isConnected()) {
+            googleApiClient.disconnect();
+        }
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
@@ -174,11 +180,12 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             String google_id = googleSignInAccount.getId();
 
             // Add user to database
-            dbHelper = new DbHelper(this);
+            DbHelper dbHelper = new DbHelper(this);
             // Make sure you're not adding duplicates to the database
             if (!dbHelper.containsUser(google_id)) {
                 dbHelper.createNewUser(google_id, firstName, lastName);
             }
+            dbHelper.close();
 
             // Go to Home Screen
             Intent intent = new Intent(this, HomeActivity.class);
@@ -201,14 +208,5 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 break;
         }
     }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (googleApiClient.isConnected()) {
-            googleApiClient.disconnect();
-        }
-    }
-
 
 }

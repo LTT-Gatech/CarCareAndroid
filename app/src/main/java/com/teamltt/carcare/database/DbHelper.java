@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,18 +29,24 @@ import com.teamltt.carcare.database.contract.TripContract;
 import com.teamltt.carcare.database.contract.UserContract;
 import com.teamltt.carcare.database.contract.VehicleContract;
 import com.teamltt.carcare.model.ObdContent;
+import com.teamltt.carcare.model.Trip;
 import com.teamltt.carcare.model.Vehicle;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class DbHelper extends SQLiteOpenHelper implements IObservable {
 
     private static final String TAG = "DbHelper";
+
+    private static final String SQL_INIT = "PRAGMA foreign_keys = on;";
 
     // errors are negative, ok is 0, anything else is positive.
     public static final long DB_ERROR_NULL = -6;
@@ -49,9 +55,10 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
     public static final long DB_WRITE_ERROR = -1; // from SQLiteDatabase if an error occurred
     public static final long DB_OK = 0;
 
-    public static final int DATABASE_VERSION = 3;
+    public static final int DATABASE_VERSION = 5;
     public static final String DATABASE_NAME = "CarCare.db";
 
+    // Format in which the database stores DateTimes. Example: 2004-12-13 13:14:15
     private static final SimpleDateFormat sqlDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     // for observer pattern to notify when data has been updated
@@ -64,6 +71,7 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        db.execSQL(SQL_INIT);
         db.execSQL(OwnershipContract.SQL_CREATE_ENTRIES);
         db.execSQL(ResponseContract.SQL_CREATE_ENTRIES);
         db.execSQL(TripContract.SQL_CREATE_ENTRIES);
@@ -129,6 +137,59 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         return res.toString();
     }
 
+    private String getCursorColumn(Cursor cursor, String column) {
+        return cursor.getString(cursor.getColumnIndexOrThrow(column));
+    }
+
+    public long createNewVehicle(Vehicle vehicle) {
+        SQLiteDatabase db = getWritableDatabase();
+        long status = DbHelper.errorChecks(db);
+        if (status != DbHelper.DB_OK) {
+            return status;
+        }
+        status = VehicleContract.insert(db, vehicle.getVin(), vehicle.getMake(), vehicle.getModel(),
+                vehicle.getYear(), vehicle.getColor(), vehicle.getNickname(), vehicle.getPlateNumber());
+        db.close();
+        setChanged(status);
+        return status;
+    }
+
+    public Vehicle getVehicle(long vehicleId) {
+        if (vehicleId == -1) {
+            return null;
+        }
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = VehicleContract.query(db, vehicleId);
+//        long id = cursor.getLong(cursor.getColumnIndexOrThrow(VehicleContract.VehicleEntry.COLUMN_NAME_ID));
+        cursor.moveToFirst();
+        String vin = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_VIN);
+        String make = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_MAKE);
+        String model = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_MODEL);
+        String year = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_YEAR);
+        String color = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_COLOR);
+        String nickname = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_NICKNAME);
+        String plateNumber = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_PLATE_NUMBER);
+        cursor.close();
+        db.close();
+        return new Vehicle(vin, make, model, year, color, nickname, plateNumber);
+    }
+
+    public int updateVehicle(long vehicleId, Vehicle vehicle) {
+        SQLiteDatabase db = getWritableDatabase();
+        long status = DbHelper.errorChecks(db);
+        if (status != DbHelper.DB_OK) {
+            return (int) status;
+        }
+        if (vehicleId == -1) {
+            return -1;
+        }
+        int numAffected = VehicleContract.update(db, vehicleId, vehicle.getVin(),
+                vehicle.getMake(), vehicle.getModel(), vehicle.getYear(), vehicle.getColor(),
+                vehicle.getNickname(), vehicle.getPlateNumber());
+        db.close();
+        return numAffected;
+    }
+
     public long createNewTrip(long vehicleId, Date startTime, Date endTime) {
         SQLiteDatabase db = getWritableDatabase();
         long status = DbHelper.errorChecks(db);
@@ -156,25 +217,53 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = UserContract.queryUserID(db, google_user_id);
         db.close();
-        return cursor != null;
+        if (cursor != null) {
+            cursor.close();
+            return true;
+        }
+        return false;
     }
 
     public List<Long> getAllTripIds() {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = TripContract.queryAll(db);
-        db.close();
         List<Long> tripIds = new ArrayList<>();
         while (cursor.moveToNext()) {
             tripIds.add(cursor.getLong(cursor.getColumnIndexOrThrow(TripContract.TripEntry.COLUMN_NAME_ID)));
         }
         cursor.close();
+        db.close();
         return tripIds;
+    }
+
+    /**
+     * Returns a map of Trip objects to trip id's
+     */
+    public Map<Trip, Long> getAllTrips() {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = TripContract.queryAll(db);
+        Map<Trip, Long> trips = new HashMap<>();
+        while (cursor.moveToNext()) {
+            long tripId = cursor.getLong(cursor.getColumnIndexOrThrow(TripContract.TripEntry.COLUMN_NAME_ID));
+            String startTime = getCursorColumn(cursor, TripContract.TripEntry.COLUMN_NAME_START_TIME);
+            String endTime = getCursorColumn(cursor, TripContract.TripEntry.COLUMN_NAME_END_TIME);
+            Date startDate, endDate;
+            try {
+                startDate = sqlDateFormat.parse(startTime);
+                endDate = sqlDateFormat.parse(endTime);
+                trips.put(new Trip(startDate, endDate), tripId);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        cursor.close();
+        db.close();
+        return trips;
     }
 
     public List<ObdContent.ObdResponse> getResponsesByTrip(long tripId) {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = ResponseContract.queryByTripId(db, tripId);
-        db.close();
         List<ObdContent.ObdResponse> responses = new ArrayList<>();
         while (cursor.moveToNext()) {
             long id = cursor.getLong(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_ID));
@@ -183,6 +272,7 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
             responses.add(ObdContent.createItemWithResponse(((Long) id).intValue(), name, value));
         }
         cursor.close();
+        db.close();
         return responses;
     }
 
@@ -209,22 +299,9 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
             items.add(ObdContent.createItemWithResponse(((Long) id).intValue(), name, value));
         }
         cursor.close();
+        db.close();
         return items;
     }
-
-    public Vehicle getVehicle(long vehicleId) {
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = VehicleContract.query(db, vehicleId);
-        long id = cursor.getLong(cursor.getColumnIndexOrThrow(VehicleContract.VehicleEntry.COLUMN_NAME_ID));
-        String nickname = cursor.getString(cursor.getColumnIndexOrThrow(VehicleContract.VehicleEntry.COLUMN_NAME_NICKNAME));
-        return new Vehicle(id, nickname);
-    }
-
-    public long updateVehicle(Vehicle vehicle) {
-        // TODO call VehicleContract.update(SQLiteDatabase, long vehicleId, String vin, String make, ...)
-        return 0L;
-    }
-
 
     @Override
     public void addObserver(IObserver observer) {

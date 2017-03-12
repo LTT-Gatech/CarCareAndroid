@@ -1,33 +1,17 @@
 /*
-<<<<<<< HEAD
  * Copyright 2017, Team LTT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-=======
- ** Copyright 2017, Team LTT
- **
- ** Licensed under the Apache License, Version 2.0 (the "License");
- ** you may not use this file except in compliance with the License.
- ** You may obtain a copy of the License at
- **
- **     http://www.apache.org/licenses/LICENSE-2.0
- **
- ** Unless required by applicable law or agreed to in writing, software
- ** distributed under the License is distributed on an "AS IS" BASIS,
- ** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- ** See the License for the specific language governing permissions and
- ** limitations under the License.
->>>>>>> giuliano/dev
  */
 
 package com.teamltt.carcare.service;
@@ -49,6 +33,7 @@ import com.github.pires.obd.commands.ObdCommand;
 import com.github.pires.obd.commands.SpeedCommand;
 import com.github.pires.obd.commands.engine.RPMCommand;
 import com.github.pires.obd.commands.engine.RuntimeCommand;
+import com.github.pires.obd.commands.protocol.EchoOffCommand;
 import com.teamltt.carcare.R;
 import com.teamltt.carcare.adapter.IObdSocket;
 import com.teamltt.carcare.adapter.bluetooth.DeviceSocket;
@@ -59,8 +44,6 @@ import com.teamltt.carcare.database.contract.TripContract;
 
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -88,12 +71,10 @@ public class ObdBluetoothService extends Service {
 
     private int numBound = 0;
 
-    private Set<IObserver> dbObservers = new HashSet<>();
-
     private boolean bluetoothReceiverRegistered = false;
     private boolean discoveryReceiverRegistered = false;
 
-    private List<BtStatusDisplay> btActivities;
+    private Set<BtStatusDisplay> btActivities;
 
     /**
      * Used to catch bluetooth status related events.
@@ -107,13 +88,11 @@ public class ObdBluetoothService extends Service {
             if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
                 int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1);
 
-                switch (state){
+                switch (state) {
                     case BluetoothAdapter.STATE_ON:
                         //Indicates the local Bluetooth adapter is on, and ready for use.
-                        sendToDisplays(getString(R.string.connecting_bt));
                         getObdDevice();
                         break;
-
                 }
             }
         }
@@ -148,9 +127,27 @@ public class ObdBluetoothService extends Service {
     };
 
     @Override
-    public void onCreate(){
+    public void onCreate() {
         super.onCreate();
-        btActivities = new LinkedList<>();
+        btActivities = new HashSet<>();
+        dbHelper = new DbHelper(ObdBluetoothService.this);
+    }
+
+    @Override
+    public void onDestroy() {
+        // release resources
+        Log.i(TAG, "onDestroy");
+        if (discoveryReceiverRegistered) {
+            unregisterReceiver(discoveryReceiver);
+        }
+        if (bluetoothReceiverRegistered) {
+            unregisterReceiver(bluetoothReceiver);
+        }
+        if (dbHelper != null) {
+            dbHelper.deleteObservers();
+            dbHelper.close();
+        }
+
     }
 
     /**
@@ -171,21 +168,9 @@ public class ObdBluetoothService extends Service {
         return super.onUnbind(intent);
     }
 
-
-    /**
-     * Registers an Observer with the database
-     * @param observer An observer entity, like an Activity that shows data from the Response table
-     */
-    public void observeDatabase(IObserver observer) {
-        dbObservers.add(observer);
-    }
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "onStartCommand");
-
-        // Connect to the database
-        dbHelper = new DbHelper(ObdBluetoothService.this);
 
 
         // Register the BroadcastReceiver
@@ -224,22 +209,17 @@ public class ObdBluetoothService extends Service {
 
     }
 
-    @Override
-    public void onDestroy() {
-        // release resources
+    /**
+     * Registers an Observer with the database
+     *
+     * @param observer An observer entity, like an Activity that shows data from the Response table
+     */
+    public void observeDatabase(IObserver observer) {
+        dbHelper.addObserver(observer);
+    }
 
-        Log.i(TAG, "onDestroy");
-        if (discoveryReceiverRegistered) {
-            unregisterReceiver(discoveryReceiver);
-        }
-        if (bluetoothReceiverRegistered) {
-            unregisterReceiver(bluetoothReceiver);
-        }
-        if (dbHelper != null) {
-            dbHelper.deleteObservers();
-            dbHelper.close();
-        }
-
+    public void unobserveDatabase(IObserver observer) {
+        dbHelper.deleteObserver(observer);
     }
 
     /**
@@ -281,9 +261,7 @@ public class ObdBluetoothService extends Service {
         Log.i(TAG, "trying socket creation");
         try {
             socket = new DeviceSocket(obdDevice.createRfcommSocketToServiceRecord(uuid));
-            sendToDisplays(getString(R.string.connecting_bt));
-            new ConnectTask().execute();
-
+            startNewTrip();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -307,8 +285,9 @@ public class ObdBluetoothService extends Service {
     private class ConnectTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
+            // Connect the device's bluetooth to the OBD adapter
             try {
-                // Android advises to cancel discovery before using socket.connect()
+                // Android advises to back discovery before using socket.connect()
                 if (bluetoothAdapter.isEnabled()) {
 
                     if (bluetoothAdapter.isDiscovering()) {
@@ -316,14 +295,9 @@ public class ObdBluetoothService extends Service {
                         bluetoothAdapter.cancelDiscovery();
                     }
                     socket.connect();
-                } else {
-                    Log.i(TAG, "Bluetooth is not on");
                 }
 
-                for (IObserver observer : dbObservers) {
 
-                    dbHelper.addObserver(observer);
-                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -336,13 +310,17 @@ public class ObdBluetoothService extends Service {
             // change R.id.status_bt to display connected
             if (dbHelper != null && socket.isConnected()) {
                 Log.i(TAG, "bluetooth connected");
+                sendToDisplays(getString(R.string.connected_bt));
                 queryTask.execute();
-            } else {
+            } else if (!bluetoothAdapter.isEnabled()) {
+                Log.i(TAG, "Bluetooth is not on");
+                sendToDisplays(getString(R.string.not_connecting_bt));
+            } else{
                 Log.i(TAG, "bluetooth not connected");
                 sendToDisplays(getString(R.string.retry_connect));
             }
         }
-    };
+    }
 
     /**
      * This task checks periodically if the car is on, then starts cycling through commands that CarCare tracks and
@@ -360,6 +338,11 @@ public class ObdBluetoothService extends Service {
         @Override
         protected Void doInBackground(Void... ignore) {
             try {
+                if (socket.isConnected()) {
+                    EchoOffCommand echo = new EchoOffCommand();
+                    echo.run(socket.getInputStream(), socket.getOutputStream());
+                }
+
                 while (socket.isConnected()) {
                     // Check for can's "heartbeat"
                     ObdCommand heartbeat = new RPMCommand();
@@ -384,6 +367,7 @@ public class ObdBluetoothService extends Service {
                     // TODO get these classes from somewhere else
                     commands.add(RuntimeCommand.class);
                     commands.add(SpeedCommand.class);
+                    commands.add(RPMCommand.class);
 
                     for (Class<? extends ObdCommand> commandClass : commands) {
                         ObdCommand sendCommand = commandClass.newInstance();
@@ -393,14 +377,17 @@ public class ObdBluetoothService extends Service {
                             // In case the Bluetooth connection breaks suddenly
                             break;
                         }
-                        long responseId = dbHelper.insertResponse(tripId, sendCommand.getName(),
-                                sendCommand.getCommandPID(), sendCommand.getFormattedResult());
+                        String name = sendCommand.getName();
+                        String commandPID = sendCommand.getCommandPID();
+                        String formattedResult = sendCommand.getFormattedResult();
+                        long responseId = dbHelper.insertResponse(tripId, name,
+                                commandPID, formattedResult);
                         if (responseId > DbHelper.DB_OK) {
                             newResponseIds.add(responseId);
                         }
                     }
                     publishProgress();
-                    Thread.sleep(1000);
+                    Thread.sleep(500);
                 }
             } catch (IOException | InterruptedException | IllegalAccessException | InstantiationException e) {
                 e.printStackTrace();

@@ -35,7 +35,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Visual Placeholder Alert Text"
+        android:text="No Alerts"
         />
     <ListView
         android:layout_width="match_parent"
@@ -43,6 +43,8 @@
         android:id="@+id/listAlert">
 
     </ListView>
+    <!--This view is the placeholder divisor you see between alerts
+     and the next thing when the app runs-->
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
@@ -57,6 +59,7 @@
         android:textColor="@color/colorPrimary"
         android:textStyle="normal|bold"
         android:textAllCaps="false"
+        android:layout_gravity="start"
         android:textAlignment="viewStart" />
 
     <LinearLayout
@@ -111,18 +114,6 @@
             android:layout_height="match_parent"
             layout="@layout/fragment_obdresponse_list" />
 
-    </LinearLayout>
-    <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <TableLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/table"
-            android:padding="6dp">
-        </TableLayout>
     </LinearLayout>
 </LinearLayout>
 

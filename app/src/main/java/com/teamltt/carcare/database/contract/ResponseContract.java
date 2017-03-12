@@ -1,33 +1,17 @@
 /*
-<<<<<<< HEAD
  * Copyright 2017, Team LTT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-=======
- ** Copyright 2017, Team LTT
- **
- ** Licensed under the Apache License, Version 2.0 (the "License");
- ** you may not use this file except in compliance with the License.
- ** You may obtain a copy of the License at
- **
- **     http://www.apache.org/licenses/LICENSE-2.0
- **
- ** Unless required by applicable law or agreed to in writing, software
- ** distributed under the License is distributed on an "AS IS" BASIS,
- ** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- ** See the License for the specific language governing permissions and
- ** limitations under the License.
->>>>>>> giuliano/dev
  */
 
 package com.teamltt.carcare.database.contract;
@@ -35,28 +19,25 @@ package com.teamltt.carcare.database.contract;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import com.teamltt.carcare.database.DbHelper;
 
-import java.util.Arrays;
-
 public class ResponseContract {
 
-    private static final String TAG = "ResponseContract";
-
-    public static final String SQL_CREATE_ENTRIES = "CREATE TABLE " + ResponseEntry.TABLE_NAME + " (" +
+    public static final String SQL_CREATE_ENTRIES = "CREATE TABLE " + ResponseEntry.TABLE_NAME + " ("
             // response_id INTEGER PRIMARY KEY AUTOINCREMENT
-            ResponseEntry.COLUMN_NAME_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-            // trip_id INTEGER REFERENCES trips(trip_id)
-            ResponseEntry.COLUMN_NAME_TRIP_ID + " INTEGER REFERENCES " +
-            TripContract.TripEntry.TABLE_NAME + "(" + TripContract.TripEntry.COLUMN_NAME_ID + ")," +
+            + ResponseEntry.COLUMN_NAME_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + ResponseEntry.COLUMN_NAME_TRIP_ID + " INTEGER,"
             // this will automatically give each row the current timestamp upon insert
-            ResponseEntry.COLUMN_NAME_TIMESTAMP + " DATETIME DEFAULT CURRENT_TIMESTAMP," +
-            ResponseEntry.COLUMN_NAME_NAME + " TEXT," +
-            ResponseEntry.COLUMN_NAME_PID + " TEXT," +
-            ResponseEntry.COLUMN_NAME_VALUE + " TEXT" +
-            ");";
+            + ResponseEntry.COLUMN_NAME_TIMESTAMP + " DATETIME DEFAULT CURRENT_TIMESTAMP,"
+            + ResponseEntry.COLUMN_NAME_NAME + " TEXT,"
+            + ResponseEntry.COLUMN_NAME_PID + " TEXT,"
+            + ResponseEntry.COLUMN_NAME_VALUE + " TEXT,"
+            // FOREIGN KEY(trip_id) REFERENCES trips(trip_id) ON DELETE CASCADE ON UPDATE CASCADE
+            + "FOREIGN KEY(" + ResponseEntry.COLUMN_NAME_TRIP_ID + ") REFERENCES "
+            + TripContract.TripEntry.TABLE_NAME + "(" + TripContract.TripEntry.COLUMN_NAME_ID + ") "
+            + "ON DELETE CASCADE ON UPDATE CASCADE"
+            + ");";
 
     public static final String SQL_DROP_ENTRIES = "DROP TABLE IF EXISTS " + ResponseEntry.TABLE_NAME;
 
@@ -113,9 +94,6 @@ public class ResponseContract {
         for (int i = 0; i < rowIds.length; i++) {
             selectionArgs[i] = Long.toString(rowIds[i]);
         }
-        Log.i(TAG, "printing selection, selectionArgs. assertTrue(num(?) == selectionArgs.length)");
-        Log.i(TAG, selection);
-        Log.i(TAG, Arrays.toString(selectionArgs));
         String orderBy = ResponseEntry.COLUMN_NAME_TIMESTAMP + " ASC";
 
         return db.query(table, columns, selection, selectionArgs, null, null, orderBy);
