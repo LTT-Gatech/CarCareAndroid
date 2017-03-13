@@ -20,8 +20,10 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -83,7 +85,6 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
             recyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
             recyclerView.setAdapter(responseListAdapter);
         }
-
     }
 
     @Override
@@ -92,6 +93,8 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
         if (!bound) {
             bindService(btServiceIntent, mConnection, Context.BIND_AUTO_CREATE);
         }
+
+        displayStaticData();
     }
 
     @Override
@@ -151,21 +154,12 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent intent;
         switch (item.getItemId()) {
-            case (R.id.action_carInfo):
-                intent = new Intent(this, CarInfoActivity.class);
+            case (R.id.action_settings):
+                intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
                 break;
-            case (R.id.action_trips):
-                intent = new Intent(this, TripsActivity.class);
-                startActivity(intent);
-                break;
-            case (R.id.action_dynamic):
-                intent = new Intent(this, DynamicActivity.class);
-                startActivity(intent);
-                break;
-            case (R.id.action_reminder):
-                intent = new Intent(this, ReminderActivity.class);
-                startActivity(intent);
+            case (R.id.action_help):
+                // TODO Add toast
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -191,5 +185,31 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
             btService.startNewTrip();
         }
 
+    }
+
+    public void displayStaticData() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String syncConnPref = preferences.getString(SettingsActivity.KEY_PREF_SYNC_CONN, "");
+
+        TextView tvStaticData = ((TextView) findViewById(R.id.tvStaticData));
+
+        String tvText = "\n";
+
+        if (preferences.getBoolean("sEngineTemp", false)) {
+            //TODO Read from database
+            tvText +=" Engine Temperature: " + "205 °F\n";
+        }
+
+        if (preferences.getBoolean("sMPG", false)) {
+            //TODO Read from database
+            tvText += " Current Miles Per Gallon: " + "22 mpg\n";
+        }
+
+        if (preferences.getBoolean("sMPH", false)) {
+            //TODO Read from database
+            tvText += " Current Miles Per Hour: " + "55 mph\n";
+        }
+
+        tvStaticData.setText(tvText);
     }
 }
