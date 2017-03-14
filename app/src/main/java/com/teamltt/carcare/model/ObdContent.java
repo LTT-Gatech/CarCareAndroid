@@ -1,17 +1,17 @@
 /*
- ** Copyright 2017, Team LTT
- **
- ** Licensed under the Apache License, Version 2.0 (the "License");
- ** you may not use this file except in compliance with the License.
- ** You may obtain a copy of the License at
- **
- **     http://www.apache.org/licenses/LICENSE-2.0
- **
- ** Unless required by applicable law or agreed to in writing, software
- ** distributed under the License is distributed on an "AS IS" BASIS,
- ** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- ** See the License for the specific language governing permissions and
- ** limitations under the License.
+ * Copyright 2017, Team LTT
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.teamltt.carcare.model;
@@ -32,13 +32,25 @@ public class ObdContent {
 
     public static final Map<String, ObdResponse> ITEM_MAP = new HashMap<>();
 
+    public static void setItems(List<ObdResponse> items) {
+        ITEMS.clear();
+        ITEM_MAP.clear();
+        addItems(items);
+    }
+
+    public static void addItems(List<ObdResponse> items) {
+        for (ObdResponse item : items) {
+            addItem(item);
+        }
+    }
+
     public static void addItem(ObdResponse item) {
         ITEMS.add(item);
         ITEM_MAP.put(item.id, item);
     }
 
-    public static ObdResponse createItemWithResponse(int position, String request, String response) {
-        return new ObdResponse(String.valueOf(position), request, response);
+    public static ObdResponse createItemWithResponse(int id, String request, String response) {
+        return new ObdResponse(String.valueOf(id), request, response);
     }
 
     public static class ObdResponse {
