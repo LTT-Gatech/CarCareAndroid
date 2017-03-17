@@ -134,23 +134,25 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         if (result.isSuccess()) {
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount googleSignInAccount = result.getSignInAccount();
-            tvStatus.setText(getString(R.string.signed_in_fmt, googleSignInAccount.getDisplayName()));
+            if (googleSignInAccount != null) {
+                tvStatus.setText(getString(R.string.signed_in_fmt, googleSignInAccount.getDisplayName()));
 
-            String firstName = googleSignInAccount.getGivenName();
-            String lastName = googleSignInAccount.getFamilyName();
-            String googleId = googleSignInAccount.getId();
+                String firstName = googleSignInAccount.getGivenName();
+                String lastName = googleSignInAccount.getFamilyName();
+                String googleId = googleSignInAccount.getId();
 
-            if (!addUserIfNew(googleId, firstName, lastName)) {
-                Log.e(TAG, "could not create new user");
+                if (!addUserIfNew(googleId, firstName, lastName)) {
+                    Log.e(TAG, "could not create new user");
+                }
+
+                // Go to Home Screen
+                Intent intent = new Intent(this, HomeActivity.class);
+                intent.putExtra(EXTRA_FIRST_NAME, firstName);
+                intent.putExtra(EXTRA_LAST_NAME, lastName);
+                intent.putExtra(EXTRA_USER_ID, googleId);
+                startActivity(intent);
+                finish();
             }
-
-            // Go to Home Screen
-            Intent intent = new Intent(this, HomeActivity.class);
-            intent.putExtra(EXTRA_FIRST_NAME, firstName);
-            intent.putExtra(EXTRA_LAST_NAME, lastName);
-            intent.putExtra(EXTRA_USER_ID, googleId);
-            startActivity(intent);
-            finish();
         } else {
             // Signed out, show unauthenticated UI.
             tvStatus.setText(R.string.please_sign_in);
