@@ -36,6 +36,7 @@ public class FuelEconomyCommand extends ConsumptionRateCommand implements System
         // speed first so it is available in performCalculations
         speedCommand.run(in, out);
         super.run(in, out);
+        setStart(speedCommand.getStart());
     }
 
     @Override
