@@ -24,18 +24,18 @@
         android:background="@android:color/darker_gray"
         android:paddingBottom="9dp"
         android:paddingTop="3dp"/>
-    <TextView
-        android:paddingBottom="3dp"
-        android:paddingTop="3dp"
-        android:layout_width="wrap_content"
+    <ScrollView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/text_reminder"/>
-    <TextView
-        android:paddingBottom="3dp"
-        android:paddingTop="3dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/text_reminder"/>
+        android:id="@+id/scrollview_reminder">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:id="@+id/container_reminder">
+        </LinearLayout>
+    </ScrollView>
+
     <!--placeholder divisor-->
     <View
         android:layout_width="match_parent"
@@ -53,7 +53,7 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"
             android:text="@string/button_create_new"
-            android:onClick="editReminder"/>
+            android:onClick="newReminder"/>
     </RelativeLayout>
 
 

@@ -20,6 +20,8 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.widget.LinearLayoutManager;
@@ -28,20 +30,28 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.teamltt.carcare.R;
 import com.teamltt.carcare.database.DbHelper;
 import com.teamltt.carcare.database.IObservable;
 import com.teamltt.carcare.database.IObserver;
+import com.teamltt.carcare.database.contract.ReminderContract;
 import com.teamltt.carcare.database.contract.ResponseContract;
 import com.teamltt.carcare.fragment.MyObdResponseRecyclerViewAdapter;
 import com.teamltt.carcare.fragment.ObdResponseFragment;
 import com.teamltt.carcare.fragment.SimpleDividerItemDecoration;
 import com.teamltt.carcare.model.ObdContent;
+import com.teamltt.carcare.model.Reminder;
 import com.teamltt.carcare.service.BtStatusDisplay;
 import com.teamltt.carcare.service.ObdBluetoothService;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObserver, ObdResponseFragment.OnListFragmentInteractionListener {
@@ -52,6 +62,9 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
     ObdBluetoothService btService;
     Intent btServiceIntent;
     boolean bound;
+    List<Reminder> reminders;
+
+    private static final String TAG = "HomeActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +105,9 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
         if (!bound) {
             bindService(btServiceIntent, mConnection, Context.BIND_AUTO_CREATE);
         }
+        DbHelper helper = new DbHelper(HomeActivity.this);
+        reminders = helper.getRemindersByVehicleId(0);
+        checkReminders();
     }
 
     @Override
@@ -194,5 +210,36 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
             btService.startNewTrip();
         }
 
+    }
+
+    private void checkReminders() {
+        //ListView layout = (ListView) findViewById(R.id.listAlert); //when alerts are implemented this will be changed
+        Log.i(TAG, "checking reminders");
+        ListView list = (ListView) findViewById(R.id.listAlert);
+        Iterator<Reminder> iterator = reminders.iterator();
+        if (!iterator.hasNext()) {
+            Log.e(TAG, "iterator does not have next");
+        }
+        while (iterator.hasNext()) {
+            Reminder reminder = iterator.next();
+            if (reminder.getFeatureId() == -2) {
+                Calendar calendar = Calendar.getInstance();
+                SimpleDateFormat mdformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                Date date = calendar.getTime();
+                Log.i(TAG, reminder.getDate());
+                try {
+                    if (mdformat.parse(reminder.getDate()).before(date)) {
+                        Log.i(TAG, "date is after date!");
+                        //TextView textView = new TextView(this);
+                        //textView.setText("Reminder " + reminder.getName() + " is triggered!");
+                    } else {
+                        Log.i(TAG, "date is not after date!");
+                    }
+                }
+                catch (ParseException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        }
     }
 }

@@ -56,8 +56,27 @@
     <string name="title_dynamic">Dynamic title visual placeholder</string>
     <string name="button_from">From</string>
     <string name="button_to">To</string>
-
+    <!---Reminder Info Edit strings-->
     <string name="field_reminder_name">Reminder Name</string>
+    <string-array name="reminder_types">
+        <item>Set by Feature</item>
+        <item>Set by Date</item>
+    </string-array>
+    <string-array name="comparison_types">
+        <item>&lt;</item>
+        <item>=</item>
+        <item>&gt;</item>
+    </string-array>
+    <string-array name="feature_types">
+        <item>Oil Pressure</item>
+        <item>Placeholder 2</item>
+        <item>Placeholder 3</item>
+    </string-array>
+    <string name="hint_value">Enter Value</string>
+    <string name="hint_date">Enter Date</string>
+    <string name="button_save">Save</string>
+    <string name="button_select_date">Select Date</string>
+
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

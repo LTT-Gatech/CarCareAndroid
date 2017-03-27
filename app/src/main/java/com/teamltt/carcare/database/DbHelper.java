@@ -24,11 +24,13 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.teamltt.carcare.database.contract.OwnershipContract;
+import com.teamltt.carcare.database.contract.ReminderContract;
 import com.teamltt.carcare.database.contract.ResponseContract;
 import com.teamltt.carcare.database.contract.TripContract;
 import com.teamltt.carcare.database.contract.UserContract;
 import com.teamltt.carcare.database.contract.VehicleContract;
 import com.teamltt.carcare.model.ObdContent;
+import com.teamltt.carcare.model.Reminder;
 import com.teamltt.carcare.model.Trip;
 import com.teamltt.carcare.model.Vehicle;
 
@@ -55,7 +57,7 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
     public static final long DB_WRITE_ERROR = -1; // from SQLiteDatabase if an error occurred
     public static final long DB_OK = 0;
 
-    public static final int DATABASE_VERSION = 5;
+    public static final int DATABASE_VERSION = 7;
     public static final String DATABASE_NAME = "CarCare.db";
 
     // Format in which the database stores DateTimes. Example: 2004-12-13 13:14:15
@@ -77,6 +79,7 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         db.execSQL(TripContract.SQL_CREATE_ENTRIES);
         db.execSQL(UserContract.SQL_CREATE_ENTRIES);
         db.execSQL(VehicleContract.SQL_CREATE_ENTRIES);
+        db.execSQL(ReminderContract.SQL_CREATE_ENTRIES);
     }
 
     @Override
@@ -87,6 +90,7 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         db.execSQL(TripContract.SQL_DROP_ENTRIES);
         db.execSQL(UserContract.SQL_DROP_ENTRIES);
         db.execSQL(VehicleContract.SQL_DROP_ENTRIES);
+        db.execSQL(ReminderContract.SQL_DROP_ENTRIES);
         onCreate(db);
     }
 
@@ -186,6 +190,81 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         int numAffected = VehicleContract.update(db, vehicleId, vehicle.getVin(),
                 vehicle.getMake(), vehicle.getModel(), vehicle.getYear(), vehicle.getColor(),
                 vehicle.getNickname(), vehicle.getPlateNumber());
+        db.close();
+        return numAffected;
+    }
+
+    public long createNewReminder(long vehicleId, String name, int featureId, int comparison, int value, String date)  {
+        SQLiteDatabase db = getWritableDatabase();
+        long status = DbHelper.errorChecks(db);
+        if (status != DbHelper.DB_OK) {
+            return status;
+        }
+        status = ReminderContract.insert(db, vehicleId, name, featureId, comparison, value, date);
+        db.close();
+        setChanged(status);
+        return status;
+    }
+
+    public long updateReminder(int reminderId, long vehicleId, String name, int featureId, int comparison, int value, String date) {
+        SQLiteDatabase db = getWritableDatabase();
+        long status = DbHelper.errorChecks(db);
+        if (status != DbHelper.DB_OK) {
+            return status;
+        }
+        if (reminderId < 0) {
+            return -1;
+        }
+        int numAffected = ReminderContract.update(db, reminderId, vehicleId, name, featureId, comparison, value, date);
+        db.close();
+        return numAffected;
+    }
+
+    //takes a vehicle id, returns a list of all reminders associated with that vehicle
+    public List<Reminder> getRemindersByVehicleId(long vehicleId) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = ReminderContract.queryByVehicleId(db, vehicleId);
+        List<Reminder> reminders = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            long reminderId = cursor.getLong(cursor.getColumnIndexOrThrow(ReminderContract.ReminderEntry.COLUMN_NAME_ID));
+            String name = getCursorColumn(cursor, ReminderContract.ReminderEntry.COLUMN_NAME_NAME);
+            int featureId = cursor.getInt(cursor.getColumnIndexOrThrow(ReminderContract.ReminderEntry.COLUMN_NAME_FEATURE_ID));
+            int comparison = cursor.getInt(cursor.getColumnIndexOrThrow(ReminderContract.ReminderEntry.COLUMN_NAME_COMPARISON));
+            int value = cursor.getInt(cursor.getColumnIndexOrThrow(ReminderContract.ReminderEntry.COLUMN_NAME_VALUE));
+            String date = getCursorColumn(cursor, ReminderContract.ReminderEntry.COLUMN_NAME_DATE);
+            reminders.add(new Reminder(reminderId, name, featureId, comparison, value, date));
+        }
+        cursor.close();
+        db.close();
+        return reminders;
+    }
+
+    //takes a reminder id (the integer identifier from the table) and returns a Reminder object with the
+    //values associated with that reminder
+    public Reminder getReminderByReminderId(long reminderId) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = ReminderContract.queryByReminderId(db, reminderId);
+        cursor.moveToFirst();
+        String name = cursor.getString(cursor.getColumnIndexOrThrow(ReminderContract.ReminderEntry.COLUMN_NAME_NAME));
+        int featureId = cursor.getInt(cursor.getColumnIndexOrThrow(ReminderContract.ReminderEntry.COLUMN_NAME_FEATURE_ID));
+        int comparison = cursor.getInt(cursor.getColumnIndexOrThrow(ReminderContract.ReminderEntry.COLUMN_NAME_COMPARISON));
+        int value = cursor.getInt(cursor.getColumnIndexOrThrow(ReminderContract.ReminderEntry.COLUMN_NAME_VALUE));
+        String date = getCursorColumn(cursor, ReminderContract.ReminderEntry.COLUMN_NAME_DATE);
+        Reminder reminder = new Reminder(reminderId, name, featureId, comparison, value, date);
+        return reminder;
+
+    }
+
+    public long deleteReminder(long reminderId) {
+        SQLiteDatabase db = getWritableDatabase();
+        long status = DbHelper.errorChecks(db);
+        if (status != DbHelper.DB_OK) {
+            return status;
+        }
+        if (reminderId < 0) {
+            return -1;
+        }
+        long numAffected = ReminderContract.delete(db, reminderId);
         db.close();
         return numAffected;
     }
