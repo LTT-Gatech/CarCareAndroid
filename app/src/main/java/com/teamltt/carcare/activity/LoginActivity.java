@@ -5,7 +5,11 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
+<<<<<<< HEAD
  *      http://www.apache.org/licenses/LICENSE-2.0
+=======
+ *     http://www.apache.org/licenses/LICENSE-2.0
+>>>>>>> refs/remotes/origin/master
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -38,8 +42,8 @@ import com.teamltt.carcare.database.DbHelper;
 
 public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
 
-    GoogleApiClient googleApiClient;
-    GoogleSignInAccount googleSignInAccount;
+    private GoogleApiClient googleApiClient;
+    private GoogleSignInAccount googleSignInAccount;
 
     private static final String TAG = "SignInActivity";
     private static final int RC_SIGN_IN = 9001;
@@ -107,6 +111,14 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                     handleSignInResult(googleSignInResult);
                 }
             });
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (googleApiClient.isConnected()) {
+            googleApiClient.disconnect();
         }
     }
 
@@ -200,14 +212,4 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 break;
         }
     }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (googleApiClient.isConnected()) {
-            googleApiClient.disconnect();
-        }
-    }
-
-
 }

@@ -5,7 +5,11 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
+<<<<<<< HEAD
  *      http://www.apache.org/licenses/LICENSE-2.0
+=======
+ *     http://www.apache.org/licenses/LICENSE-2.0
+>>>>>>> refs/remotes/origin/master
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,7 +24,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -57,24 +60,14 @@ public class CarInfoActivity extends BaseActivity {
         Log.i(TAG, "onStart");
         //grab info from database or whatever and put it on the text views
         dbHelper = new DbHelper(CarInfoActivity.this);
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-
-        Cursor info = db.query(VehicleContract.VehicleEntry.TABLE_NAME, null, null, null, null, null,null);
-        Log.i(TAG, "count: " + info.getCount());
         vehicleId = 1;
-        //HACK auto populates the database with 1 vehicle
-        if (info.getCount() == 0) {
-            vehicleId = dbHelper.createNewVehicle(new Vehicle("", "", "", "", "", "", ""));
-            if (vehicleId == -1) {
-                Log.e(TAG, "problem creating new vehicle");
-                finish();
-            }
-        }
-        info.close();
-        db.close();
-
-        Log.i(TAG, "id: " + vehicleId);
         Vehicle vehicle = dbHelper.getVehicle(vehicleId);
+        if (vehicle == null) {
+            //HACK auto populates the database with 1 vehicle
+            vehicleId = dbHelper.createNewVehicle(new Vehicle("", "", "", "", "", "", ""));
+        }
+
+        vehicle = dbHelper.getVehicle(vehicleId);
 
         updateUi(vehicle);
     }
@@ -93,13 +86,10 @@ public class CarInfoActivity extends BaseActivity {
                 intent = new Intent(this, CarInfoActivity.class);
                 startActivity(intent);
                 break;
-            case (R.id.action_demo):
-                intent = new Intent(this, DemoActivity.class);
-                startActivity(intent);
-                break;
             case (R.id.action_trips):
                 intent = new Intent(this, TripsActivity.class);
                 startActivity(intent);
+                break;
             case (R.id.action_dynamic):
                 intent = new Intent(this, DynamicActivity.class);
                 startActivity(intent);
@@ -112,15 +102,16 @@ public class CarInfoActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
+    /**
+     * Launches a new activity CarInfoEditActivity to edit fields seen in this activity
+     * @param view The R.id.carInfoEdit button in the layout
+     */
     public void editInfo(View view) {
         //go to the car info edit screen
         Intent intent = new Intent(this, CarInfoEditActivity.class);
         intent.putExtra(EXTRA_VEHICLE_ID, vehicleId);
         startActivity(intent);
-    }
-
-    public void toggleLogging(MenuItem item) {
-        //
     }
 
     private void updateUi(Vehicle vehicle) {

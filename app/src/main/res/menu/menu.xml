@@ -8,10 +8,6 @@
         android:orderInCategory="1"
         android:title="Car Info"/>
     <item
-        android:id="@+id/action_demo"
-        android:orderInCategory="2"
-        android:title="Demo"/>
-    <item
         android:id="@+id/action_trips"
         android:orderInCategory="2"
         android:title="Trips"/>
@@ -24,11 +20,5 @@
         android:id="@+id/action_reminder"
         android:orderInCategory="3"
         android:title="Reminders"
-        />
-    <item
-        android:id="@+id/action_bluetooth"
-        android:onClick="toggleLogging"
-        android:orderInCategory="3"
-        android:title="@string/stop_logging"
         />
 </menu>

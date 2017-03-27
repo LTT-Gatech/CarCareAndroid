@@ -5,7 +5,11 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
+<<<<<<< HEAD
  *      http://www.apache.org/licenses/LICENSE-2.0
+=======
+ *     http://www.apache.org/licenses/LICENSE-2.0
+>>>>>>> refs/remotes/origin/master
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,8 +24,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.widget.LinearLayoutManager;
@@ -37,7 +39,6 @@ import com.teamltt.carcare.R;
 import com.teamltt.carcare.database.DbHelper;
 import com.teamltt.carcare.database.IObservable;
 import com.teamltt.carcare.database.IObserver;
-import com.teamltt.carcare.database.contract.ReminderContract;
 import com.teamltt.carcare.database.contract.ResponseContract;
 import com.teamltt.carcare.fragment.MyObdResponseRecyclerViewAdapter;
 import com.teamltt.carcare.fragment.ObdResponseFragment;
@@ -105,6 +106,7 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
         if (!bound) {
             bindService(btServiceIntent, mConnection, Context.BIND_AUTO_CREATE);
         }
+
         DbHelper helper = new DbHelper(HomeActivity.this);
         reminders = helper.getRemindersByVehicleId(0);
         checkReminders();
@@ -115,8 +117,9 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
         super.onStop();
         // Unbind from the service
         if (bound) {
-            btService.unobserveDatabaset(HomeActivity.this);
+            btService.unobserveDatabase(HomeActivity.this);
             unbindService(mConnection);
+            // should this be removed from here since it is done in mConnection.onServiceDisconnected?
             bound = false;
         }
     }
@@ -170,10 +173,6 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
                 intent = new Intent(this, CarInfoActivity.class);
                 startActivity(intent);
                 break;
-            case (R.id.action_demo):
-                intent = new Intent(this, DemoActivity.class);
-                startActivity(intent);
-                break;
             case (R.id.action_trips):
                 intent = new Intent(this, TripsActivity.class);
                 startActivity(intent);
@@ -211,7 +210,6 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
         }
 
     }
-
     private void checkReminders() {
         //ListView layout = (ListView) findViewById(R.id.listAlert); //when alerts are implemented this will be changed
         Log.i(TAG, "checking reminders");
@@ -242,4 +240,5 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
             }
         }
     }
+
 }

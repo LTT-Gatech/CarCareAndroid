@@ -16,15 +16,8 @@
 
 package com.teamltt.carcare.activity;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.teamltt.carcare.R;
@@ -47,6 +40,13 @@ public class DynamicActivity extends BaseActivity {
         dialog.show(getFragmentManager(), "DateFragment");
     }
 
+    /**
+     * Called by a date picker fragment. TODO see DatePickerFragment
+     * @param year
+     * @param month
+     * @param day
+     */
+
     public void setDate(int year, int month, int day) {
         TextView tv;
         if (from) {
@@ -55,7 +55,9 @@ public class DynamicActivity extends BaseActivity {
             tv = (TextView) findViewById(R.id.textTo);
         }
         String date = month + "/" + day + "/" + year;
-        tv.setText(date);
-    }
 
+        if (tv != null) {
+            tv.setText(date);
+        }
+    }
 }

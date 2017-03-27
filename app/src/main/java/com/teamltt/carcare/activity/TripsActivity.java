@@ -5,7 +5,11 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
+<<<<<<< HEAD
  *      http://www.apache.org/licenses/LICENSE-2.0
+=======
+ *     http://www.apache.org/licenses/LICENSE-2.0
+>>>>>>> refs/remotes/origin/master
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -88,7 +92,6 @@ public class TripsActivity extends AppCompatActivity implements ObdResponseFragm
         dbHelper = new DbHelper(this);
         tripLongMap.clear();
         trips.clear();
-        // TODO order these values chronologically or by key
         tripLongMap.putAll(dbHelper.getAllTrips());
         trips.addAll(tripLongMap.keySet());
         Collections.sort(trips);
@@ -123,30 +126,6 @@ public class TripsActivity extends AppCompatActivity implements ObdResponseFragm
         inflater.inflate(R.menu.menu, menu);
         return true;
     }
-
-    protected void goToDemo(View view) {
-        Intent intent = new Intent(this, DemoActivity.class);
-        startActivity(intent);
-    }
-
-    protected void goToStatic(View view) {
-        Intent intent = new Intent(this, DemoActivity.class);
-        startActivity(intent);
-    }
-
-    protected void goToDynamic(View view) {
-        Intent intent = new Intent(this, DemoActivity.class);
-        startActivity(intent);
-    }
-
-    /*protected void openDrawer(View view) {
-        if (drawer.isDrawerOpen(findViewById(android.R.id.home))) {
-            drawer.closeDrawer(Gravity.LEFT);
-        }
-        else {
-            drawer.openDrawer(Gravity.RIGHT);
-        }
-    }*/
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent intent;
         switch (item.getItemId()) {
@@ -154,13 +133,10 @@ public class TripsActivity extends AppCompatActivity implements ObdResponseFragm
                 intent = new Intent(this, CarInfoActivity.class);
                 startActivity(intent);
                 break;
-            case (R.id.action_demo):
-                intent = new Intent(this, DemoActivity.class);
-                startActivity(intent);
-                break;
             case (R.id.action_trips):
                 intent = new Intent(this, TripsActivity.class);
                 startActivity(intent);
+                break;
             case (R.id.action_dynamic):
                 intent = new Intent(this, DynamicActivity.class);
                 startActivity(intent);

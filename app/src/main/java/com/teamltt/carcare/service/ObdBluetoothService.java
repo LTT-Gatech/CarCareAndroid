@@ -5,7 +5,11 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
+<<<<<<< HEAD
  *      http://www.apache.org/licenses/LICENSE-2.0
+=======
+ *     http://www.apache.org/licenses/LICENSE-2.0
+>>>>>>> refs/remotes/origin/master
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -127,7 +131,7 @@ public class ObdBluetoothService extends Service {
     };
 
     @Override
-    public void onCreate(){
+    public void onCreate() {
         super.onCreate();
         btActivities = new HashSet<>();
         dbHelper = new DbHelper(ObdBluetoothService.this);
@@ -218,7 +222,7 @@ public class ObdBluetoothService extends Service {
         dbHelper.addObserver(observer);
     }
 
-    public void unobserveDatabaset(IObserver observer) {
+    public void unobserveDatabase(IObserver observer) {
         dbHelper.deleteObserver(observer);
     }
 
@@ -287,7 +291,7 @@ public class ObdBluetoothService extends Service {
         protected Void doInBackground(Void... params) {
             // Connect the device's bluetooth to the OBD adapter
             try {
-                // Android advises to cancel discovery before using socket.connect()
+                // Android advises to back discovery before using socket.connect()
                 if (bluetoothAdapter.isEnabled()) {
 
                     if (bluetoothAdapter.isDiscovering()) {
