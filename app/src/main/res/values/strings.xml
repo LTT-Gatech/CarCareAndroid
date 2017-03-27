@@ -59,9 +59,44 @@
 
     <string name="field_reminder_name">Reminder Name</string>
 
+    <!--Car info strings-->
+    <string name="text_car_info_title">Car Info</string>
+    <string name="text_year">Year</string>
+    <string name="hint_year">Enter Year</string>
+    <string name="text_make">Make</string>
+    <string name="hint_make">Enter Make</string>
+    <string name="text_model">Model</string>
+    <string name="hint_model">Enter Model</string>
+    <string name="text_VIN">VIN</string>
+    <string name="hint_VIN">Enter VIN</string>
+    <string name="text_license_plate">License Plate</string>
+    <string name="hint_license_plate">Enter License Plate</string>
+    <string name="text_color">Color</string>
+    <string name="hint_color">Enter Color</string>
+    <string name="text_nickname">Nickname</string>
+    <string name="hint_nickname">Enter Nickname</string>
+    <string name="button_edit">Edit</string>
+    <string name="button_save">Save</string>
+
+    <!--Alerts strings-->
+    <string name="text_alerts_title">Alerts</string>
+
+    <!--Menu strings-->
+    <string name="text_trips">Trips</string>
+    <string name="text_dynamic">Dynamic</string>
+    <string name="text_reminders_title">Reminders</string>
+
+    <string name="text_welcome">Welcome</string>
+    <string name="button_read_data">Read Data</string>
+
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="search_statistics">Search Statistics</string>
     <string name="car_information">Car Information</string>
     <string name="sign_out">Sign Out</string>
+    <string name="text_placeholder">Placeholder text</string>
+    <string name="placeholder_data_type">Data type:</string>
+    <string name="placeholder_value">0 mph</string>
+
 </resources>

@@ -15,7 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="26dp"
-        android:id="@+id/btnGoogleSignIn"
+        android:id="@+id/button_google_sign_in"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
 
@@ -23,9 +23,9 @@
         android:text=""
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/btnGoogleSignIn"
+        android:layout_below="@+id/button_google_sign_in"
         android:layout_marginTop="35dp"
-        android:id="@+id/tvStatus"
+        android:id="@+id/text_status"
         android:layout_alignParentLeft="false"
         android:layout_alignParentStart="false"
         android:layout_centerInParent="true" />

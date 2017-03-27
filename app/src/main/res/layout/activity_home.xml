@@ -29,18 +29,18 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/textAlert"
-        android:text="Alerts"
-        android:textSize="30dp"/>
+        android:id="@+id/text_alerts_title"
+        android:text="@string/text_alerts_title"
+        android:textSize="30sp"/>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="No Alerts"
+        android:text="@string/text_placeholder"
         />
     <ListView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/listAlert">
+        android:id="@+id/list_alerts">
 
     </ListView>
     <!--This view is the placeholder divisor you see between alerts
@@ -51,7 +51,7 @@
         android:background="@android:color/darker_gray"/>
 
     <TextView
-        android:text="Welcome"
+        android:text="@string/text_welcome"
         android:layout_width="match_parent"
         android:layout_height="31dp"
         android:id="@+id/tvWelcome"
@@ -98,14 +98,14 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:visibility="gone"
-            android:id="@+id/topPanel">
+            android:id="@+id/top_panel">
 
             <Button
-                android:text="Read Data"
+                android:text="@string/button_read_data"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:onClick="readData"
-                android:id="@+id/readData" />
+                android:id="@+id/button_read_data" />
 
         </LinearLayout>
 

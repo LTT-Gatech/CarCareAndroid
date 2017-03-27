@@ -151,7 +151,7 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent intent;
         switch (item.getItemId()) {
-            case (R.id.action_carInfo):
+            case (R.id.action_car_info):
                 intent = new Intent(this, CarInfoActivity.class);
                 startActivity(intent);
                 break;

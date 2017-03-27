@@ -91,23 +91,23 @@ public class CarInfoEditActivity extends AppCompatActivity {
     }
 
     private void updateUi(Vehicle vehicle) {
-        ((TextView) findViewById(R.id.fieldYear)).setText(vehicle.getYear());
-        ((TextView) findViewById(R.id.fieldVIN)).setText(vehicle.getVin());
-        ((TextView) findViewById(R.id.fieldMake)).setText(vehicle.getMake());
-        ((TextView) findViewById(R.id.fieldModel)).setText(vehicle.getModel());
-        ((TextView) findViewById(R.id.fieldColor)).setText(vehicle.getColor());
-        ((TextView) findViewById(R.id.fieldNickname)).setText(vehicle.getNickname());
-        ((TextView) findViewById(R.id.fieldPlate)).setText(vehicle.getPlateNumber());
+        ((TextView) findViewById(R.id.field_year)).setText(vehicle.getYear());
+        ((TextView) findViewById(R.id.field_VIN)).setText(vehicle.getVin());
+        ((TextView) findViewById(R.id.field_make)).setText(vehicle.getMake());
+        ((TextView) findViewById(R.id.field_model)).setText(vehicle.getModel());
+        ((TextView) findViewById(R.id.field_color)).setText(vehicle.getColor());
+        ((TextView) findViewById(R.id.field_nickname)).setText(vehicle.getNickname());
+        ((TextView) findViewById(R.id.field_license_plate)).setText(vehicle.getPlateNumber());
     }
 
     private boolean updateVehicle() {
-        String vin = ((TextView) findViewById(R.id.fieldVIN)).getText().toString();
-        String make = ((TextView) findViewById(R.id.fieldMake)).getText().toString();
-        String model = ((TextView) findViewById(R.id.fieldModel)).getText().toString();
-        String year = ((TextView) findViewById(R.id.fieldYear)).getText().toString();
-        String color = ((TextView) findViewById(R.id.fieldColor)).getText().toString();
-        String nickname = ((TextView) findViewById(R.id.fieldNickname)).getText().toString();
-        String plateNumber = ((TextView) findViewById(R.id.fieldPlate)).getText().toString();
+        String vin = ((TextView) findViewById(R.id.field_VIN)).getText().toString();
+        String make = ((TextView) findViewById(R.id.field_make)).getText().toString();
+        String model = ((TextView) findViewById(R.id.field_model)).getText().toString();
+        String year = ((TextView) findViewById(R.id.field_year)).getText().toString();
+        String color = ((TextView) findViewById(R.id.field_color)).getText().toString();
+        String nickname = ((TextView) findViewById(R.id.field_nickname)).getText().toString();
+        String plateNumber = ((TextView) findViewById(R.id.field_license_plate)).getText().toString();
 
         Vehicle vehicle = new Vehicle(vin, make, model, year, color, nickname, plateNumber);
         int numAffected = dbHelper.updateVehicle(vehicleId, vehicle);
