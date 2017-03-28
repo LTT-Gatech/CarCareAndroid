@@ -23,21 +23,21 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.teamltt.carcare.R;
-import com.teamltt.carcare.fragment.ObdResponseFragment.OnListFragmentInteractionListener;
-import com.teamltt.carcare.model.ObdContent;
+import com.teamltt.carcare.fragment.ResponseFragment.OnListFragmentInteractionListener;
+import com.teamltt.carcare.model.Response;
 
 import java.util.List;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link ObdContent.ObdResponse} and makes a call to the
+ * {@link RecyclerView.Adapter} that can display a {@link Response} and makes a call to the
  * specified {@link OnListFragmentInteractionListener}.
  */
 public class MyObdResponseRecyclerViewAdapter extends RecyclerView.Adapter<MyObdResponseRecyclerViewAdapter.ViewHolder> {
 
-    private final List<ObdContent.ObdResponse> mValues;
+    private final List<Response> mValues;
     private final OnListFragmentInteractionListener mListener;
 
-    public MyObdResponseRecyclerViewAdapter(List<ObdContent.ObdResponse> items, OnListFragmentInteractionListener listener) {
+    public MyObdResponseRecyclerViewAdapter(List<Response> items, OnListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }
@@ -51,7 +51,7 @@ public class MyObdResponseRecyclerViewAdapter extends RecyclerView.Adapter<MyObd
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        ObdContent.ObdResponse item = mValues.get(position);
+        Response item = mValues.get(position);
         holder.mItem = item;
         holder.mRequestView.setText(item.request);
         holder.mResponseView.setText(item.response);
@@ -77,7 +77,7 @@ public class MyObdResponseRecyclerViewAdapter extends RecyclerView.Adapter<MyObd
         public final View mView;
         public final TextView mRequestView;
         public final TextView mResponseView;
-        public ObdContent.ObdResponse mItem;
+        public Response mItem;
 
         public ViewHolder(View view) {
             super(view);

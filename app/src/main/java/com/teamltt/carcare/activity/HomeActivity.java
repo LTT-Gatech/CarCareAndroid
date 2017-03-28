@@ -36,15 +36,16 @@ import com.teamltt.carcare.database.IObservable;
 import com.teamltt.carcare.database.IObserver;
 import com.teamltt.carcare.database.contract.ResponseContract;
 import com.teamltt.carcare.fragment.MyObdResponseRecyclerViewAdapter;
-import com.teamltt.carcare.fragment.ObdResponseFragment;
+import com.teamltt.carcare.fragment.ResponseFragment;
 import com.teamltt.carcare.fragment.SimpleDividerItemDecoration;
 import com.teamltt.carcare.model.ObdContent;
+import com.teamltt.carcare.model.Response;
 import com.teamltt.carcare.service.BtStatusDisplay;
 import com.teamltt.carcare.service.ObdBluetoothService;
 
 import java.util.List;
 
-public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObserver, ObdResponseFragment.OnListFragmentInteractionListener {
+public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObserver, ResponseFragment.OnListFragmentInteractionListener {
 
     // Used to keep track of the items in the RecyclerView
     private RecyclerView.Adapter responseListAdapter;
@@ -65,7 +66,7 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
         String userId = intent.getStringExtra(LoginActivity.EXTRA_USER_ID);
 
         // Add user's name to the screen to show successful sign-in for demo
-        ((TextView) findViewById(R.id.tvWelcome)).setText(getString(R.string.welcome_text, firstName));
+        ((TextView) findViewById(R.id.tv_welcome)).setText(getString(R.string.welcome_text, firstName));
 
         btServiceIntent = new Intent(this, ObdBluetoothService.class);
         // Stop any existing services, we don't need more than one running
@@ -107,8 +108,8 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
     }
 
     @Override
-    public void onListFragmentInteraction(ObdContent.ObdResponse item) {
-        Log.i("ObdResponse Card", item.toString());
+    public void onListFragmentInteraction(Response item) {
+        Log.i("Response Card", item.toString());
     }
 
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -135,7 +136,7 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
         if (args != null && o instanceof DbHelper) {
             DbHelper dbHelper = (DbHelper) o;
             long[] responseIds = args.getLongArray(ResponseContract.ResponseEntry.COLUMN_NAME_ID + "_ARRAY");
-            List<ObdContent.ObdResponse> items = dbHelper.getResponsesById(responseIds);
+            List<Response> items = dbHelper.getResponsesById(responseIds);
             ObdContent.setItems(items);
             responseListAdapter.notifyDataSetChanged();
         }
@@ -151,7 +152,7 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent intent;
         switch (item.getItemId()) {
-            case (R.id.action_carInfo):
+            case (R.id.action_car_info):
                 intent = new Intent(this, CarInfoActivity.class);
                 startActivity(intent);
                 break;

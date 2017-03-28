@@ -30,12 +30,12 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/textAlertTitle"
-        android:text="Placeholder alert title text"/>
+        android:id="@+id/text_alert_title"
+        android:text="@string/text_placeholder"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/textAlertContent"
-        android:text="Placeholder alert title text"/>
+        android:id="@+id/text_alert_content"
+        android:text="@string/text_placeholder"/>
 
 </LinearLayout>

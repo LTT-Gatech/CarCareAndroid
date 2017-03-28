@@ -28,6 +28,7 @@ import android.view.ViewGroup;
 
 import com.teamltt.carcare.R;
 import com.teamltt.carcare.model.ObdContent;
+import com.teamltt.carcare.model.Response;
 
 /**
  * A fragment representing a list of Items.
@@ -35,7 +36,7 @@ import com.teamltt.carcare.model.ObdContent;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class ObdResponseFragment extends Fragment {
+public class ResponseFragment extends Fragment {
 
     private static final String ARG_COLUMN_COUNT = "column-count";
     private int mColumnCount = 1;
@@ -45,12 +46,12 @@ public class ObdResponseFragment extends Fragment {
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public ObdResponseFragment() {
+    public ResponseFragment() {
     }
 
     @SuppressWarnings("unused")
-    public static ObdResponseFragment newInstance(int columnCount, int rowCount) {
-        ObdResponseFragment fragment = new ObdResponseFragment();
+    public static ResponseFragment newInstance(int columnCount, int rowCount) {
+        ResponseFragment fragment = new ResponseFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         fragment.setArguments(args);
@@ -113,6 +114,6 @@ public class ObdResponseFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnListFragmentInteractionListener {
-        void onListFragmentInteraction(ObdContent.ObdResponse item);
+        void onListFragmentInteraction(Response item);
     }
 }

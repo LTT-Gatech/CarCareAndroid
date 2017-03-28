@@ -32,9 +32,9 @@ import android.widget.Spinner;
 import com.teamltt.carcare.R;
 import com.teamltt.carcare.database.DbHelper;
 import com.teamltt.carcare.fragment.MyObdResponseRecyclerViewAdapter;
-import com.teamltt.carcare.fragment.ObdResponseFragment;
+import com.teamltt.carcare.fragment.ResponseFragment;
 import com.teamltt.carcare.fragment.SimpleDividerItemDecoration;
-import com.teamltt.carcare.model.ObdContent;
+import com.teamltt.carcare.model.Response;
 import com.teamltt.carcare.model.Trip;
 
 import java.util.ArrayList;
@@ -43,7 +43,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class TripsActivity extends AppCompatActivity implements ObdResponseFragment.OnListFragmentInteractionListener {
+public class TripsActivity extends AppCompatActivity implements ResponseFragment.OnListFragmentInteractionListener {
 
     private static final String TAG = "TripsActivity";
 
@@ -56,13 +56,13 @@ public class TripsActivity extends AppCompatActivity implements ObdResponseFragm
 
     // Used to keep track of the items in the RecyclerView
     private RecyclerView.Adapter responseListAdapter;
-    private List<ObdContent.ObdResponse> responses;
+    private List<Response> responses;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trips);
-        spinner = (Spinner) findViewById(R.id.tripsSpinner);
+        spinner = (Spinner) findViewById(R.id.trips_spinner);
         tripLongMap = new HashMap<>();
         trips = new ArrayList<>();
         spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, trips);
@@ -101,7 +101,7 @@ public class TripsActivity extends AppCompatActivity implements ObdResponseFragm
     }
 
     @Override
-    public void onListFragmentInteraction(ObdContent.ObdResponse item) {
+    public void onListFragmentInteraction(Response item) {
         Log.i(TAG, item.toString());
     }
 
@@ -126,7 +126,7 @@ public class TripsActivity extends AppCompatActivity implements ObdResponseFragm
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent intent;
         switch (item.getItemId()) {
-            case (R.id.action_carInfo):
+            case (R.id.action_car_info):
                 intent = new Intent(this, CarInfoActivity.class);
                 startActivity(intent);
                 break;
