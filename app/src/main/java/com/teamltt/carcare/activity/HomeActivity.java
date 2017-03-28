@@ -39,6 +39,7 @@ import com.teamltt.carcare.fragment.MyObdResponseRecyclerViewAdapter;
 import com.teamltt.carcare.fragment.ObdResponseFragment;
 import com.teamltt.carcare.fragment.SimpleDividerItemDecoration;
 import com.teamltt.carcare.model.ObdContent;
+import com.teamltt.carcare.model.Response;
 import com.teamltt.carcare.service.BtStatusDisplay;
 import com.teamltt.carcare.service.ObdBluetoothService;
 
@@ -107,8 +108,8 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
     }
 
     @Override
-    public void onListFragmentInteraction(ObdContent.ObdResponse item) {
-        Log.i("ObdResponse Card", item.toString());
+    public void onListFragmentInteraction(Response item) {
+        Log.i("Response Card", item.toString());
     }
 
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -135,7 +136,7 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
         if (args != null && o instanceof DbHelper) {
             DbHelper dbHelper = (DbHelper) o;
             long[] responseIds = args.getLongArray(ResponseContract.ResponseEntry.COLUMN_NAME_ID + "_ARRAY");
-            List<ObdContent.ObdResponse> items = dbHelper.getResponsesById(responseIds);
+            List<Response> items = dbHelper.getResponsesById(responseIds);
             ObdContent.setItems(items);
             responseListAdapter.notifyDataSetChanged();
         }

@@ -28,45 +28,28 @@ import java.util.Map;
  */
 public class ObdContent {
 
-    public static final List<ObdResponse> ITEMS = new ArrayList<>();
+    public static final List<Response> ITEMS = new ArrayList<>();
 
-    public static final Map<String, ObdResponse> ITEM_MAP = new HashMap<>();
+    public static final Map<String, Response> ITEM_MAP = new HashMap<>();
 
-    public static void setItems(List<ObdResponse> items) {
+    public static void setItems(List<Response> items) {
         ITEMS.clear();
         ITEM_MAP.clear();
         addItems(items);
     }
 
-    public static void addItems(List<ObdResponse> items) {
-        for (ObdResponse item : items) {
+    public static void addItems(List<Response> items) {
+        for (Response item : items) {
             addItem(item);
         }
     }
 
-    public static void addItem(ObdResponse item) {
+    public static void addItem(Response item) {
         ITEMS.add(item);
         ITEM_MAP.put(item.id, item);
     }
 
-    public static ObdResponse createItemWithResponse(int id, String request, String response) {
-        return new ObdResponse(String.valueOf(id), request, response);
-    }
-
-    public static class ObdResponse {
-        public final String id;
-        public final String request;
-        public final String response;
-
-        public ObdResponse(String id, String request, String response) {
-            this.id = id;
-            this.request = request;
-            this.response = response;
-        }
-
-        @Override
-        public String toString() {
-            return request + " : " + response;
-        }
+    public static Response createItemWithResponse(int id, String request, String response) {
+        return new Response(String.valueOf(id), request, response);
     }
 }

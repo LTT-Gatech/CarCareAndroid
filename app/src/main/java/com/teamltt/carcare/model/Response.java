@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package com.teamltt.carcare.database;
+package com.teamltt.carcare.model;
 
-import android.os.Bundle;
+public class Response {
+    public final String id;
+    public final String request;
+    public final String response;
 
-/**
- * In the Observer pattern, An observable object (subject) maintains a list of its observers.
- * The subject notifies the observers when the state changes.
- * See more at https://en.wikipedia.org/wiki/Observer_pattern
- */
-public interface IObserver {
-    /**
-     * A method for the Observable subject to deliver its state changes.
-     *
-     * @param o    the subject
-     * @param args the state changes
-     */
-    void update(IObservable o, Bundle args);
+    public Response(String id, String request, String response) {
+        this.id = id;
+        this.request = request;
+        this.response = response;
+    }
+
+    @Override
+    public String toString() {
+        return request + " : " + response;
+    }
 }

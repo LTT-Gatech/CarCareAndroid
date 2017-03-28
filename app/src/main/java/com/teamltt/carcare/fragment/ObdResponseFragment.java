@@ -28,6 +28,7 @@ import android.view.ViewGroup;
 
 import com.teamltt.carcare.R;
 import com.teamltt.carcare.model.ObdContent;
+import com.teamltt.carcare.model.Response;
 
 /**
  * A fragment representing a list of Items.
@@ -113,6 +114,6 @@ public class ObdResponseFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnListFragmentInteractionListener {
-        void onListFragmentInteraction(ObdContent.ObdResponse item);
+        void onListFragmentInteraction(Response item);
     }
 }

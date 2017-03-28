@@ -42,9 +42,9 @@ public class DynamicActivity extends BaseActivity {
 
     /**
      * Called by a date picker fragment. TODO see DatePickerFragment
-     * @param year
-     * @param month
-     * @param day
+     * @param year an int
+     * @param month an int
+     * @param day an int
      */
 
     public void setDate(int year, int month, int day) {

@@ -34,7 +34,7 @@ import com.teamltt.carcare.database.DbHelper;
 import com.teamltt.carcare.fragment.MyObdResponseRecyclerViewAdapter;
 import com.teamltt.carcare.fragment.ObdResponseFragment;
 import com.teamltt.carcare.fragment.SimpleDividerItemDecoration;
-import com.teamltt.carcare.model.ObdContent;
+import com.teamltt.carcare.model.Response;
 import com.teamltt.carcare.model.Trip;
 
 import java.util.ArrayList;
@@ -56,7 +56,7 @@ public class TripsActivity extends AppCompatActivity implements ObdResponseFragm
 
     // Used to keep track of the items in the RecyclerView
     private RecyclerView.Adapter responseListAdapter;
-    private List<ObdContent.ObdResponse> responses;
+    private List<Response> responses;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,7 +101,7 @@ public class TripsActivity extends AppCompatActivity implements ObdResponseFragm
     }
 
     @Override
-    public void onListFragmentInteraction(ObdContent.ObdResponse item) {
+    public void onListFragmentInteraction(Response item) {
         Log.i(TAG, item.toString());
     }
 
