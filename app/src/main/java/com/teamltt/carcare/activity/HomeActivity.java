@@ -66,7 +66,7 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
         String userId = intent.getStringExtra(LoginActivity.EXTRA_USER_ID);
 
         // Add user's name to the screen to show successful sign-in for demo
-        ((TextView) findViewById(R.id.tvWelcome)).setText(getString(R.string.welcome_text, firstName));
+        ((TextView) findViewById(R.id.tv_welcome)).setText(getString(R.string.welcome_text, firstName));
 
         btServiceIntent = new Intent(this, ObdBluetoothService.class);
         // Stop any existing services, we don't need more than one running

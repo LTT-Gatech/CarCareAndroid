@@ -34,7 +34,7 @@ public class ReminderActivity extends AppCompatActivity {
         setContentView(R.layout.activity_reminder);
     }
 
-    protected void editReminder(View view) {
+    public void editReminder(View view) {
         Intent intent = new Intent(this, ReminderEditActivity.class);
         startActivity(intent);
     }
