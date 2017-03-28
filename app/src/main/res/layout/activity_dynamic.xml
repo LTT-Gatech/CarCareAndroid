@@ -28,7 +28,7 @@
     tools:context="com.teamltt.carcare.activity.DynamicActivity" >
 
     <TextView
-        android:id="@+id/textDynamic"
+        android:id="@+id/text_dynamic_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -41,27 +41,27 @@
         android:paddingBottom="6dp"
         android:paddingTop="6dp">
         <Button
-            android:id="@+id/buttonFrom"
+            android:id="@+id/button_from"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="showDatePickerDialog"
             android:text="@string/button_from" />
 
         <TextView
-            android:id="@+id/textFrom"
+            android:id="@+id/text_from"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/text_from" />
 
         <Button
-            android:id="@+id/buttonTo"
+            android:id="@+id/button_to"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="showDatePickerDialog"
             android:text="@string/button_to" />
 
         <TextView
-            android:id="@+id/textTo"
+            android:id="@+id/text_to"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/text_to"/>
@@ -70,7 +70,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/textDataValue"
+        android:id="@+id/text_data_value"
         android:text="@string/data_value"/>
 
 </LinearLayout>

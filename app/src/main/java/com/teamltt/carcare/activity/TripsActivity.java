@@ -62,7 +62,7 @@ public class TripsActivity extends AppCompatActivity implements ResponseFragment
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trips);
-        spinner = (Spinner) findViewById(R.id.tripsSpinner);
+        spinner = (Spinner) findViewById(R.id.trips_spinner);
         tripLongMap = new HashMap<>();
         trips = new ArrayList<>();
         spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, trips);
@@ -126,7 +126,7 @@ public class TripsActivity extends AppCompatActivity implements ResponseFragment
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent intent;
         switch (item.getItemId()) {
-            case (R.id.action_carInfo):
+            case (R.id.action_car_info):
                 intent = new Intent(this, CarInfoActivity.class);
                 startActivity(intent);
                 break;

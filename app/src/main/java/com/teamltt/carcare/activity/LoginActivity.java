@@ -61,7 +61,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         setBtnClickListeners();
 
         // Set view
-        tvStatus = (TextView) findViewById(R.id.tvStatus);
+        tvStatus = (TextView) findViewById(R.id.text_status);
     }
 
     private void buildNewGoogleApiClient() {
@@ -79,7 +79,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     }
 
     private void setBtnClickListeners() {
-        findViewById(R.id.btnGoogleSignIn).setOnClickListener(this);
+        findViewById(R.id.button_google_sign_in).setOnClickListener(this);
     }
 
     @Override
@@ -196,14 +196,14 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         } else {
             tvStatus.setText(R.string.please_sign_in);
 
-            findViewById(R.id.btnGoogleSignIn).setVisibility(View.VISIBLE);
+            findViewById(R.id.button_google_sign_in).setVisibility(View.VISIBLE);
         }
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.btnGoogleSignIn:
+            case R.id.button_google_sign_in:
                 signIn();
                 break;
         }

@@ -29,14 +29,14 @@
     <Spinner
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/tripsSpinner" />
+        android:id="@+id/trips_spinner" />
 
     <Button
-        android:text="@string/read_data"
+        android:text="@string/button_read_data"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="readData"
-        android:id="@+id/readData" />
+        android:id="@+id/button_read_data" />
 
     <include
         android:layout_width="match_parent"

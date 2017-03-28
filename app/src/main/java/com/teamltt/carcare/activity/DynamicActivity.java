@@ -35,7 +35,7 @@ public class DynamicActivity extends BaseActivity {
 
 
     public void showDatePickerDialog(View v) {
-        from = findViewById(R.id.buttonTo) != v;
+        from = findViewById(R.id.button_to) != v;
         DatePickerFragment dialog = new DatePickerFragment();
         dialog.show(getFragmentManager(), "DateFragment");
     }
@@ -50,9 +50,9 @@ public class DynamicActivity extends BaseActivity {
     public void setDate(int year, int month, int day) {
         TextView tv;
         if (from) {
-            tv = (TextView) findViewById(R.id.textFrom);
+            tv = (TextView) findViewById(R.id.text_from);
         } else {
-            tv = (TextView) findViewById(R.id.textTo);
+            tv = (TextView) findViewById(R.id.text_to);
         }
         String date = month + "/" + day + "/" + year;
 
