@@ -32,7 +32,7 @@ import android.widget.Spinner;
 import com.teamltt.carcare.R;
 import com.teamltt.carcare.database.DbHelper;
 import com.teamltt.carcare.fragment.MyObdResponseRecyclerViewAdapter;
-import com.teamltt.carcare.fragment.ObdResponseFragment;
+import com.teamltt.carcare.fragment.ResponseFragment;
 import com.teamltt.carcare.fragment.SimpleDividerItemDecoration;
 import com.teamltt.carcare.model.Response;
 import com.teamltt.carcare.model.Trip;
@@ -43,7 +43,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class TripsActivity extends AppCompatActivity implements ObdResponseFragment.OnListFragmentInteractionListener {
+public class TripsActivity extends AppCompatActivity implements ResponseFragment.OnListFragmentInteractionListener {
 
     private static final String TAG = "TripsActivity";
 

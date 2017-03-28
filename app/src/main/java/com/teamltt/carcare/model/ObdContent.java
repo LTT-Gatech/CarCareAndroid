@@ -24,7 +24,6 @@ import java.util.Map;
 /**
  * Helper class for providing sample content for user interfaces created by
  * Android template wizards.
- * <p>
  */
 public class ObdContent {
 

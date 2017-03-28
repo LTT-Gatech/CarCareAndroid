@@ -23,7 +23,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.teamltt.carcare.R;
-import com.teamltt.carcare.fragment.ObdResponseFragment.OnListFragmentInteractionListener;
+import com.teamltt.carcare.fragment.ResponseFragment.OnListFragmentInteractionListener;
 import com.teamltt.carcare.model.Response;
 
 import java.util.List;
