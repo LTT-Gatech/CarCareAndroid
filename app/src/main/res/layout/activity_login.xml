@@ -30,4 +30,13 @@
         android:layout_alignParentStart="false"
         android:layout_centerInParent="true" />
 
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Import Database"
+        android:onClick="importDatabase"
+        android:layout_alignTop="@+id/text_status"
+        android:layout_centerHorizontal="true"/>
+
 </RelativeLayout>
