@@ -191,25 +191,31 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         String syncConnPref = preferences.getString(SettingsActivity.KEY_PREF_SYNC_CONN, "");
 
-        TextView tvStaticData = ((TextView) findViewById(R.id.tvStaticData));
+        TextView tvStaticDataName = ((TextView) findViewById(R.id.tvStaticDataName));
+        TextView tvStaticDataValue = ((TextView) findViewById(R.id.tvStaticDataValue));
 
-        String tvText = "\n";
+        String tvTextName = "";
+        String tvTextValue = "";
 
         if (preferences.getBoolean("sEngineTemp", false)) {
             //TODO Read from database
-            tvText +=" Engine Temperature: " + "205 °F\n";
+            tvTextName +="Engine Temperature:";
+            tvTextValue += "80 F ";
         }
 
         if (preferences.getBoolean("sMPG", false)) {
             //TODO Read from database
-            tvText += " Current Miles Per Gallon: " + "22 mpg\n";
+            tvTextName += "\nCurrent Miles Per Gallon:";
+            tvTextValue += "\n35 mpg";
         }
 
         if (preferences.getBoolean("sMPH", false)) {
             //TODO Read from database
-            tvText += " Current Miles Per Hour: " + "55 mph\n";
+            tvTextName += "\nCurrent Miles Per Hour:";
+            tvTextValue += "\n60 mph";
         }
 
-        tvStaticData.setText(tvText);
+        tvStaticDataName.setText(tvTextName);
+        tvStaticDataValue.setText(tvTextValue);
     }
 }
