@@ -42,7 +42,7 @@ public class AlertActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent intent;
         switch (item.getItemId()) {
-            case (R.id.action_carInfo):
+            case (R.id.action_car_info):
                 intent = new Intent(this, CarInfoActivity.class);
                 startActivity(intent);
                 break;

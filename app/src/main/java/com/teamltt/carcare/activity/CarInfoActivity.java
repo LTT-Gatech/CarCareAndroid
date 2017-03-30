@@ -5,11 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
-<<<<<<< HEAD
- *      http://www.apache.org/licenses/LICENSE-2.0
-=======
  *     http://www.apache.org/licenses/LICENSE-2.0
->>>>>>> refs/remotes/origin/master
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -60,6 +56,7 @@ public class CarInfoActivity extends BaseActivity {
         Log.i(TAG, "onStart");
         //grab info from database or whatever and put it on the text views
         dbHelper = new DbHelper(CarInfoActivity.this);
+
         vehicleId = 1;
         Vehicle vehicle = dbHelper.getVehicle(vehicleId);
         if (vehicle == null) {
@@ -82,7 +79,7 @@ public class CarInfoActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent intent;
         switch (item.getItemId()) {
-            case (R.id.action_carInfo):
+            case (R.id.action_car_info):
                 intent = new Intent(this, CarInfoActivity.class);
                 startActivity(intent);
                 break;
@@ -102,7 +99,6 @@ public class CarInfoActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
-
     /**
      * Launches a new activity CarInfoEditActivity to edit fields seen in this activity
      * @param view The R.id.carInfoEdit button in the layout
@@ -115,12 +111,12 @@ public class CarInfoActivity extends BaseActivity {
     }
 
     private void updateUi(Vehicle vehicle) {
-        ((TextView) findViewById(R.id.fieldYear)).setText(vehicle.getYear());
-        ((TextView) findViewById(R.id.fieldVIN)).setText(vehicle.getVin());
-        ((TextView) findViewById(R.id.fieldMake)).setText(vehicle.getMake());
-        ((TextView) findViewById(R.id.fieldModel)).setText(vehicle.getModel());
-        ((TextView) findViewById(R.id.fieldColor)).setText(vehicle.getColor());
-        ((TextView) findViewById(R.id.fieldNickname)).setText(vehicle.getNickname());
-        ((TextView) findViewById(R.id.fieldPlate)).setText(vehicle.getPlateNumber());
+        ((TextView) findViewById(R.id.field_year)).setText(vehicle.getYear());
+        ((TextView) findViewById(R.id.field_VIN)).setText(vehicle.getVin());
+        ((TextView) findViewById(R.id.field_make)).setText(vehicle.getMake());
+        ((TextView) findViewById(R.id.field_model)).setText(vehicle.getModel());
+        ((TextView) findViewById(R.id.field_color)).setText(vehicle.getColor());
+        ((TextView) findViewById(R.id.field_nickname)).setText(vehicle.getNickname());
+        ((TextView) findViewById(R.id.field_plate)).setText(vehicle.getPlateNumber());
     }
 }

@@ -28,12 +28,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".activity.LoginActivity">
+            <!--this intent-filter specifies the beginning activity when this app is initially launched-->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".activity.DemoActivity" />
         <activity android:name=".activity.HomeActivity" />
         <activity android:name=".activity.TripsActivity" />
         <activity android:name=".activity.StaticActivity" />

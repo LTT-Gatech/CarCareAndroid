@@ -5,11 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
-<<<<<<< HEAD
- *      http://www.apache.org/licenses/LICENSE-2.0
-=======
  *     http://www.apache.org/licenses/LICENSE-2.0
->>>>>>> refs/remotes/origin/master
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -72,12 +68,11 @@ public class ObdBluetoothService extends Service {
      * Abstraction layer over a database connection.
      */
     private DbHelper dbHelper;
-
     private int numBound = 0;
 
-    private boolean bluetoothReceiverRegistered = false;
-    private boolean discoveryReceiverRegistered = false;
-
+    /**
+     * Set of activities which receive status updates from the service
+     */
     private Set<BtStatusDisplay> btActivities;
 
     /**
@@ -101,6 +96,7 @@ public class ObdBluetoothService extends Service {
             }
         }
     };
+    private boolean isBluetoothReceiverRegistered = false;
 
     /**
      * Used to catch bluetooth discovery related events.
@@ -129,6 +125,7 @@ public class ObdBluetoothService extends Service {
             }
         }
     };
+    private boolean isDiscoveryReceiverRegistered = false;
 
     @Override
     public void onCreate() {
@@ -141,10 +138,10 @@ public class ObdBluetoothService extends Service {
     public void onDestroy() {
         // release resources
         Log.i(TAG, "onDestroy");
-        if (discoveryReceiverRegistered) {
+        if (isDiscoveryReceiverRegistered) {
             unregisterReceiver(discoveryReceiver);
         }
-        if (bluetoothReceiverRegistered) {
+        if (isBluetoothReceiverRegistered) {
             unregisterReceiver(bluetoothReceiver);
         }
         if (dbHelper != null) {
@@ -181,12 +178,11 @@ public class ObdBluetoothService extends Service {
         IntentFilter discoveryFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         discoveryFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         registerReceiver(discoveryReceiver, discoveryFilter);
-
-        discoveryReceiverRegistered = true;
+        isDiscoveryReceiverRegistered = true;
 
         IntentFilter bluetoothFilter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
         registerReceiver(bluetoothReceiver, bluetoothFilter);
-        bluetoothReceiverRegistered = true;
+        isBluetoothReceiverRegistered = true;
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter != null) {
