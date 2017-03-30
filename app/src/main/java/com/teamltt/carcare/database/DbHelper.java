@@ -29,6 +29,7 @@ import com.teamltt.carcare.database.contract.TripContract;
 import com.teamltt.carcare.database.contract.UserContract;
 import com.teamltt.carcare.database.contract.VehicleContract;
 import com.teamltt.carcare.model.ObdContent;
+import com.teamltt.carcare.model.Response;
 import com.teamltt.carcare.model.Trip;
 import com.teamltt.carcare.model.Vehicle;
 
@@ -42,11 +43,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * An abstraction over a SQLiteDatabase to be used by Activities and Fragments.
+ * To query the DB, methods here should open a connection to the SQLiteDatabase
+ * and query the specific Contract classes with the open connection.
+ * In all queries, the SQLiteDatabase connection should be closed. In queries with
+ * a Cursor, the Cursor should be closed before the SQLiteDatabase.
+ * When possible, this class accepts Models as arguments and returns Models to its caller.
+ * The Contract classes should favor interaction with individual arguments over Models.
+ * Methods in this class should return List objects instead of a Cursor.
+ * If the query is writing, open a writable connection, otherwise use read-only.
+ * This class handles upgrades when the DB schema changes. This is handled by
+ * the monotonically increasing DATABASE_VERSION constant.
+ * This class is an observable subject in the Observer pattern. When the state changes,
+ * its observers are notified.
+ */
 public class DbHelper extends SQLiteOpenHelper implements IObservable {
 
     private static final String TAG = "DbHelper";
 
-    private static final String SQL_INIT = "PRAGMA foreign_keys = on;";
+    private static final String SQL_FOREIGN_KEY = "PRAGMA foreign_keys = on;";
+    private static final String SQL_INIT = SQL_FOREIGN_KEY;
 
     // errors are negative, ok is 0, anything else is positive.
     public static final long DB_ERROR_NULL = -6;
@@ -71,7 +88,11 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        // db is being created for the first time.
+        // db-wide constraints
         db.execSQL(SQL_INIT);
+
+        // individual table creates
         db.execSQL(OwnershipContract.SQL_CREATE_ENTRIES);
         db.execSQL(ResponseContract.SQL_CREATE_ENTRIES);
         db.execSQL(TripContract.SQL_CREATE_ENTRIES);
@@ -108,7 +129,12 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         }
     }
 
-
+    /**
+     * Helper method to convert from a Date object to a SQLite Date String
+     *
+     * @param date the Date object
+     * @return a SQLite Date String
+     */
     public static String convertDate(Date date) {
         if (date == null) {
             return null;
@@ -117,11 +143,22 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
     }
 
 
+    /**
+     * Helper method which returns a SQLite Date String for the NOW() function
+     * @return the NOW() function
+     */
     public static String now() {
         // set the format to sql date time
         return sqlDateFormat.format(new Date());
     }
 
+    /**
+     * Helper method which builds a multi-argument where clause.
+     * returns in the format "COLUMN IN (?,?,?,...,?)" to select an array of arguments.
+     * @param column the column to select
+     * @param numArgs the number of "?" to append
+     * @return a String SQLite "COLUMN IN (?,...,?)" clause
+     */
     public static String inClauseBuilder(String column, int numArgs) {
         // length will be length of column plus 5 characters " IN (" plus numArgs of "?" plus
         // numArgs of "," - 1 plus 1 for closing parentheses.
@@ -137,6 +174,12 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         return res.toString();
     }
 
+    /**
+     * A helper method which returns a String column from a cursor
+     * @param cursor the cursor
+     * @param column the column name
+     * @return the String value at the column
+     */
     private String getCursorColumn(Cursor cursor, String column) {
         return cursor.getString(cursor.getColumnIndexOrThrow(column));
     }
@@ -161,17 +204,22 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = VehicleContract.query(db, vehicleId);
 //        long id = cursor.getLong(cursor.getColumnIndexOrThrow(VehicleContract.VehicleEntry.COLUMN_NAME_ID));
-        cursor.moveToFirst();
-        String vin = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_VIN);
-        String make = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_MAKE);
-        String model = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_MODEL);
-        String year = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_YEAR);
-        String color = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_COLOR);
-        String nickname = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_NICKNAME);
-        String plateNumber = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_PLATE_NUMBER);
-        cursor.close();
-        db.close();
-        return new Vehicle(vin, make, model, year, color, nickname, plateNumber);
+        if (cursor.moveToFirst()) {
+            String vin = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_VIN);
+            String make = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_MAKE);
+            String model = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_MODEL);
+            String year = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_YEAR);
+            String color = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_COLOR);
+            String nickname = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_NICKNAME);
+            String plateNumber = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_PLATE_NUMBER);
+            cursor.close();
+            db.close();
+            return new Vehicle(vin, make, model, year, color, nickname, plateNumber);}
+        else {
+            cursor.close();
+            db.close();
+            return null;
+        }
     }
 
     public int updateVehicle(long vehicleId, Vehicle vehicle) {
@@ -261,10 +309,10 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         return trips;
     }
 
-    public List<ObdContent.ObdResponse> getResponsesByTrip(long tripId) {
+    public List<Response> getResponsesByTrip(long tripId) {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = ResponseContract.queryByTripId(db, tripId);
-        List<ObdContent.ObdResponse> responses = new ArrayList<>();
+        List<Response> responses = new ArrayList<>();
         while (cursor.moveToNext()) {
             long id = cursor.getLong(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_ID));
             String name = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_NAME));
@@ -288,10 +336,10 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         return status;
     }
 
-    public List<ObdContent.ObdResponse> getResponsesById(long[] responseIds) {
+    public List<Response> getResponsesById(long[] responseIds) {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = ResponseContract.queryByIds(db, responseIds);
-        List<ObdContent.ObdResponse> items = new ArrayList<>();
+        List<Response> items = new ArrayList<>();
         while (cursor.moveToNext()) {
             long id = cursor.getLong(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_ID));
             String name = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_NAME));
@@ -303,6 +351,7 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         return items;
     }
 
+    // Observer pattern. See IObservable and IObserver.
     @Override
     public void addObserver(IObserver observer) {
         observers.add(observer);
@@ -343,10 +392,18 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         notifyObservers(null);
     }
 
+    /**
+     * Used by notifyObservers
+     */
     private void clearChanged() {
         changed = false;
     }
 
+    /**
+     * used by query methods to set whether the state has changed.
+     * The state has changed if the status is not an error code (>0)
+     * @param status The status code.
+     */
     private void setChanged(long status) {
         if (status > DB_OK) {
             changed = true;

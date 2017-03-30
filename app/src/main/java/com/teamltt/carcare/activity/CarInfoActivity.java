@@ -97,12 +97,12 @@ public class CarInfoActivity extends BaseActivity {
     }
 
     private void updateUi(Vehicle vehicle) {
-        ((TextView) findViewById(R.id.fieldYear)).setText(vehicle.getYear());
-        ((TextView) findViewById(R.id.fieldVIN)).setText(vehicle.getVin());
-        ((TextView) findViewById(R.id.fieldMake)).setText(vehicle.getMake());
-        ((TextView) findViewById(R.id.fieldModel)).setText(vehicle.getModel());
-        ((TextView) findViewById(R.id.fieldColor)).setText(vehicle.getColor());
-        ((TextView) findViewById(R.id.fieldNickname)).setText(vehicle.getNickname());
-        ((TextView) findViewById(R.id.fieldPlate)).setText(vehicle.getPlateNumber());
+        ((TextView) findViewById(R.id.field_year)).setText(vehicle.getYear());
+        ((TextView) findViewById(R.id.field_VIN)).setText(vehicle.getVin());
+        ((TextView) findViewById(R.id.field_make)).setText(vehicle.getMake());
+        ((TextView) findViewById(R.id.field_model)).setText(vehicle.getModel());
+        ((TextView) findViewById(R.id.field_color)).setText(vehicle.getColor());
+        ((TextView) findViewById(R.id.field_nickname)).setText(vehicle.getNickname());
+        ((TextView) findViewById(R.id.field_plate)).setText(vehicle.getPlateNumber());
     }
 }

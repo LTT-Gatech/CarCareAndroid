@@ -37,12 +37,12 @@ public class ReminderEditActivity extends AppCompatActivity {
         edited = false;
     }
 
-    protected void saveInfo(View view) {
+    public void saveInfo(View view) {
         edited = true;
         back(view);
     }
 
-    protected void back(View view) {
+    public void back(View view) {
         Intent intent = new Intent(this, ReminderActivity.class);
         startActivity(intent);
     }

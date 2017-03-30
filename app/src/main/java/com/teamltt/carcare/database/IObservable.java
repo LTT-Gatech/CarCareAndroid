@@ -18,20 +18,51 @@ package com.teamltt.carcare.database;
 
 import android.os.Bundle;
 
+/**
+ * In the Observer pattern, An observable object (subject) maintains a list of its observers.
+ * The subject notifies the observers when the state changes.
+ * See more at https://en.wikipedia.org/wiki/Observer_pattern
+ */
 public interface IObservable {
 
-    // public
+    /**
+     * A method for registering an observer to a subject
+     *
+     * @param observer the observer to register
+     */
     void addObserver(IObserver observer);
 
+    /**
+     * @return the number of registered observers
+     */
     int countObservers();
 
+    /**
+     * A method for deregistering an observer to a subject
+     * @param observer the observer to deregister
+     */
     void deleteObserver(IObserver observer);
 
+    /**
+     * A method to deregister all observers of a subject
+     */
     void deleteObservers();
 
+    /**
+     * A method to detect if the subject has state changes
+     * @return true if the state has changed, false otherwise.
+     */
     boolean hasChanged();
 
+    /**
+     * A method to notify the observers of the new state changes.
+     * @param args the state changes
+     */
     void notifyObservers(Bundle args);
 
+    /**
+     * A method to notify the observers of state changes.
+     * Passes a default state to notifyObservers(Bundle args)
+     */
     void notifyObservers();
 }
