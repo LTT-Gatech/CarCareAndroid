@@ -28,6 +28,7 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -35,6 +36,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.Space;
 import android.widget.TextView;
 import android.widget.LinearLayout.LayoutParams;
 
@@ -180,6 +182,7 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
 
     /**
      * Starts a new trip or finishes the current one
+     *
      * @param item The button that was pressed
      */
     public void toggleLogging(MenuItem item) {
@@ -204,24 +207,23 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
 
         boolean haveStatic = false;
 
-        if (preferences.getBoolean("@string/key_engine_temp", false)) {
+        if (preferences.getBoolean(getString(R.string.key_engine_temp), false)) {
             //TODO Read from database
-            lvStaticData.addView(createTextView("Engine Temperature:", 3));
-            lvStaticData.addView(createTextView("80 F", 5));
+            lvStaticData.addView(createDataView(createTextView("Engine Temperature:"), createTextView("80 F")));
+
             haveStatic = true;
         }
 
-        if (preferences.getBoolean("@string/key_mpg", false)) {
+        if (preferences.getBoolean(getString(R.string.key_mpg), false)) {
             //TODO Read from database
-            lvStaticData.addView(createTextView("Current Miles Per Gallon:", 3));
-            lvStaticData.addView(createTextView("35 mpg", 5));
+            lvStaticData.addView(createDataView(createTextView("Current Miles Per Gallon:"), createTextView("35 mpg")));
             haveStatic = true;
         }
 
-        if (preferences.getBoolean("@string/key_mph", false)) {
+        if (preferences.getBoolean(getString(R.string.key_mph), false)) {
             //TODO Read from database
-            lvStaticData.addView(createTextView("Current Miles Per Hour:", 3));
-            lvStaticData.addView(createTextView("60 mph", 5));
+            lvStaticData.addView(createDataView(createTextView("Current Miles Per Hour:"), createTextView("60 mph")));
+
             haveStatic = true;
         }
 
@@ -233,12 +235,40 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
         }
     }
 
-    public TextView createTextView(String text, int gravity) {
+    /**
+     * Creates a horizontal Linear layout for static data so that it can be put in the static data Card
+     *
+     * @param title TextView of the content on the left side of the line
+     * @param value TextView of the content on the right side of the line
+     * @return A LinearLayout to be added to the static CardView's vertical LinearLayout
+     */
+    public LinearLayout createDataView(TextView title, TextView value) {
+        // Default orientation is horizontal
+        LinearLayout dataLine = new LinearLayout(this);
+        // Add title/name of data
+        dataLine.addView(title);
+
+        // Add spacer to push the title to the left and the value to the right
+        Space space = new Space(this);
+        space.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, 1f));
+        dataLine.addView(space);
+
+        // Add value of data
+        dataLine.addView(value);
+        return dataLine;
+    }
+
+    /**
+     * Creates a TextView out of text that needs to go in the static CardView
+     *
+     * @param text text of the text view
+     * @return A TextView with LinearLayout LayoutParams
+     */
+    public TextView createTextView(String text) {
         TextView newTextView = new TextView(this);
-        newTextView.setLayoutParams(new LayoutParams(0,
-                LayoutParams.WRAP_CONTENT, 1.0f));
+        newTextView.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT,
+                LayoutParams.WRAP_CONTENT, 0f));
         newTextView.setText(text);
-        newTextView.setGravity(gravity);
         return newTextView;
     }
 }
