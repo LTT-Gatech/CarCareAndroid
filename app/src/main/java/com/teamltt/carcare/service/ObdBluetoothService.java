@@ -38,6 +38,7 @@ import com.teamltt.carcare.R;
 import com.teamltt.carcare.adapter.IObdSocket;
 import com.teamltt.carcare.adapter.bluetooth.DeviceSocket;
 import com.teamltt.carcare.database.DbHelper;
+import com.teamltt.carcare.database.IObservable;
 import com.teamltt.carcare.database.IObserver;
 import com.teamltt.carcare.database.contract.ResponseContract;
 import com.teamltt.carcare.database.contract.TripContract;
@@ -221,6 +222,10 @@ public class ObdBluetoothService extends Service {
 
     public void unobserveDatabase(IObserver observer) {
         dbHelper.deleteObserver(observer);
+    }
+
+    public IObservable getObservable() {
+        return dbHelper;
     }
 
     /**
