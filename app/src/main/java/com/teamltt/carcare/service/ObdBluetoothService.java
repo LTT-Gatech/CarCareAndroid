@@ -41,6 +41,7 @@ import com.teamltt.carcare.database.DbHelper;
 import com.teamltt.carcare.database.IObserver;
 import com.teamltt.carcare.database.contract.ResponseContract;
 import com.teamltt.carcare.database.contract.TripContract;
+import com.teamltt.carcare.model.Response;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -333,7 +334,7 @@ public class ObdBluetoothService extends Service {
         long vehicleId = 1;
         long tripId;
 
-        Set<Long> newResponseIds = new HashSet<>();
+        Set<Response> newResponses = new HashSet<>();
 
         @Override
         protected Void doInBackground(Void... ignore) {
@@ -383,7 +384,7 @@ public class ObdBluetoothService extends Service {
                         long responseId = dbHelper.insertResponse(tripId, name,
                                 commandPID, formattedResult);
                         if (responseId > DbHelper.DB_OK) {
-                            newResponseIds.add(responseId);
+                            newResponses.add(new Response(responseId, name, commandPID, formattedResult));
                         }
                     }
                     publishProgress();
@@ -400,18 +401,17 @@ public class ObdBluetoothService extends Service {
         @Override
         protected void onProgressUpdate(Void... ignore) {
             super.onProgressUpdate(ignore);
-            if (!newResponseIds.isEmpty()) {
+            if (!newResponses.isEmpty()) {
                 Bundle args = new Bundle();
                 args.putLong(TripContract.TripEntry.COLUMN_NAME_ID, tripId);
-
-                // HACK because Java hates primitives
-                Long[] foo = newResponseIds.toArray(new Long[0]);
-                long[] bar = new long[foo.length];
-                for (int i = 0; i < foo.length; i++) {
-                    bar[i] = foo[i];
+                long[] newResponseIds = new long[newResponses.size()];
+                int i = 0;
+                for (Response newResponse : newResponses) {
+                    args.putParcelable(ResponseContract.ResponseEntry.COLUMN_NAME_PID + "_" + newResponse.pId, newResponse);
+                    newResponseIds[i++] = newResponse.id;
                 }
-                args.putLongArray(ResponseContract.ResponseEntry.COLUMN_NAME_ID + "_ARRAY", bar);
-                newResponseIds.clear();
+                args.putLongArray(ResponseContract.ResponseEntry.COLUMN_NAME_ID + "_ARRAY", newResponseIds);
+                newResponses.clear();
                 dbHelper.notifyObservers(args);
             }
         }

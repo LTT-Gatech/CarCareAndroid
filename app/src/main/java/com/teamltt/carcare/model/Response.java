@@ -22,22 +22,39 @@ import android.os.Parcelable;
 public class Response implements Parcelable {
     public final long id;
     public final String request;
+    public final String pId;
     public final String response;
 
-    public Response(long id, String request, String response) {
+    public Response(long id, String request, String pId, String response) {
         this.id = id;
         this.request = request;
+        this.pId = pId;
         this.response = response;
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (o == null) return false;
+        if (o == this) return true;
+        if (!(o instanceof Response)) return false;
+        Response that = (Response) o;
+        return this.id == that.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
     public String toString() {
-        return request + " : " + response;
+        return request + " (" + pId + ") : " + response;
     }
 
     protected Response(Parcel in) {
         id = in.readLong();
         request = in.readString();
+        pId = in.readString();
         response = in.readString();
     }
 
@@ -50,6 +67,7 @@ public class Response implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(id);
         dest.writeString(request);
+        dest.writeString(pId);
         dest.writeString(response);
     }
 

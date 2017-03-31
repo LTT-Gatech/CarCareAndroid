@@ -56,7 +56,6 @@ public class ResponseContract {
         values.put(ResponseContract.ResponseEntry.COLUMN_NAME_TRIP_ID, tripId);
         values.put(ResponseContract.ResponseEntry.COLUMN_NAME_NAME, name);
         values.put(ResponseContract.ResponseEntry.COLUMN_NAME_PID, pId);
-
         values.put(ResponseContract.ResponseEntry.COLUMN_NAME_VALUE, value);
         return db.insert(ResponseEntry.TABLE_NAME, null, values);
     }
@@ -109,7 +108,7 @@ public class ResponseContract {
         public static final String COLUMN_NAME_TRIP_ID = TripContract.TripEntry.COLUMN_NAME_ID;
         public static final String COLUMN_NAME_TIMESTAMP = "timestamp";
         public static final String COLUMN_NAME_NAME = "name";
-        public static final String COLUMN_NAME_PID = "pid";
+        public static final String COLUMN_NAME_PID = "pId";
         public static final String COLUMN_NAME_VALUE = "value";
     }
 }
