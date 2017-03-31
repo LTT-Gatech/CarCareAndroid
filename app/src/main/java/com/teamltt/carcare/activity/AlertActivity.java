@@ -18,19 +18,43 @@ package com.teamltt.carcare.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.text.format.DateFormat;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.teamltt.carcare.R;
 
-public class AlertActivity extends AppCompatActivity {
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class AlertActivity extends BaseActivity {
+
+    private String alertName;
+    private String alertDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        activityContent = R.layout.activity_alert;
+        includeDrawer = false;
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_alert);
+
+        if (savedInstanceState == null) {
+            Bundle extras = getIntent().getExtras();
+            if(extras == null) {
+                alertName = "NullAlert";
+                alertDate = "NullDate";
+            } else {
+                alertName = extras.getString("alert_name");
+                alertDate = extras.getString("alert_date");
+            }
+        } else {
+            alertName = (String) savedInstanceState.getSerializable("alert_name");
+            alertDate = (String) savedInstanceState.getSerializable("alert_date");
+        }
+        updateUi();
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -62,7 +86,27 @@ public class AlertActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void toggleLogging(MenuItem item) {
-        //
+    private void updateUi() {
+        TextView alertIntro = (TextView) findViewById(R.id.text_alert_intro);
+        alertIntro.setText("Your reminder titled " + alertName + " was triggered.");
+        SimpleDateFormat mdformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date convertedDate = new Date();
+        String day = "";
+        String month = "";
+        String year = "";
+        try {
+            convertedDate = mdformat.parse(alertDate);
+            day = (String) DateFormat.format("dd", convertedDate);
+            month = (String) DateFormat.format("MM", convertedDate);
+            year = (String) DateFormat.format("yyyy", convertedDate);
+        }
+        catch (ParseException e1) {
+            e1.printStackTrace();
+        }
+
+        TextView alertContent = (TextView) findViewById(R.id.text_alert_content);
+        alertContent.setText("Your reminder was set to date " + month + "/" + day + "/" + year + ".");
+
+
     }
 }

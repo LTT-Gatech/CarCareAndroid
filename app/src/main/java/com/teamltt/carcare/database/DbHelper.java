@@ -208,17 +208,22 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = VehicleContract.query(db, vehicleId);
 //        long id = cursor.getLong(cursor.getColumnIndexOrThrow(VehicleContract.VehicleEntry.COLUMN_NAME_ID));
-        cursor.moveToFirst();
-        String vin = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_VIN);
-        String make = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_MAKE);
-        String model = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_MODEL);
-        String year = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_YEAR);
-        String color = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_COLOR);
-        String nickname = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_NICKNAME);
-        String plateNumber = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_PLATE_NUMBER);
-        cursor.close();
-        db.close();
-        return new Vehicle(vin, make, model, year, color, nickname, plateNumber);
+        if (cursor.moveToFirst()) {
+            String vin = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_VIN);
+            String make = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_MAKE);
+            String model = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_MODEL);
+            String year = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_YEAR);
+            String color = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_COLOR);
+            String nickname = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_NICKNAME);
+            String plateNumber = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_PLATE_NUMBER);
+            cursor.close();
+            db.close();
+            return new Vehicle(vin, make, model, year, color, nickname, plateNumber);}
+        else {
+            cursor.close();
+            db.close();
+            return null;
+        }
     }
 
     public int updateVehicle(long vehicleId, Vehicle vehicle) {

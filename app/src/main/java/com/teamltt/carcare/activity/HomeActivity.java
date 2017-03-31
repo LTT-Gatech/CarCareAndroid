@@ -20,14 +20,18 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -210,14 +214,15 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
 
     }
     private void checkReminders() {
-        //ListView layout = (ListView) findViewById(R.id.listAlert); //when alerts are implemented this will be changed
+        LinearLayout layout = (LinearLayout) findViewById(R.id.layout_alerts);
+        layout.removeAllViews();
         Log.i(TAG, "checking reminders");
         Iterator<Reminder> iterator = reminders.iterator();
         if (!iterator.hasNext()) {
             Log.e(TAG, "iterator does not have next");
         }
         while (iterator.hasNext()) {
-            Reminder reminder = iterator.next();
+            final Reminder reminder = iterator.next();
             if (reminder.getFeatureId() == -2) {
                 Calendar calendar = Calendar.getInstance();
                 SimpleDateFormat mdformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -228,6 +233,18 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
                         Log.i(TAG, "date is after date!");
                         //TextView textView = new TextView(this);
                         //textView.setText("Reminder " + reminder.getName() + " is triggered!");
+                        TextView alertText = new TextView(this);
+                        alertText.setText("Reminder " + reminder.getName() + " is active.");
+                        alertText.setTextColor(Color.BLUE);
+                        alertText.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                viewAlert(view, reminder.getName(), reminder.getDate());
+                            }
+                        });
+                        layout.addView(alertText);
+
+
                     } else {
                         Log.i(TAG, "date is not after date!");
                     }
@@ -239,4 +256,12 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
         }
     }
 
+    private void viewAlert(View view, String reminderName, String reminderDate) {
+        Intent intent = new Intent(this, AlertActivity.class);
+        String keyName = "alert_name";
+        String keyDate = "alert_date";
+        intent.putExtra(keyName, reminderName);
+        intent.putExtra(keyDate, reminderDate);
+        startActivity(intent);
+    }
 }
