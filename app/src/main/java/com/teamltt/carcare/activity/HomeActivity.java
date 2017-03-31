@@ -30,12 +30,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.jjoe64.graphview.GraphView;
 import com.teamltt.carcare.R;
 import com.teamltt.carcare.database.DbHelper;
 import com.teamltt.carcare.database.IObservable;
 import com.teamltt.carcare.database.IObserver;
 import com.teamltt.carcare.database.contract.ResponseContract;
+//import com.teamltt.carcare.fragment.MyDynamicDataAdapter;
 import com.teamltt.carcare.fragment.MyObdResponseRecyclerViewAdapter;
+import com.teamltt.carcare.fragment.RealTimeUpdates;
 import com.teamltt.carcare.fragment.ResponseFragment;
 import com.teamltt.carcare.fragment.SimpleDividerItemDecoration;
 import com.teamltt.carcare.model.ObdContent;
@@ -49,6 +52,12 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
 
     // Used to keep track of the items in the RecyclerView
     private RecyclerView.Adapter responseListAdapter;
+
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
+    private GraphView gvDynamicData;
+    private RealTimeUpdates realTimeUpdates;
 
     ObdBluetoothService btService;
     Intent btServiceIntent;
@@ -84,6 +93,8 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
             recyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
             recyclerView.setAdapter(responseListAdapter);
         }
+
+        addDynamicData();
 
     }
 
@@ -152,22 +163,22 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent intent;
         switch (item.getItemId()) {
-            case (R.id.action_car_info):
-                intent = new Intent(this, CarInfoActivity.class);
-                startActivity(intent);
-                break;
-            case (R.id.action_trips):
-                intent = new Intent(this, TripsActivity.class);
-                startActivity(intent);
-                break;
-            case (R.id.action_dynamic):
-                intent = new Intent(this, DynamicActivity.class);
-                startActivity(intent);
-                break;
-            case (R.id.action_reminder):
-                intent = new Intent(this, ReminderActivity.class);
-                startActivity(intent);
-                break;
+//            case (R.id.action_car_info):
+//                intent = new Intent(this, CarInfoActivity.class);
+//                startActivity(intent);
+//                break;
+//            case (R.id.action_trips):
+//                intent = new Intent(this, TripsActivity.class);
+//                startActivity(intent);
+//                break;
+//            case (R.id.action_dynamic):
+//                intent = new Intent(this, DynamicActivity.class);
+//                startActivity(intent);
+//                break;
+//            case (R.id.action_reminder):
+//                intent = new Intent(this, ReminderActivity.class);
+//                startActivity(intent);
+//                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -192,5 +203,21 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
             btService.startNewTrip();
         }
 
+    }
+
+    public void addDynamicData() {
+        mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
+
+        // use a linear layout manager
+        mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+
+        realTimeUpdates = new RealTimeUpdates();
+
+        // specify an adapter
+        // This branch doesn't have the settings, so the graphs should change based on the
+        // specified
+//        mAdapter = new MyDynamicDataAdapter();
+//        mRecyclerView.setAdapter(mAdapter);
     }
 }

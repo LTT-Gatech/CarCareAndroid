@@ -123,28 +123,28 @@ public class TripsActivity extends AppCompatActivity implements ResponseFragment
         return true;
     }
 
-    public boolean onOptionsItemSelected(MenuItem item) {
-        Intent intent;
-        switch (item.getItemId()) {
-            case (R.id.action_car_info):
-                intent = new Intent(this, CarInfoActivity.class);
-                startActivity(intent);
-                break;
-            case (R.id.action_trips):
-                intent = new Intent(this, TripsActivity.class);
-                startActivity(intent);
-                break;
-            case (R.id.action_dynamic):
-                intent = new Intent(this, DynamicActivity.class);
-                startActivity(intent);
-                break;
-            case (R.id.action_reminder):
-                intent = new Intent(this, ReminderActivity.class);
-                startActivity(intent);
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        Intent intent;
+//        switch (item.getItemId()) {
+//            case (R.id.action_car_info):
+//                intent = new Intent(this, CarInfoActivity.class);
+//                startActivity(intent);
+//                break;
+//            case (R.id.action_trips):
+//                intent = new Intent(this, TripsActivity.class);
+//                startActivity(intent);
+//                break;
+//            case (R.id.action_dynamic):
+//                intent = new Intent(this, DynamicActivity.class);
+//                startActivity(intent);
+//                break;
+//            case (R.id.action_reminder):
+//                intent = new Intent(this, ReminderActivity.class);
+//                startActivity(intent);
+//                break;
+//        }
+//        return super.onOptionsItemSelected(item);
+//    }
 
     public void toggleLogging(MenuItem item) {
         //
