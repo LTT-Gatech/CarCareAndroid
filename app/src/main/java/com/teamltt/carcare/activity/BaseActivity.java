@@ -144,6 +144,9 @@ public class BaseActivity extends AppCompatActivity
         if (id == R.id.nav_car_information) {
             intent = new Intent(this, CarInfoActivity.class);
             startActivity(intent);
+        } else if(id == R.id.nav_reminders) {
+            intent = new Intent(this, ReminderActivity.class);
+            startActivity(intent);
         } else if (id == R.id.export_database) {
             DbHelper dbHelper = new DbHelper(this);
             dbHelper.exportDatabase(this);

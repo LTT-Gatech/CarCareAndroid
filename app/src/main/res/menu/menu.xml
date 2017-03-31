@@ -3,21 +3,11 @@
       android:id="@+id/toolbar">
 
     <item
-        android:id="@+id/action_car_info"
+        android:id="@+id/action_settings"
         android:orderInCategory="1"
-        android:title="@string/text_car_info_title"/>
+        android:title="@string/settings"/>
     <item
-        android:id="@+id/action_trips"
+        android:id="@+id/action_help"
         android:orderInCategory="2"
-        android:title="@string/text_trips"/>
-    <item
-        android:id="@+id/action_dynamic"
-        android:orderInCategory="3"
-        android:title="@string/text_dynamic"
-        />
-    <item
-        android:id="@+id/action_reminder"
-        android:orderInCategory="3"
-        android:title="@string/text_reminders_title"
-        />
+        android:title="@string/help"/>
 </menu>

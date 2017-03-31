@@ -44,6 +44,7 @@
         <activity android:name=".activity.ReminderActivity"/>
         <activity android:name=".activity.ReminderEditActivity"/>
         <activity android:name=".activity.AlertActivity"/>
+        <activity android:name=".activity.SettingsActivity"/>
         <activity
             android:name=".activity.BaseActivity"
             android:label="@string/title_activity_base"

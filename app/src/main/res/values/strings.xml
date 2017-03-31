@@ -113,5 +113,23 @@
     <string name="text_placeholder">Placeholder text</string>
     <string name="placeholder_data_type">Data type:</string>
     <string name="placeholder_value">0 mph</string>
+    <string name="engine_temp">Engine Temperature</string>
+    <string name="current_mpg">Current MPG</string>
+    <string name="current_mph">Current MPH</string>
+    <string name="graph_mpg">MPG Graph</string>
+    <string name="graph_mph">MPH Graph</string>
+    <string name="graph_tire_pressure">Tire Pressure Graph</string>
+    <string name="key_engine_temp">sEngineTemp</string>
+    <string name="key_mpg">sMPG</string>
+    <string name="key_mph">sMPH</string>
+    <string name="key_mpg_d">dMPG</string>
+    <string name="key_mph_d">dMPH</string>
+    <string name="key_tire_pressure_d">dTirePress</string>
+    <string name="settings">Settings</string>
+    <string name="help">Help</string>
+    <string name="static_data">Static Data</string>
+    <string name="dynamic_data">Dynamic Data</string>
+
+    <string name="export_database">Export Database</string>
 
 </resources>
