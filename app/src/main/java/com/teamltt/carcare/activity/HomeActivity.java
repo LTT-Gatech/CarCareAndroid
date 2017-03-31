@@ -136,7 +136,7 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
         if (args != null && o instanceof DbHelper) {
             DbHelper dbHelper = (DbHelper) o;
             long[] responseIds = args.getLongArray(ResponseContract.ResponseEntry.COLUMN_NAME_ID + "_ARRAY");
-            List<Response> items = dbHelper.getResponsesById(responseIds);
+            List<Response> items = dbHelper.getResponsesByIds(responseIds);
             ObdContent.setItems(items);
             responseListAdapter.notifyDataSetChanged();
         }

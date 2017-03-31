@@ -53,8 +53,8 @@ public class MyObdResponseRecyclerViewAdapter extends RecyclerView.Adapter<MyObd
     public void onBindViewHolder(final ViewHolder holder, int position) {
         Response item = mValues.get(position);
         holder.mItem = item;
-        holder.mRequestView.setText(item.request);
-        holder.mResponseView.setText(item.response);
+        holder.mRequestView.setText(item.name);
+        holder.mResponseView.setText(item.value);
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override

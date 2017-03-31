@@ -386,10 +386,11 @@ public class ObdBluetoothService extends Service {
                         String name = sendCommand.getName();
                         String commandPID = sendCommand.getCommandPID();
                         String formattedResult = sendCommand.getFormattedResult();
-                        long responseId = dbHelper.insertResponse(tripId, name,
-                                commandPID, formattedResult);
+                        Response response = new Response(-1, name, commandPID, formattedResult);
+                        long responseId = dbHelper.insertResponse(tripId, response);
+                        response.id = responseId;
                         if (responseId > DbHelper.DB_OK) {
-                            newResponses.add(new Response(responseId, name, commandPID, formattedResult));
+                            newResponses.add(response);
                         }
                     }
                     publishProgress();

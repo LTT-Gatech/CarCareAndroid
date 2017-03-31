@@ -20,16 +20,16 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class Response implements Parcelable {
-    public final long id;
-    public final String request;
-    public final String pId;
-    public final String response;
+    public long id;
+    public String name;
+    public String pId;
+    public String value;
 
-    public Response(long id, String request, String pId, String response) {
+    public Response(long id, String name, String pId, String value) {
         this.id = id;
-        this.request = request;
+        this.name = name;
         this.pId = pId;
-        this.response = response;
+        this.value = value;
     }
 
     @Override
@@ -48,14 +48,14 @@ public class Response implements Parcelable {
 
     @Override
     public String toString() {
-        return request + " (" + pId + ") : " + response;
+        return name + " (" + pId + ") : " + value;
     }
 
     protected Response(Parcel in) {
         id = in.readLong();
-        request = in.readString();
+        name = in.readString();
         pId = in.readString();
-        response = in.readString();
+        value = in.readString();
     }
 
     @Override
@@ -66,9 +66,9 @@ public class Response implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(id);
-        dest.writeString(request);
+        dest.writeString(name);
         dest.writeString(pId);
-        dest.writeString(response);
+        dest.writeString(value);
     }
 
     @SuppressWarnings("unused")

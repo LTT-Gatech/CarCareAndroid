@@ -324,19 +324,19 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         return responses;
     }
 
-    public long insertResponse(long tripId, String name, String pId, String value) {
+    public long insertResponse(long tripId, Response response) {
         SQLiteDatabase db = getWritableDatabase();
         long status = DbHelper.errorChecks(db);
         if (status != DbHelper.DB_OK) {
             return status;
         }
-        status = ResponseContract.insert(db, tripId, name, pId, value);
+        status = ResponseContract.insert(db, tripId, response.name, response.pId, response.value);
         db.close();
         setChanged(status);
         return status;
     }
 
-    public List<Response> getResponsesById(long[] responseIds) {
+    public List<Response> getResponsesByIds(long[] responseIds) {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = ResponseContract.queryByIds(db, responseIds);
         List<Response> items = new ArrayList<>();
