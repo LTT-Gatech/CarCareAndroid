@@ -16,11 +16,15 @@
 
 package com.teamltt.carcare.database;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
+import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
 import com.teamltt.carcare.database.contract.OwnershipContract;
@@ -35,6 +39,11 @@ import com.teamltt.carcare.model.Response;
 import com.teamltt.carcare.model.Trip;
 import com.teamltt.carcare.model.Vehicle;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.channels.FileChannel;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -120,6 +129,69 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         onUpgrade(db, oldVersion, newVersion);
     }
 
+    public boolean importDatabase(File storageDirectory, Context context) {
+        // Close the SQLiteOpenHelper so it will commit the created empty
+        // database to internal storage.
+        close();
+
+        // Copy the database files
+        File newDb = new File(storageDirectory + "/" + DATABASE_NAME);
+        File oldDb = new File(context.getDatabasePath(DATABASE_NAME).toString());
+        if (newDb.exists()) {
+            FileInputStream fromFile;
+            try {
+                fromFile = new FileInputStream(newDb);
+                FileOutputStream toFile = new FileOutputStream(oldDb);
+                FileChannel fromChannel = null;
+                FileChannel toChannel = null;
+                try {
+                    fromChannel = fromFile.getChannel();
+                    toChannel = toFile.getChannel();
+                    fromChannel.transferTo(0, fromChannel.size(), toChannel);
+                    Log.i(TAG, "database transfer successful");
+                } finally {
+                    try {
+                        if (fromChannel != null) {
+                            fromChannel.close();
+                        }
+                    } finally {
+                        if (toChannel != null) {
+                            toChannel.close();
+                        }
+                    }
+                }
+            } catch (IOException e ) {
+                e.printStackTrace();
+            }
+            // Access the copied database so SQLiteHelper will cache it and mark
+            // it as created.
+            getWritableDatabase().close();
+            return true;
+
+        }
+        else {
+            Log.e(TAG, "import not successful: database did not exist");
+        }
+        return false;
+    }
+
+    public void exportDatabase(Context context) {
+        try {
+            File databaseLocation = new File(context.getDatabasePath(DATABASE_NAME).toString());
+            FileInputStream inStream = new FileInputStream(databaseLocation);
+            File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            File destination = new File(dir, DATABASE_NAME);
+            FileOutputStream outStream = new FileOutputStream(destination);
+            FileChannel inChannel = inStream.getChannel();
+            FileChannel outChannel = outStream.getChannel();
+            inChannel.transferTo(0, inChannel.size(), outChannel);
+            inStream.close();
+            outStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
 
     private static long errorChecks(SQLiteDatabase db) {
         if (db == null) {
@@ -490,4 +562,6 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
             Log.e(TAG, "error occurred when writing: " + status);
         }
     }
+
+
 }
