@@ -29,7 +29,7 @@ public class ObdContent {
 
     public static final List<Response> ITEMS = new ArrayList<>();
 
-    public static final Map<String, Response> ITEM_MAP = new HashMap<>();
+    public static final Map<Long, Response> ITEM_MAP = new HashMap<>();
 
     public static void setItems(List<Response> items) {
         ITEMS.clear();
@@ -48,7 +48,7 @@ public class ObdContent {
         ITEM_MAP.put(item.id, item);
     }
 
-    public static Response createItemWithResponse(int id, String request, String response) {
-        return new Response(String.valueOf(id), request, response);
+    public static Response createItemWithResponse(long id, String request, String response) {
+        return new Response(id, request, response);
     }
 }

@@ -16,12 +16,15 @@
 
 package com.teamltt.carcare.model;
 
-public class Response {
-    public final String id;
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Response implements Parcelable {
+    public final long id;
     public final String request;
     public final String response;
 
-    public Response(String id, String request, String response) {
+    public Response(long id, String request, String response) {
         this.id = id;
         this.request = request;
         this.response = response;
@@ -31,4 +34,35 @@ public class Response {
     public String toString() {
         return request + " : " + response;
     }
+
+    protected Response(Parcel in) {
+        id = in.readLong();
+        request = in.readString();
+        response = in.readString();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(id);
+        dest.writeString(request);
+        dest.writeString(response);
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<Response> CREATOR = new Parcelable.Creator<Response>() {
+        @Override
+        public Response createFromParcel(Parcel in) {
+            return new Response(in);
+        }
+
+        @Override
+        public Response[] newArray(int size) {
+            return new Response[size];
+        }
+    };
 }

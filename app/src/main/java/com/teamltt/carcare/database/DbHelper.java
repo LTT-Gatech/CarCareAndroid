@@ -317,7 +317,7 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
             long id = cursor.getLong(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_ID));
             String name = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_NAME));
             String value = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_VALUE));
-            responses.add(ObdContent.createItemWithResponse(((Long) id).intValue(), name, value));
+            responses.add(ObdContent.createItemWithResponse(id, name, value));
         }
         cursor.close();
         db.close();
@@ -344,7 +344,7 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
             long id = cursor.getLong(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_ID));
             String name = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_NAME));
             String value = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_VALUE));
-            items.add(ObdContent.createItemWithResponse(((Long) id).intValue(), name, value));
+            items.add(ObdContent.createItemWithResponse(id, name, value));
         }
         cursor.close();
         db.close();
