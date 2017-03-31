@@ -214,12 +214,18 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
 
     }
     private void checkReminders() {
-        LinearLayout layout = (LinearLayout) findViewById(R.id.layout_alerts);
+        LinearLayout layout = (LinearLayout) findViewById(R.id.layout_alerts_content);
         layout.removeAllViews();
         Log.i(TAG, "checking reminders");
         Iterator<Reminder> iterator = reminders.iterator();
         if (!iterator.hasNext()) {
             Log.e(TAG, "iterator does not have next");
+            LinearLayout alertLayout = (LinearLayout) findViewById(R.id.layout_alerts);
+            alertLayout.setVisibility(View.GONE);
+        }
+        else {
+            LinearLayout alertLayout = (LinearLayout) findViewById(R.id.layout_alerts);
+            alertLayout.setVisibility(View.VISIBLE);
         }
         while (iterator.hasNext()) {
             final Reminder reminder = iterator.next();
@@ -239,7 +245,7 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
                         alertText.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                viewAlert(view, reminder.getName(), reminder.getDate());
+                                viewAlert(view, "Reminder", reminder.getName(), reminder.getDate());
                             }
                         });
                         layout.addView(alertText);
@@ -256,12 +262,14 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
         }
     }
 
-    private void viewAlert(View view, String reminderName, String reminderDate) {
+    private void viewAlert(View view, String alertType, String alertName, String alertDate) {
         Intent intent = new Intent(this, AlertActivity.class);
+        String keyType = "alert_type";
         String keyName = "alert_name";
         String keyDate = "alert_date";
-        intent.putExtra(keyName, reminderName);
-        intent.putExtra(keyDate, reminderDate);
+        intent.putExtra(keyType, alertType);
+        intent.putExtra(keyName, alertName);
+        intent.putExtra(keyDate, alertDate);
         startActivity(intent);
     }
 }

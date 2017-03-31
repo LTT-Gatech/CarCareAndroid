@@ -32,6 +32,7 @@ import java.util.Date;
 
 public class AlertActivity extends BaseActivity {
 
+    private String alertType;
     private String alertName;
     private String alertDate;
 
@@ -44,13 +45,16 @@ public class AlertActivity extends BaseActivity {
         if (savedInstanceState == null) {
             Bundle extras = getIntent().getExtras();
             if(extras == null) {
+                alertType = "NullType";
                 alertName = "NullAlert";
                 alertDate = "NullDate";
             } else {
+                alertType = extras.getString("alert_type");
                 alertName = extras.getString("alert_name");
                 alertDate = extras.getString("alert_date");
             }
         } else {
+            alertType = (String) savedInstanceState.getSerializable("alert_type");
             alertName = (String) savedInstanceState.getSerializable("alert_name");
             alertDate = (String) savedInstanceState.getSerializable("alert_date");
         }
@@ -87,6 +91,8 @@ public class AlertActivity extends BaseActivity {
     }
 
     private void updateUi() {
+        TextView alertTitle = (TextView) findViewById(R.id.text_alert_title);
+        alertTitle.setText(alertType);
         TextView alertIntro = (TextView) findViewById(R.id.text_alert_intro);
         alertIntro.setText("Your reminder titled " + alertName + " was triggered.");
         SimpleDateFormat mdformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
