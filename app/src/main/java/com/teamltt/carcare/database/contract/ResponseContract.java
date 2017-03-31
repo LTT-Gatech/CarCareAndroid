@@ -51,11 +51,11 @@ public class ResponseContract {
      * @param value   the formatted result after the command returns
      * @return the new row id or a {@link DbHelper} error code
      */
-    public static long insert(SQLiteDatabase db, long tripId, String name, String pId, String value) {
+    public static long insert(SQLiteDatabase db, long tripId, String pId, String name, String value) {
         ContentValues values = new ContentValues();
         values.put(ResponseContract.ResponseEntry.COLUMN_NAME_TRIP_ID, tripId);
-        values.put(ResponseContract.ResponseEntry.COLUMN_NAME_NAME, name);
         values.put(ResponseContract.ResponseEntry.COLUMN_NAME_PID, pId);
+        values.put(ResponseContract.ResponseEntry.COLUMN_NAME_NAME, name);
         values.put(ResponseContract.ResponseEntry.COLUMN_NAME_VALUE, value);
         return db.insert(ResponseEntry.TABLE_NAME, null, values);
     }
@@ -66,8 +66,8 @@ public class ResponseContract {
                 ResponseEntry.COLUMN_NAME_ID,
 //                ResponseEntry.COLUMN_NAME_TRIP_ID, // shouldn't be necessary to include in cursor
                 ResponseEntry.COLUMN_NAME_TIMESTAMP,
-                ResponseEntry.COLUMN_NAME_NAME,
                 ResponseEntry.COLUMN_NAME_PID,
+                ResponseEntry.COLUMN_NAME_NAME,
                 ResponseEntry.COLUMN_NAME_VALUE
         };
         String selection = ResponseEntry.COLUMN_NAME_TRIP_ID + " = ?";
@@ -83,8 +83,8 @@ public class ResponseContract {
                 ResponseEntry.COLUMN_NAME_ID,
                 ResponseEntry.COLUMN_NAME_TRIP_ID,
                 ResponseEntry.COLUMN_NAME_TIMESTAMP,
-                ResponseEntry.COLUMN_NAME_NAME,
                 ResponseEntry.COLUMN_NAME_PID,
+                ResponseEntry.COLUMN_NAME_NAME,
                 ResponseEntry.COLUMN_NAME_VALUE
         };
         String selection = DbHelper.inClauseBuilder(ResponseEntry.COLUMN_NAME_ID, rowIds.length);
@@ -107,8 +107,8 @@ public class ResponseContract {
         public static final String COLUMN_NAME_ID = "response_id";
         public static final String COLUMN_NAME_TRIP_ID = TripContract.TripEntry.COLUMN_NAME_ID;
         public static final String COLUMN_NAME_TIMESTAMP = "timestamp";
-        public static final String COLUMN_NAME_NAME = "name";
         public static final String COLUMN_NAME_PID = "pid";
+        public static final String COLUMN_NAME_NAME = "name";
         public static final String COLUMN_NAME_VALUE = "value";
     }
 }

@@ -315,9 +315,10 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         List<Response> responses = new ArrayList<>();
         while (cursor.moveToNext()) {
             long id = cursor.getLong(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_ID));
+            String pId = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_PID));
             String name = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_NAME));
             String value = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_VALUE));
-            responses.add(ObdContent.createItemWithResponse(id, name, value));
+            responses.add(ObdContent.createItemWithResponse(id, pId, name, value));
         }
         cursor.close();
         db.close();
@@ -330,7 +331,7 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         if (status != DbHelper.DB_OK) {
             return status;
         }
-        status = ResponseContract.insert(db, tripId, response.name, response.pId, response.value);
+        status = ResponseContract.insert(db, tripId, response.pId, response.name, response.value);
         db.close();
         setChanged(status);
         return status;
@@ -342,9 +343,10 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         List<Response> items = new ArrayList<>();
         while (cursor.moveToNext()) {
             long id = cursor.getLong(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_ID));
+            String pId = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_PID));
             String name = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_NAME));
             String value = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_VALUE));
-            items.add(ObdContent.createItemWithResponse(id, name, value));
+            items.add(ObdContent.createItemWithResponse(id, pId, name, value));
         }
         cursor.close();
         db.close();

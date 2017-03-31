@@ -21,14 +21,14 @@ import android.os.Parcelable;
 
 public class Response implements Parcelable {
     public long id;
-    public String name;
     public String pId;
+    public String name;
     public String value;
 
-    public Response(long id, String name, String pId, String value) {
+    public Response(long id, String pId, String name, String value) {
         this.id = id;
-        this.name = name;
         this.pId = pId;
+        this.name = name;
         this.value = value;
     }
 
@@ -53,8 +53,8 @@ public class Response implements Parcelable {
 
     protected Response(Parcel in) {
         id = in.readLong();
-        name = in.readString();
         pId = in.readString();
+        name = in.readString();
         value = in.readString();
     }
 

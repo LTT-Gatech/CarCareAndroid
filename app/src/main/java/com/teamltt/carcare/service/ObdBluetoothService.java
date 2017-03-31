@@ -383,10 +383,10 @@ public class ObdBluetoothService extends Service {
                             // In case the Bluetooth connection breaks suddenly
                             break;
                         }
+                        String pId = sendCommand.getCommandPID();
                         String name = sendCommand.getName();
-                        String commandPID = sendCommand.getCommandPID();
                         String formattedResult = sendCommand.getFormattedResult();
-                        Response response = new Response(-1, name, commandPID, formattedResult);
+                        Response response = new Response(-1, pId, name, formattedResult);
                         long responseId = dbHelper.insertResponse(tripId, response);
                         response.id = responseId;
                         if (responseId > DbHelper.DB_OK) {
