@@ -5,10 +5,10 @@
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="1"
-        android:title="Settings"/>
+        android:title="@string/settings"/>
     <item
         android:id="@+id/action_help"
         android:orderInCategory="2"
-        android:title="Help"/>
+        android:title="@string/help"/>
 </menu>
 

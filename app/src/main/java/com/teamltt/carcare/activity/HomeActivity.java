@@ -24,13 +24,19 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.preference.PreferenceManager;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.LinearLayout.LayoutParams;
 
 import com.teamltt.carcare.R;
 import com.teamltt.carcare.database.DbHelper;
@@ -193,31 +199,46 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         String syncConnPref = preferences.getString(SettingsActivity.KEY_PREF_SYNC_CONN, "");
 
-        TextView tvStaticDataName = ((TextView) findViewById(R.id.tvStaticDataName));
-        TextView tvStaticDataValue = ((TextView) findViewById(R.id.tvStaticDataValue));
+        LinearLayout lvStaticData = ((LinearLayout) findViewById(R.id.static_data));
+        lvStaticData.removeAllViews();
 
-        String tvTextName = "";
-        String tvTextValue = "";
+        boolean haveStatic = false;
 
-        if (preferences.getBoolean("sEngineTemp", false)) {
+        if (preferences.getBoolean("@string/key_engine_temp", false)) {
             //TODO Read from database
-            tvTextName +="Engine Temperature:";
-            tvTextValue += "80 F ";
+            lvStaticData.addView(createTextView("Engine Temperature:", 3));
+            lvStaticData.addView(createTextView("80 F", 5));
+            haveStatic = true;
         }
 
-        if (preferences.getBoolean("sMPG", false)) {
+        if (preferences.getBoolean("@string/key_mpg", false)) {
             //TODO Read from database
-            tvTextName += "\nCurrent Miles Per Gallon:";
-            tvTextValue += "\n35 mpg";
+            lvStaticData.addView(createTextView("Current Miles Per Gallon:", 3));
+            lvStaticData.addView(createTextView("35 mpg", 5));
+            haveStatic = true;
         }
 
-        if (preferences.getBoolean("sMPH", false)) {
+        if (preferences.getBoolean("@string/key_mph", false)) {
             //TODO Read from database
-            tvTextName += "\nCurrent Miles Per Hour:";
-            tvTextValue += "\n60 mph";
+            lvStaticData.addView(createTextView("Current Miles Per Hour:", 3));
+            lvStaticData.addView(createTextView("60 mph", 5));
+            haveStatic = true;
         }
 
-        tvStaticDataName.setText(tvTextName);
-        tvStaticDataValue.setText(tvTextValue);
+
+        if (!haveStatic) {
+            findViewById(R.id.static_data_card).setVisibility(View.INVISIBLE);
+        } else {
+            findViewById(R.id.static_data_card).setVisibility(View.VISIBLE);
+        }
+    }
+
+    public TextView createTextView(String text, int gravity) {
+        TextView newTextView = new TextView(this);
+        newTextView.setLayoutParams(new LayoutParams(0,
+                LayoutParams.WRAP_CONTENT, 1.0f));
+        newTextView.setText(text);
+        newTextView.setGravity(gravity);
+        return newTextView;
     }
 }

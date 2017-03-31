@@ -116,7 +116,7 @@
 
         <android.support.v7.widget.CardView
             xmlns:card_view="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/staticData"
+            android:id="@+id/static_data_card"
             android:layout_gravity="center"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -128,22 +128,8 @@
                 android:layout_height="wrap_content"
                 android:weightSum="2"
                 android:orientation="horizontal"
-                android:padding="10dp">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/tvStaticDataName"
-                    android:textSize="14sp"
-                    android:layout_gravity="start"/>
-                <TextView
-                    android:layout_width= "0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/tvStaticDataValue"
-                    android:textSize="14sp"
-                    android:gravity="end"/>
+                android:padding="10dp"
+                android:id="@+id/static_data">
             </LinearLayout>
         </android.support.v7.widget.CardView>
     </LinearLayout>
