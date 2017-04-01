@@ -41,7 +41,7 @@ public class RealTimeUpdates extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.activity_home, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_real_time_updates, container, false);
 
         GraphView graph = (GraphView) rootView.findViewById(R.id.graph);
         mSeries1 = new LineGraphSeries<>(generateData());
