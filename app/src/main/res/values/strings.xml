@@ -68,7 +68,7 @@
         <item>&gt;</item>
     </string-array>
     <string-array name="feature_types">
-        <item>Oil Pressure</item>
+        <item>Mileage</item>
         <item>Placeholder 2</item>
         <item>Placeholder 3</item>
     </string-array>
