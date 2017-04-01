@@ -24,34 +24,27 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
 import android.widget.Space;
 import android.widget.TextView;
-import android.widget.LinearLayout.LayoutParams;
 import android.widget.Toast;
 
-import com.jjoe64.graphview.GraphView;
 import com.teamltt.carcare.R;
 import com.teamltt.carcare.database.DbHelper;
 import com.teamltt.carcare.database.IObservable;
 import com.teamltt.carcare.database.IObserver;
 import com.teamltt.carcare.database.contract.ResponseContract;
-//import com.teamltt.carcare.fragment.MyDynamicDataAdapter;
+import com.teamltt.carcare.fragment.GraphFragment;
+import com.teamltt.carcare.fragment.MyGraphAdapter;
 import com.teamltt.carcare.fragment.MyObdResponseRecyclerViewAdapter;
-import com.teamltt.carcare.fragment.RealTimeUpdates;
 import com.teamltt.carcare.fragment.ResponseFragment;
 import com.teamltt.carcare.fragment.SimpleDividerItemDecoration;
 import com.teamltt.carcare.model.ObdContent;
@@ -59,18 +52,20 @@ import com.teamltt.carcare.model.Response;
 import com.teamltt.carcare.service.BtStatusDisplay;
 import com.teamltt.carcare.service.ObdBluetoothService;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObserver, ResponseFragment.OnListFragmentInteractionListener {
+public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObserver, ResponseFragment.OnListFragmentInteractionListener, GraphFragment.OnGraphFragmentInteractionListener {
 
     // Used to keep track of the items in the RecyclerView
     private RecyclerView.Adapter responseListAdapter;
 
-    private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
-    private GraphView gvDynamicData;
-    private RealTimeUpdates realTimeUpdates;
+    private RecyclerView.Adapter mGraphAdapter;
+    private RecyclerView mGraphRecyclerView;
+//    private RecyclerView.Adapter mAdapter;
+//    private RecyclerView.LayoutManager mLayoutManager;
+//    private GraphView gvDynamicData;
+//    private RealTimeUpdates realTimeUpdates;
 
     ObdBluetoothService btService;
     Intent btServiceIntent;
@@ -107,8 +102,20 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
             recyclerView.setAdapter(responseListAdapter);
         }
 
-        addDynamicData();
-
+        // TODO get list of parameter identifiers here
+        List<String> pIds = new ArrayList<>();
+        // TODO get the IObservable database connection (from btService.getObservable())
+        // HACK this might throw an exception because the btService isn't connected yet or
+        // HACK cont.: the btService doesn't have a dbHelper connection
+        IObservable observable = btService.getObservable();
+        mGraphAdapter = new MyGraphAdapter(pIds, this, observable);
+        RecyclerView graphRecyclerView = (RecyclerView) findViewById(R.id.graph_list);
+        if (graphRecyclerView != null) {
+            graphRecyclerView.setHasFixedSize(true);
+            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+            graphRecyclerView.setLayoutManager(layoutManager);
+            graphRecyclerView.setAdapter(mGraphAdapter);
+        }
     }
 
     @Override
@@ -136,6 +143,11 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
     @Override
     public void onListFragmentInteraction(Response item) {
         Log.i("Response Card", item.toString());
+    }
+
+    @Override
+    public void onGraphFragmentInteraction(String pId) {
+        Log.i("Graph Card", pId);
     }
 
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -285,27 +297,5 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
                 LayoutParams.WRAP_CONTENT, 0f));
         newTextView.setText(text);
         return newTextView;
-    }
-
-    public void addDynamicData() {
-        mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
-
-        // use a linear layout manager
-        mLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-
-        realTimeUpdates = new RealTimeUpdates();
-
-        // specify an adapter
-        // This branch doesn't have the settings, so the graphs should change based on the
-        // specified
-//        mAdapter = new MyDynamicDataAdapter();
-//        mRecyclerView.setAdapter(mAdapter);
-
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        RealTimeUpdates fragment = new RealTimeUpdates();
-        fragmentTransaction.add(R.id.dynamic_data_frame, fragment);
-        fragmentTransaction.commit();
     }
 }
