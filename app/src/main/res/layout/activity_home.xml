@@ -138,6 +138,11 @@
             android:scrollbars="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
+
+        <FrameLayout
+            android:id="@+id/dynamic_data_frame"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
     </LinearLayout>
 </LinearLayout>
 

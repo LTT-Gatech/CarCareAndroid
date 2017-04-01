@@ -24,6 +24,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -39,6 +41,7 @@ import android.widget.LinearLayout;
 import android.widget.Space;
 import android.widget.TextView;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.Toast;
 
 import com.jjoe64.graphview.GraphView;
 import com.teamltt.carcare.R;
@@ -180,7 +183,8 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
                 startActivity(intent);
                 break;
             case (R.id.action_help):
-                // TODO Add toast
+                Toast.makeText(this, "Have you tried turning it off and back on?",
+                        Toast.LENGTH_SHORT).show();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -297,5 +301,11 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
         // specified
 //        mAdapter = new MyDynamicDataAdapter();
 //        mRecyclerView.setAdapter(mAdapter);
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        RealTimeUpdates fragment = new RealTimeUpdates();
+        fragmentTransaction.add(R.id.dynamic_data_frame, fragment);
+        fragmentTransaction.commit();
     }
 }
