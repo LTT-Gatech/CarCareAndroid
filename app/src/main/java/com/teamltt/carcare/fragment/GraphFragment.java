@@ -96,7 +96,7 @@ public class GraphFragment extends Fragment {
             List<String> pIds = new ArrayList<>();
             // TODO get the IObservable database connection (from btService.getObservable())
             IObservable observable = null;
-            recyclerView.setAdapter(new MyGraphAdapter(pIds, mListener, observable));
+            recyclerView.setAdapter(new MyGraphAdapter(mListener, observable, getActivity()));
         }
         return view;
     }

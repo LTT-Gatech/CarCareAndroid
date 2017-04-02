@@ -20,52 +20,38 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.preference.PreferenceManager;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
-import android.widget.Space;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.teamltt.carcare.R;
-import com.teamltt.carcare.database.DbHelper;
 import com.teamltt.carcare.database.IObservable;
-import com.teamltt.carcare.database.IObserver;
-import com.teamltt.carcare.database.contract.ResponseContract;
 import com.teamltt.carcare.fragment.GraphFragment;
 import com.teamltt.carcare.fragment.MyGraphAdapter;
 import com.teamltt.carcare.fragment.MyObdResponseRecyclerViewAdapter;
 import com.teamltt.carcare.fragment.ResponseFragment;
 import com.teamltt.carcare.fragment.SimpleDividerItemDecoration;
+import com.teamltt.carcare.fragment.StaticCard;
 import com.teamltt.carcare.model.ObdContent;
 import com.teamltt.carcare.model.Response;
 import com.teamltt.carcare.service.BtStatusDisplay;
 import com.teamltt.carcare.service.ObdBluetoothService;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObserver, ResponseFragment.OnListFragmentInteractionListener, GraphFragment.OnGraphFragmentInteractionListener {
+public class HomeActivity extends BaseActivity implements BtStatusDisplay, ResponseFragment.OnListFragmentInteractionListener, GraphFragment.OnGraphFragmentInteractionListener {
 
     // Used to keep track of the items in the RecyclerView
     private RecyclerView.Adapter responseListAdapter;
 
     private RecyclerView.Adapter mGraphAdapter;
-    private RecyclerView mGraphRecyclerView;
-//    private RecyclerView.Adapter mAdapter;
-//    private RecyclerView.LayoutManager mLayoutManager;
-//    private GraphView gvDynamicData;
-//    private RealTimeUpdates realTimeUpdates;
+    private StaticCard staticCard;
 
     ObdBluetoothService btService;
     Intent btServiceIntent;
@@ -102,20 +88,7 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
             recyclerView.setAdapter(responseListAdapter);
         }
 
-        // TODO get list of parameter identifiers here
-        List<String> pIds = new ArrayList<>();
-        // TODO get the IObservable database connection (from btService.getObservable())
-        // HACK this might throw an exception because the btService isn't connected yet or
-        // HACK cont.: the btService doesn't have a dbHelper connection
-        IObservable observable = btService.getObservable();
-        mGraphAdapter = new MyGraphAdapter(pIds, this, observable);
-        RecyclerView graphRecyclerView = (RecyclerView) findViewById(R.id.graph_list);
-        if (graphRecyclerView != null) {
-            graphRecyclerView.setHasFixedSize(true);
-            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-            graphRecyclerView.setLayoutManager(layoutManager);
-            graphRecyclerView.setAdapter(mGraphAdapter);
-        }
+        staticCard = new StaticCard((CardView) findViewById(R.id.static_data_card), this);
     }
 
     @Override
@@ -125,7 +98,6 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
             bindService(btServiceIntent, mConnection, Context.BIND_AUTO_CREATE);
         }
 
-        displayStaticData();
     }
 
     @Override
@@ -133,7 +105,6 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
         super.onStop();
         // Unbind from the service
         if (bound) {
-            btService.unobserveDatabase(HomeActivity.this);
             unbindService(mConnection);
             // should this be removed from here since it is done in mConnection.onServiceDisconnected?
             bound = false;
@@ -158,8 +129,22 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
             // Bound to the bluetooth service, cast binder and get service instance
             ObdBluetoothService.ObdServiceBinder binder = (ObdBluetoothService.ObdServiceBinder) service;
             btService = binder.getService();
-            btService.observeDatabase((HomeActivity.this));
             btService.addDisplay(HomeActivity.this);
+
+            staticCard.displayStaticData();
+            btService.observeDatabase(staticCard);
+
+            IObservable observable = btService.getObservable();
+            mGraphAdapter = new MyGraphAdapter(HomeActivity.this, observable, HomeActivity.this);
+            RecyclerView graphRecyclerView = (RecyclerView) findViewById(R.id.graph_list);
+            if (graphRecyclerView != null) {
+                graphRecyclerView.setHasFixedSize(true);
+                RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(HomeActivity.this);
+                graphRecyclerView.setLayoutManager(layoutManager);
+                graphRecyclerView.setAdapter(mGraphAdapter);
+
+            }
+
             bound = true;
         }
 
@@ -168,17 +153,6 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
             bound = false;
         }
     };
-
-    @Override
-    public void update(IObservable o, Bundle args) {
-        if (args != null && o instanceof DbHelper) {
-            DbHelper dbHelper = (DbHelper) o;
-            long[] responseIds = args.getLongArray(ResponseContract.ResponseEntry.COLUMN_NAME_ID + "_ARRAY");
-            List<Response> items = dbHelper.getResponsesByIds(responseIds);
-            ObdContent.setItems(items);
-            responseListAdapter.notifyDataSetChanged();
-        }
-    }
 
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -223,79 +197,5 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
             btService.startNewTrip();
         }
 
-    }
-
-    public void displayStaticData() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String syncConnPref = preferences.getString(SettingsActivity.KEY_PREF_SYNC_CONN, "");
-
-        LinearLayout lvStaticData = ((LinearLayout) findViewById(R.id.static_data));
-        lvStaticData.removeAllViews();
-
-        boolean haveStatic = false;
-
-        if (preferences.getBoolean(getString(R.string.key_engine_temp), false)) {
-            //TODO Read from database
-            lvStaticData.addView(createDataView(createTextView("Engine Temperature:"), createTextView("80 F")));
-
-            haveStatic = true;
-        }
-
-        if (preferences.getBoolean(getString(R.string.key_mpg), false)) {
-            //TODO Read from database
-            lvStaticData.addView(createDataView(createTextView("Current Miles Per Gallon:"), createTextView("35 mpg")));
-            haveStatic = true;
-        }
-
-        if (preferences.getBoolean(getString(R.string.key_mph), false)) {
-            //TODO Read from database
-            lvStaticData.addView(createDataView(createTextView("Current Miles Per Hour:"), createTextView("60 mph")));
-
-            haveStatic = true;
-        }
-
-
-        if (!haveStatic) {
-            findViewById(R.id.static_data_card).setVisibility(View.INVISIBLE);
-        } else {
-            findViewById(R.id.static_data_card).setVisibility(View.VISIBLE);
-        }
-    }
-
-    /**
-     * Creates a horizontal Linear layout for static data so that it can be put in the static data Card
-     *
-     * @param title TextView of the content on the left side of the line
-     * @param value TextView of the content on the right side of the line
-     * @return A LinearLayout to be added to the static CardView's vertical LinearLayout
-     */
-    public LinearLayout createDataView(TextView title, TextView value) {
-        // Default orientation is horizontal
-        LinearLayout dataLine = new LinearLayout(this);
-        // Add title/name of data
-        dataLine.addView(title);
-
-        // Add spacer to push the title to the left and the value to the right
-        Space space = new Space(this);
-        space.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, 1f));
-        dataLine.addView(space);
-
-        // Add value of data
-        dataLine.addView(value);
-        return dataLine;
-    }
-
-    /**
-     * Creates a TextView out of text that needs to go in the static CardView
-     *
-     * @param text text of the text view
-     * @return A TextView with LinearLayout LayoutParams
-     */
-    public TextView createTextView(String text) {
-        TextView newTextView = new TextView(this);
-        newTextView.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT,
-                LayoutParams.WRAP_CONTENT, 0f));
-        newTextView.setText(text);
-        return newTextView;
     }
 }
