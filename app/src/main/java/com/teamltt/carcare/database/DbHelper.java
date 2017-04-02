@@ -72,7 +72,7 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
     public static final long DB_WRITE_ERROR = -1; // from SQLiteDatabase if an error occurred
     public static final long DB_OK = 0;
 
-    public static final int DATABASE_VERSION = 5;
+    public static final int DATABASE_VERSION = 6;
     public static final String DATABASE_NAME = "CarCare.db";
 
     // Format in which the database stores DateTimes. Example: 2004-12-13 13:14:15
@@ -318,7 +318,9 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
             String pId = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_PID));
             String name = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_NAME));
             String value = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_VALUE));
-            responses.add(ObdContent.createItemWithResponse(id, pId, name, value));
+            String unit = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_UNIT));
+            String timestamp = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_TIMESTAMP));
+            responses.add(ObdContent.createItemWithResponse(id, pId, name, value, unit, timestamp));
         }
         cursor.close();
         db.close();
@@ -331,7 +333,7 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         if (status != DbHelper.DB_OK) {
             return status;
         }
-        status = ResponseContract.insert(db, tripId, response.pId, response.name, response.value);
+        status = ResponseContract.insert(db, tripId, response.pId, response.name, response.value, response.unit);
         db.close();
         setChanged(status);
         return status;
@@ -346,7 +348,9 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
             String pId = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_PID));
             String name = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_NAME));
             String value = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_VALUE));
-            items.add(ObdContent.createItemWithResponse(id, pId, name, value));
+            String unit = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_UNIT));
+            String timestamp = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_TIMESTAMP));
+            items.add(ObdContent.createItemWithResponse(id, pId, name, value, unit, timestamp));
         }
         cursor.close();
         db.close();
