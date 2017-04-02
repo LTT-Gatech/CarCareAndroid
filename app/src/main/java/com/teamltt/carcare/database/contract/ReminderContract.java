@@ -34,7 +34,10 @@ public class ReminderContract {
             + ReminderEntry.COLUMN_NAME_FEATURE_ID + " INTEGER,"
             + ReminderEntry.COLUMN_NAME_COMPARISON + " INTEGER,"
             + ReminderEntry.COLUMN_NAME_VALUE + " INTEGER,"
-            + ReminderEntry.COLUMN_NAME_DATE + " DATE"
+            + ReminderEntry.COLUMN_NAME_DATE + " DATE,"
+            + "FOREIGN KEY(" + ReminderEntry.COLUMN_NAME_VEHICLE_ID + ") REFERENCES "
+            + VehicleContract.VehicleEntry.TABLE_NAME + "(" + VehicleContract.VehicleEntry.COLUMN_NAME_ID + ") "
+            + "ON DELETE CASCADE ON UPDATE CASCADE"
             + ");";
 
     public static final String SQL_DROP_ENTRIES = "DROP TABLE IF EXISTS " + ReminderContract.ReminderEntry.TABLE_NAME;
@@ -43,7 +46,6 @@ public class ReminderContract {
     public static Cursor queryByReminderId(SQLiteDatabase db, long reminderId) {
         String table = ReminderEntry.TABLE_NAME;
         String[] columns = {
-                ReminderEntry.COLUMN_NAME_ID,
                 ReminderEntry.COLUMN_NAME_VEHICLE_ID,
                 ReminderEntry.COLUMN_NAME_NAME,
                 ReminderEntry.COLUMN_NAME_FEATURE_ID,
@@ -62,7 +64,6 @@ public class ReminderContract {
         String table = ReminderEntry.TABLE_NAME;
         String[] columns = {
                 ReminderEntry.COLUMN_NAME_ID,
-                ReminderEntry.COLUMN_NAME_VEHICLE_ID,
                 ReminderEntry.COLUMN_NAME_NAME,
                 ReminderEntry.COLUMN_NAME_FEATURE_ID,
                 ReminderEntry.COLUMN_NAME_COMPARISON,
@@ -128,13 +129,13 @@ public class ReminderContract {
 
     public static class ReminderEntry {
         public static final String TABLE_NAME = "reminders";
-        public static final String COLUMN_NAME_VEHICLE_ID = "vehicle_id";
         public static final String COLUMN_NAME_ID = "reminder_id";
+        public static final String COLUMN_NAME_VEHICLE_ID = VehicleContract.VehicleEntry.COLUMN_NAME_ID;
         public static final String COLUMN_NAME_NAME = "reminder_name";
         public static final String COLUMN_NAME_FEATURE_ID = "feature_id";
         public static final String COLUMN_NAME_COMPARISON = "comparison_type";
         public static final String COLUMN_NAME_VALUE = "value";
-        public static final String COLUMN_NAME_DATE = "year";
+        public static final String COLUMN_NAME_DATE = "date";
 
     }
 }

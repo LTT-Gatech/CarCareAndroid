@@ -22,10 +22,11 @@ public class Reminder {
     private int comparison, value;
     private int featureId;
     private String name, date;
+    private long vehicleId;
     private long reminderId;
 
 
-    public Reminder(long reminderId, String name, int featureId, int comparison, int value, String date) {
+    public Reminder(long reminderId, long vehicleId, String name, int featureId, int comparison, int value, String date) {
         this.name = name;
         this.reminderId = reminderId;
         this.featureId = featureId;
@@ -35,6 +36,8 @@ public class Reminder {
     }
 
     public long getReminderId() { return reminderId; }
+
+    public long getVehicleId() { return vehicleId; }
 
     public String getName() { return name; }
 

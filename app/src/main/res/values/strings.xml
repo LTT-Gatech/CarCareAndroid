@@ -69,8 +69,30 @@
     </string-array>
     <string-array name="feature_types">
         <item>Mileage</item>
-        <item>Placeholder 2</item>
-        <item>Placeholder 3</item>
+        <item>Air intake temperature</item>
+        <item>Ambient air temperature</item>
+        <item>Engine coolant temperature</item>
+        <item>Barometric pressure</item>
+        <item>Fuel pressure</item>
+        <item>Intake manifold pressure</item>
+        <item>Engine load</item>
+        <item>Engine runtime</item>
+        <item>Engine RPM</item>
+        <item>Engine fuel rate</item>
+        <item>Engine oil pressure</item>
+        <item>Vehicle speed</item>
+        <item>Mass air flow</item>
+        <item>Fuel level</item>
+        <item>Fuel consumption rate</item>
+        <item>Timing advance</item>
+        <item>Distance since codes cleared</item>
+        <item>Control module power supply</item>
+        <item>Fuel rail pressure</item>
+        <item>Distance travelled with MIL on</item>
+        <item>Time run with MIL on</item>
+        <item>Time since trouble codes cleared</item>
+        <item>Absolute load</item>
+        <item>Air/fuel ratio</item>
     </string-array>
     <string name="hint_value">Enter Value</string>
     <string name="hint_date">Enter Date</string>
