@@ -25,13 +25,15 @@ public class Response implements Parcelable {
     public String name;
     public String value;
     public String unit;
+    public String timestamp;
 
-    public Response(long id, String pId, String name, String value, String unit) {
+    public Response(long id, String pId, String name, String value, String unit, String timestamp) {
         this.id = id;
         this.pId = pId;
         this.name = name;
         this.value = value;
         this.unit = unit;
+        this.timestamp = timestamp;
     }
 
     /**
@@ -63,11 +65,13 @@ public class Response implements Parcelable {
     }
 
     protected Response(Parcel in) {
+        // order is important, must match writeToParcel(Parcel dest, int flags)
         id = in.readLong();
         pId = in.readString();
         name = in.readString();
         value = in.readString();
         unit = in.readString();
+        timestamp = in.readString();
     }
 
     @Override
@@ -77,11 +81,13 @@ public class Response implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        // order is important, must match Response(Parcel in)
         dest.writeLong(id);
         dest.writeString(pId);
         dest.writeString(name);
         dest.writeString(value);
         dest.writeString(unit);
+        dest.writeString(timestamp);
     }
 
     @SuppressWarnings("unused")
