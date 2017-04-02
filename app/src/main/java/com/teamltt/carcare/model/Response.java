@@ -24,12 +24,14 @@ public class Response implements Parcelable {
     public String pId;
     public String name;
     public String value;
+    public String unit;
 
-    public Response(long id, String pId, String name, String value) {
+    public Response(long id, String pId, String name, String value, String unit) {
         this.id = id;
         this.pId = pId;
         this.name = name;
         this.value = value;
+        this.unit = unit;
     }
 
     @Override
@@ -48,7 +50,7 @@ public class Response implements Parcelable {
 
     @Override
     public String toString() {
-        return name + " (" + pId + ") : " + value;
+        return name + " (" + pId + ") : " + value + unit;
     }
 
     protected Response(Parcel in) {
@@ -56,6 +58,7 @@ public class Response implements Parcelable {
         pId = in.readString();
         name = in.readString();
         value = in.readString();
+        unit = in.readString();
     }
 
     @Override
@@ -69,6 +72,7 @@ public class Response implements Parcelable {
         dest.writeString(pId);
         dest.writeString(name);
         dest.writeString(value);
+        dest.writeString(unit);
     }
 
     @SuppressWarnings("unused")
