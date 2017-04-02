@@ -36,6 +36,8 @@ import com.teamltt.carcare.database.contract.ResponseContract;
 import com.teamltt.carcare.fragment.GraphFragment.OnGraphFragmentInteractionListener;
 import com.teamltt.carcare.model.Response;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -125,7 +127,11 @@ public class MyGraphAdapter extends RecyclerView.Adapter<MyGraphAdapter.ViewHold
             Response response = args.getParcelable(ResponseContract.ResponseEntry.COLUMN_NAME_NAME);
             if (response != null && response.name.equals(mPId)) {
                 String value = response.value;
-                mSeries.appendData(new DataPoint(mSeries.getHighestValueX() + 1, Double.parseDouble(value)), true, 20);
+                try {
+                    mSeries.appendData(new DataPoint(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(response.timestamp), Double.parseDouble(value)), true, 20);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
