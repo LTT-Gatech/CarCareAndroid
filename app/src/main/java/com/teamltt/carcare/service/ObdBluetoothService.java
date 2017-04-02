@@ -45,6 +45,7 @@ import com.teamltt.carcare.database.contract.TripContract;
 import com.teamltt.carcare.model.Response;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -385,8 +386,10 @@ public class ObdBluetoothService extends Service {
                         }
                         String pId = sendCommand.getCommandPID();
                         String name = sendCommand.getName();
-                        String formattedResult = sendCommand.getFormattedResult();
-                        Response response = new Response(-1, pId, name, formattedResult);
+                        String value = sendCommand.getCalculatedResult();
+                        String unit = sendCommand.getResultUnit();
+                        String timestamp = DbHelper.convertDate(new Date(sendCommand.getEnd()));
+                        Response response = new Response(-1, pId, name, value, unit, timestamp);
                         long responseId = dbHelper.insertResponse(tripId, response);
                         response.id = responseId;
                         if (responseId > DbHelper.DB_OK) {

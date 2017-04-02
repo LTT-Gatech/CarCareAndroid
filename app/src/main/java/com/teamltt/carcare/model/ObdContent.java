@@ -48,7 +48,7 @@ public class ObdContent {
         ITEM_MAP.put(item.id, item);
     }
 
-    public static Response createItemWithResponse(long id, String pId, String name, String value) {
-        return new Response(id, pId, name, value);
+    public static Response createItemWithResponse(long id, String pId, String name, String value, String unit, String timestamp) {
+        return new Response(id, pId, name, value, unit, timestamp);
     }
 }
