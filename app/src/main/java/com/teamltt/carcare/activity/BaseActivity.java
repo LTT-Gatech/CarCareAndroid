@@ -37,6 +37,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.teamltt.carcare.R;
+import com.teamltt.carcare.database.DbHelper;
 
 public class BaseActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener {
@@ -143,7 +144,13 @@ public class BaseActivity extends AppCompatActivity
         if (id == R.id.nav_car_information) {
             intent = new Intent(this, CarInfoActivity.class);
             startActivity(intent);
-        } else if (id == R.id.nav_search) {
+        } else if(id == R.id.nav_reminders) {
+            intent = new Intent(this, ReminderActivity.class);
+            startActivity(intent);
+        } else if (id == R.id.export_database) {
+            DbHelper dbHelper = new DbHelper(this);
+            dbHelper.exportDatabase(this);
+        } else if(id == R.id.nav_search) {
             intent = new Intent(this, StaticActivity.class);
             startActivity(intent);
         } else if (id == R.id.sign_out) {

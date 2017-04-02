@@ -39,5 +39,4 @@
         android:layout_weight="1"
         android:id="@+id/text_data_value" />
 
-
 </LinearLayout>

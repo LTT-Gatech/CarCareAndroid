@@ -18,19 +18,51 @@ package com.teamltt.carcare.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.text.format.DateFormat;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.teamltt.carcare.R;
 
-public class AlertActivity extends AppCompatActivity {
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class AlertActivity extends BaseActivity {
+
+    private String alertTitle;
+    private String alertType;
+    private String alertName;
+    private String alertValue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        activityContent = R.layout.activity_alert;
+        includeDrawer = false;
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_alert);
+
+        if (savedInstanceState == null) {
+            Bundle extras = getIntent().getExtras();
+            if(extras == null) {
+                alertTitle = "NullTitle";
+                alertType = "NullType";
+                alertName = "NullAlert";
+                alertValue = "NullValue";
+            } else {
+                alertTitle = extras.getString("alert_title");
+                alertType = extras.getString("alert_type");
+                alertName = extras.getString("alert_name");
+                alertValue = extras.getString("alert_value");
+            }
+        } else {
+            alertTitle = (String) savedInstanceState.getSerializable("alert_title");
+            alertType = (String) savedInstanceState.getSerializable("alert_type");
+            alertName = (String) savedInstanceState.getSerializable("alert_name");
+            alertValue = (String) savedInstanceState.getSerializable("alert_value");
+        }
+        updateUi();
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -48,7 +80,28 @@ public class AlertActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void toggleLogging(MenuItem item) {
-        //
+    private void updateUi() {
+        TextView alertTitleTv = (TextView) findViewById(R.id.text_alert_title);
+        alertTitleTv.setText(alertTitle);
+        TextView alertIntro = (TextView) findViewById(R.id.text_alert_intro);
+        alertIntro.setText("Your reminder titled " + alertName + " was triggered.");
+        if (alertType.equals("date")) {
+            SimpleDateFormat mdformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date convertedDate = new Date();
+            String day = "";
+            String month = "";
+            String year = "";
+            try {
+                convertedDate = mdformat.parse(alertValue);
+                day = (String) DateFormat.format("dd", convertedDate);
+                month = (String) DateFormat.format("MM", convertedDate);
+                year = (String) DateFormat.format("yyyy", convertedDate);
+            } catch (ParseException e1) {
+                e1.printStackTrace();
+            }
+        } else {
+            TextView alertContent = (TextView) findViewById(R.id.text_alert_content);
+            alertContent.setText("Your reminder was set to " + alertType + alertValue + ".");
+        }
     }
 }
