@@ -34,6 +34,15 @@ public class Response implements Parcelable {
         this.unit = unit;
     }
 
+    /**
+     * Helper method that combines value and unit.
+     *
+     * @return value concatenated with unit
+     */
+    public String getFormattedResult() {
+        return value + unit;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null) return false;
