@@ -210,9 +210,4 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         }
     }
 
-    public void importDatabase(View v) {
-        DbHelper dbHelper = new DbHelper(this);
-        dbHelper.importDatabase(Environment.getExternalStorageDirectory(), this);
-    }
-
 }

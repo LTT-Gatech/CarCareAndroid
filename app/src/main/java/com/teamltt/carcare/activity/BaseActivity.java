@@ -147,9 +147,6 @@ public class BaseActivity extends AppCompatActivity
         } else if(id == R.id.nav_reminders) {
             intent = new Intent(this, ReminderActivity.class);
             startActivity(intent);
-        } else if (id == R.id.export_database) {
-            DbHelper dbHelper = new DbHelper(this);
-            dbHelper.exportDatabase(this);
         } else if(id == R.id.nav_search) {
             intent = new Intent(this, StaticActivity.class);
             startActivity(intent);
