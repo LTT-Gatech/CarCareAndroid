@@ -32,26 +32,72 @@
         android:layout_height="wrap_content"
         android:id="@+id/field_reminder_name"
         android:text="@string/field_reminder_name"/>
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/spinner_reminder_type"
+        android:gravity="center"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/layout_feature">
+        <Spinner
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/spinner_feature"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"/>
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/field_value"
+            android:gravity="bottom"
+            android:layout_alignParentRight="true"
+            android:hint="@string/hint_value"/>
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/spinner_comparison"
+            android:layout_toLeftOf="@id/field_value"
+            android:layout_below="@id/spinner_feature"/>
+    </RelativeLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/layout_time"
+        android:visibility="gone">
+        <Button
+            android:id="@+id/button_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/button_select_date"
+            android:onClick="showDatePickerDialog"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_date"
+            android:id="@+id/text_date"/>
+
+    </LinearLayout>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/button_create_new"
+            android:text="@string/button_save"
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
             android:onClick="saveInfo"/>
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
             android:layout_alignParentBottom="true"
             android:text="@string/button_back"
-            android:onClick="back"/>
-
+            android:onClick="cancel"/>
     </RelativeLayout>
 
 </LinearLayout>
