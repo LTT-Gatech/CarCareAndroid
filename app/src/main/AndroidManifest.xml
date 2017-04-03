@@ -20,6 +20,7 @@
     <uses-permission android:name="android.permission.BLUETOOTH"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -28,6 +29,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".activity.LoginActivity">
+            <!--this intent-filter specifies the beginning activity when this app is initially launched-->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -41,6 +43,8 @@
         <activity android:name=".activity.CarInfoEditActivity" />
         <activity android:name=".activity.ReminderActivity"/>
         <activity android:name=".activity.ReminderEditActivity"/>
+        <activity android:name=".activity.AlertActivity"/>
+        <activity android:name=".activity.SettingsActivity"/>
         <activity
             android:name=".activity.BaseActivity"
             android:label="@string/title_activity_base"

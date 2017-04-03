@@ -20,6 +20,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -61,8 +62,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         setContentView(R.layout.activity_login);
 
         // Set view
-        tvStatus = (TextView) findViewById(R.id.tvStatus);
-        SignInButton signInButton = (SignInButton) findViewById(R.id.btnGoogleSignIn);
+        tvStatus = (TextView) findViewById(R.id.text_status);
+        SignInButton signInButton = (SignInButton) findViewById(R.id.button_google_sign_in);
         if (signInButton != null) {
             signInButton.setOnClickListener(this);
             signInButton.setStyle(SignInButton.SIZE_WIDE, SignInButton.COLOR_DARK);
@@ -202,7 +203,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.btnGoogleSignIn:
+            case R.id.button_google_sign_in:
                 signIn();
                 break;
         }
