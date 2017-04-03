@@ -111,6 +111,9 @@ public class TripsActivity extends AppCompatActivity implements ResponseFragment
     public void readData(View view) {
         Log.i(TAG, "readData");
         Trip trip = (Trip) spinner.getSelectedItem();
+        if (tripLongMap.isEmpty()) {
+            Log.e(TAG, "tripLongMap is empty");
+        }
         long tripId = tripLongMap.get(trip);
         responses.clear();
         responses.addAll(dbHelper.getResponsesByTrip(tripId));
