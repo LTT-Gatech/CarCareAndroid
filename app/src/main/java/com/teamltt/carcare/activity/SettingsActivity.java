@@ -36,8 +36,10 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
     public static final String KEY_PREF_SYNC_CONN = "pref_syncConnectionType";
     public static final String[] staticPreferenceTitles = new String[]{
             SPEED.getValue(),
-            ENGINE_RPM.getValue(),
-            ENGINE_RUNTIME.getValue()};;
+            ENGINE_RUNTIME.getValue(),
+            AIR_INTAKE_TEMP.getValue(),
+            BAROMETRIC_PRESSURE.getValue()
+            };
 
     public static final String[] dynamicPreferenceTitles = new String[]{
             SPEED.getValue(),
