@@ -45,7 +45,7 @@ import com.teamltt.carcare.model.Reminder;
 public class ReminderEditActivity extends AppCompatActivity implements OnItemSelectedListener {
 
     private boolean edited;
-    private int featureId; //based on some id for the features reminders can check for, i.e. oil pressure, 0 if type is date
+    private int featureId; //based on some id for the features reminders can check for, i.e. oil pressure, -2 if type is date
     private int reminderId; //if editing a reminder, id is passed in as an extra from ReminderActivity. Set to -2 otherwise
     private int vehicleId;
     private String formattedDate;
@@ -124,7 +124,7 @@ public class ReminderEditActivity extends AppCompatActivity implements OnItemSel
         } else if (pos == 1) {
             featureLayout.setVisibility(View.GONE);
             timeLayout.setVisibility(View.VISIBLE);
-            featureId = -2;
+            featureId = -2; //if checking for date, featureId is -2 for now
         }
     }
 
