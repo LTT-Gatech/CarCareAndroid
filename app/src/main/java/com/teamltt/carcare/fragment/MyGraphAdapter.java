@@ -27,6 +27,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.GridLabelRenderer;
+import com.jjoe64.graphview.Viewport;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 import com.teamltt.carcare.R;
@@ -36,9 +38,8 @@ import com.teamltt.carcare.database.contract.ResponseContract;
 import com.teamltt.carcare.fragment.GraphFragment.OnGraphFragmentInteractionListener;
 import com.teamltt.carcare.model.Response;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static com.teamltt.carcare.activity.SettingsActivity.dynamicPreferenceTitles;
@@ -80,6 +81,7 @@ public class MyGraphAdapter extends RecyclerView.Adapter<MyGraphAdapter.ViewHold
     public void onBindViewHolder(final ViewHolder holder, int position) {
         String pId = mPIds.get(position);
         holder.mPId = pId;
+        holder.mGraphView.setTitle(pId);
 
         mObservable.addObserver(holder);
 
@@ -103,6 +105,7 @@ public class MyGraphAdapter extends RecyclerView.Adapter<MyGraphAdapter.ViewHold
     class ViewHolder extends RecyclerView.ViewHolder implements IObserver {
         final View mView;
         final GraphView mGraphView;
+        private int lastXValue;
         String mPId;
 
         private LineGraphSeries<DataPoint> mSeries;
@@ -116,6 +119,19 @@ public class MyGraphAdapter extends RecyclerView.Adapter<MyGraphAdapter.ViewHold
             mView = view;
             mGraphView = (GraphView) view.findViewById(R.id.graph);
 
+            GridLabelRenderer gridLabelRenderer = mGraphView.getGridLabelRenderer();
+            gridLabelRenderer.setTextSize(gridLabelRenderer.getTextSize() - 4);
+            // Show a blank label so the axis numbers will have room
+            gridLabelRenderer.setVerticalAxisTitle("  ");
+            gridLabelRenderer.setHorizontalLabelsVisible(true);
+            lastXValue = 0;
+
+            Viewport viewport = mGraphView.getViewport();
+            viewport.setXAxisBoundsManual(true);
+            viewport.setMinX(0);
+            viewport.setMaxX(40);
+            viewport.setMaxXAxisSize(40);
+
             mSeries = new LineGraphSeries<>();
             mGraphView.addSeries(mSeries);
 
@@ -127,11 +143,10 @@ public class MyGraphAdapter extends RecyclerView.Adapter<MyGraphAdapter.ViewHold
             Response response = args.getParcelable(ResponseContract.ResponseEntry.COLUMN_NAME_NAME);
             if (response != null && response.name.equals(mPId)) {
                 String value = response.value;
-                try {
-                    mSeries.appendData(new DataPoint(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(response.timestamp), Double.parseDouble(value)), true, 20);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
+                // For some reason, trying this with dates clutters the bottom axis with long strings
+//                mSeries.appendData(new DataPoint(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(response.timestamp), Double.parseDouble(value)), true, 20);
+                mSeries.appendData(new DataPoint(lastXValue++, Double.parseDouble(value)), true, 20);
+
             }
         }
 
