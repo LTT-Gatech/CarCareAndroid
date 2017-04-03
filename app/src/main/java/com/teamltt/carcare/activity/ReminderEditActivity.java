@@ -180,11 +180,11 @@ public class ReminderEditActivity extends AppCompatActivity implements OnItemSel
 
         if (reminderId < 0) {
             Log.i(TAG, "adding new reminder");
-            long status = dbHelper.createNewReminder(vehicleId, name, featureId, comparison, value, formattedDate);
+            long status = dbHelper.createNewReminder(new Reminder(reminderId, vehicleId, name, featureId, comparison, value, formattedDate));
             return status > 0;
         } else {
             Log.i(TAG, "editing reminder of id " + reminderId);
-            long status = dbHelper.updateReminder(reminderId, vehicleId, name, featureId, comparison, value, formattedDate);
+            long status = dbHelper.updateReminder(new Reminder(reminderId, vehicleId, name, featureId, comparison, value, formattedDate));
             return status > 0;
         }
     }
@@ -206,6 +206,6 @@ public class ReminderEditActivity extends AppCompatActivity implements OnItemSel
         if (formattedDay.length() < 2) {
             formattedDay = "0" + formattedDay;
         }
-        formattedDate = year + "-" + formattedMonth + "-" + formattedDay + " 00:00:00";
+        formattedDate = year + "-" + formattedMonth + "-" + formattedDay + " 00:00:00"; //TODO format this with simpleDateFormat in saveReminder instead of saving it here
     }
 }

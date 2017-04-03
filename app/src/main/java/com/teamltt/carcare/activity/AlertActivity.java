@@ -32,9 +32,10 @@ import java.util.Date;
 
 public class AlertActivity extends BaseActivity {
 
+    private String alertTitle;
     private String alertType;
     private String alertName;
-    private String alertDate;
+    private String alertValue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,18 +46,21 @@ public class AlertActivity extends BaseActivity {
         if (savedInstanceState == null) {
             Bundle extras = getIntent().getExtras();
             if(extras == null) {
+                alertTitle = "NullTitle";
                 alertType = "NullType";
                 alertName = "NullAlert";
-                alertDate = "NullDate";
+                alertValue = "NullValue";
             } else {
+                alertTitle = extras.getString("alert_title");
                 alertType = extras.getString("alert_type");
                 alertName = extras.getString("alert_name");
-                alertDate = extras.getString("alert_date");
+                alertValue = extras.getString("alert_value");
             }
         } else {
+            alertTitle = (String) savedInstanceState.getSerializable("alert_title");
             alertType = (String) savedInstanceState.getSerializable("alert_type");
             alertName = (String) savedInstanceState.getSerializable("alert_name");
-            alertDate = (String) savedInstanceState.getSerializable("alert_date");
+            alertValue = (String) savedInstanceState.getSerializable("alert_value");
         }
         updateUi();
     }
@@ -77,28 +81,27 @@ public class AlertActivity extends BaseActivity {
     }
 
     private void updateUi() {
-        TextView alertTitle = (TextView) findViewById(R.id.text_alert_title);
-        alertTitle.setText(alertType);
+        TextView alertTitleTv = (TextView) findViewById(R.id.text_alert_title);
+        alertTitleTv.setText(alertTitle);
         TextView alertIntro = (TextView) findViewById(R.id.text_alert_intro);
         alertIntro.setText("Your reminder titled " + alertName + " was triggered.");
-        SimpleDateFormat mdformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date convertedDate = new Date();
-        String day = "";
-        String month = "";
-        String year = "";
-        try {
-            convertedDate = mdformat.parse(alertDate);
-            day = (String) DateFormat.format("dd", convertedDate);
-            month = (String) DateFormat.format("MM", convertedDate);
-            year = (String) DateFormat.format("yyyy", convertedDate);
+        if (alertType.equals("date")) {
+            SimpleDateFormat mdformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date convertedDate = new Date();
+            String day = "";
+            String month = "";
+            String year = "";
+            try {
+                convertedDate = mdformat.parse(alertValue);
+                day = (String) DateFormat.format("dd", convertedDate);
+                month = (String) DateFormat.format("MM", convertedDate);
+                year = (String) DateFormat.format("yyyy", convertedDate);
+            } catch (ParseException e1) {
+                e1.printStackTrace();
+            }
+        } else {
+            TextView alertContent = (TextView) findViewById(R.id.text_alert_content);
+            alertContent.setText("Your reminder was set to " + alertType + alertValue + ".");
         }
-        catch (ParseException e1) {
-            e1.printStackTrace();
-        }
-
-        TextView alertContent = (TextView) findViewById(R.id.text_alert_content);
-        alertContent.setText("Your reminder was set to date " + month + "/" + day + "/" + year + ".");
-
-
     }
 }

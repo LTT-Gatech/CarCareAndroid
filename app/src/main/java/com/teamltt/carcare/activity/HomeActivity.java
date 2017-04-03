@@ -74,6 +74,8 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
     boolean bound;
     List<Reminder> reminders;
 
+    private int comparisonValue = 95000; //hardcoded value to use with feature reminders until they are implemented
+
     private static final String TAG = "HomeActivity";
 
     @Override
@@ -244,7 +246,7 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
                         alertText.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                viewAlert(view, "Reminder", reminder.getName(), reminder.getDate());
+                                viewAlert(view, "Reminder", "date", reminder.getName(), reminder.getDate());
                             }
                         });
                         layout.addView(alertText);
@@ -257,18 +259,52 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
                 catch (ParseException e1) {
                     e1.printStackTrace();
                 }
+            } else {
+                Log.i(TAG, "checking for feature");
+                Log.i(TAG, "comparisonType is " + reminder.getComparisonType());
+                //check for hardcoded var here
+                if (reminder.getComparisonType() == 0 && reminder.getComparisonValue() > comparisonValue
+                    || reminder.getComparisonType() == 1 && reminder.getComparisonValue() == comparisonValue
+                    || reminder.getComparisonType() == 2 && reminder.getComparisonValue() < comparisonValue) {
+
+                    final String alertType;
+                    if (reminder.getComparisonType() == 0) {
+                        alertType = "mileage < ";
+                        Log.i(TAG, "comparison type <");
+                    } else if (reminder.getComparisonType() == 1) {
+                        alertType = "mileage = ";
+                        Log.i(TAG, "comparison type ==");
+                    } else {
+                        Log.i(TAG, "comparison type >");
+                        alertType = "mileage > ";
+                    }
+                    TextView alertText = new TextView(this);
+                    alertText.setText("Reminder " + reminder.getName() + " is active.");
+                    alertText.setTextColor(Color.BLUE);
+                    alertText.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            viewAlert(view, "Reminder", alertType, reminder.getName(), Integer.toString(reminder.getComparisonValue()));
+                            //the hardcoded mileage will eventually draw from somewhere depending on Reminder.featureId
+                        }
+                    });
+                    layout.addView(alertText);
+                }
+
             }
         }
     }
 
-    private void viewAlert(View view, String alertType, String alertName, String alertDate) {
+    private void viewAlert(View view, String alertTitle, String alertType, String alertName, String alertValue) {
         Intent intent = new Intent(this, AlertActivity.class);
+        String keyTitle = "alert_title"; //this is either reminder or alert
         String keyType = "alert_type";
         String keyName = "alert_name";
-        String keyDate = "alert_date";
+        String keyValue = "alert_value";
+        intent.putExtra(keyTitle, alertTitle);
         intent.putExtra(keyType, alertType);
         intent.putExtra(keyName, alertName);
-        intent.putExtra(keyDate, alertDate);
+        intent.putExtra(keyValue, alertValue);
         startActivity(intent);
     }
 

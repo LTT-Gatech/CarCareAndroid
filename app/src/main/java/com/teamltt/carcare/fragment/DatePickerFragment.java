@@ -51,8 +51,7 @@ public class DatePickerFragment extends DialogFragment
         //that use set date
         if (getActivity() instanceof DynamicActivity) {
             ((DynamicActivity) getActivity()).setDate(year, month + 1, day);
-        }
-        else {
+        } else {
             ((ReminderEditActivity) getActivity()).setDate(year, month + 1, day);
         }
     }
