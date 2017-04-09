@@ -301,8 +301,7 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         int comparison = cursor.getInt(cursor.getColumnIndexOrThrow(ReminderContract.ReminderEntry.COLUMN_NAME_COMPARISON));
         int value = cursor.getInt(cursor.getColumnIndexOrThrow(ReminderContract.ReminderEntry.COLUMN_NAME_VALUE));
         String date = getCursorColumn(cursor, ReminderContract.ReminderEntry.COLUMN_NAME_DATE);
-        Reminder reminder = new Reminder(reminderId, vehicleId, name, featureId, comparison, value, date);
-        return reminder;
+        return new Reminder(reminderId, vehicleId, name, featureId, comparison, value, date);
 
     }
 

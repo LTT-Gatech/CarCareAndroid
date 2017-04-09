@@ -74,11 +74,14 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, Graph
 
         Intent intent = getIntent();
         String firstName = intent.getStringExtra(LoginActivity.EXTRA_FIRST_NAME);
-        String lastName = intent.getStringExtra(LoginActivity.EXTRA_LAST_NAME);
-        String userId = intent.getStringExtra(LoginActivity.EXTRA_USER_ID);
+//        String lastName = intent.getStringExtra(LoginActivity.EXTRA_LAST_NAME);
+//        String userId = intent.getStringExtra(LoginActivity.EXTRA_USER_ID);
 
         // Add user's name to the screen to show successful sign-in for demo
-        ((TextView) findViewById(R.id.tv_welcome)).setText(getString(R.string.welcome_text, firstName));
+        TextView tvWelcome = (TextView) findViewById(R.id.tv_welcome);
+        if (tvWelcome != null) {
+            tvWelcome.setText(getString(R.string.welcome_text, firstName));
+        }
 
         btServiceIntent = new Intent(this, ObdBluetoothService.class);
         // Stop any existing services, we don't need more than one running
@@ -175,7 +178,10 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, Graph
 
     @Override
     public void displayStatus(String status) {
-        ((TextView) findViewById(R.id.status_bt)).setText(status);
+        TextView tvStatusBt = (TextView) findViewById(R.id.status_bt);
+        if (tvStatusBt != null) {
+            tvStatusBt.setText(status);
+        }
     }
 
     /**
@@ -198,16 +204,22 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, Graph
 
     private void checkReminders() {
         LinearLayout layout = (LinearLayout) findViewById(R.id.layout_alerts_content);
-        layout.removeAllViews();
+        if (layout != null) {
+            layout.removeAllViews();
+        }
         Log.i(TAG, "checking reminders");
         Iterator<Reminder> iterator = reminders.iterator();
         if (!iterator.hasNext()) {
             Log.e(TAG, "iterator does not have next");
             LinearLayout alertLayout = (LinearLayout) findViewById(R.id.layout_alerts);
-            alertLayout.setVisibility(View.GONE);
+            if (alertLayout != null) {
+                alertLayout.setVisibility(View.GONE);
+            }
         } else {
             LinearLayout alertLayout = (LinearLayout) findViewById(R.id.layout_alerts);
-            alertLayout.setVisibility(View.VISIBLE);
+            if (alertLayout != null) {
+                alertLayout.setVisibility(View.VISIBLE);
+            }
         }
         while (iterator.hasNext()) {
             final Reminder reminder = iterator.next();
@@ -231,7 +243,9 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, Graph
                                 viewAlert(view, "Reminder", "date", reminder.getName(), reminder.getDate());
                             }
                         });
-                        layout.addView(alertText);
+                        if (layout != null) {
+                            layout.addView(alertText);
+                        }
 
 
                     } else {
@@ -269,7 +283,9 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, Graph
                             //the hardcoded mileage will eventually draw from somewhere depending on Reminder.featureId
                         }
                     });
-                    layout.addView(alertText);
+                    if (layout != null) {
+                        layout.addView(alertText);
+                    }
                 }
 
             }

@@ -53,7 +53,7 @@ public class MyGraphAdapter extends RecyclerView.Adapter<MyGraphAdapter.ViewHold
     private final IObservable mObservable;
 
     /**
-     * @param listener
+     * @param listener a class which implements the {@link OnGraphFragmentInteractionListener} interface.
      */
     public MyGraphAdapter(OnGraphFragmentInteractionListener listener, IObservable observable, Context context) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
