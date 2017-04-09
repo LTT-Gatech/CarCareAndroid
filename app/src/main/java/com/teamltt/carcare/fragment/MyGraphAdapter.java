@@ -19,7 +19,6 @@ package com.teamltt.carcare.fragment;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -39,7 +38,6 @@ import com.teamltt.carcare.fragment.GraphFragment.OnGraphFragmentInteractionList
 import com.teamltt.carcare.model.Response;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import static com.teamltt.carcare.activity.SettingsActivity.dynamicPreferenceTitles;
@@ -109,10 +107,6 @@ public class MyGraphAdapter extends RecyclerView.Adapter<MyGraphAdapter.ViewHold
         String mPId;
 
         private LineGraphSeries<DataPoint> mSeries;
-
-        // TODO delete this when update method is complete
-        private final Handler mHandler = new Handler();
-        private Runnable mTimer;
 
         ViewHolder(View view) {
             super(view);
