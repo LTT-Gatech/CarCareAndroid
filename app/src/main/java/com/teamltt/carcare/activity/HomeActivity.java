@@ -40,13 +40,8 @@ import com.teamltt.carcare.database.DbHelper;
 import com.teamltt.carcare.database.IObservable;
 import com.teamltt.carcare.fragment.GraphFragment;
 import com.teamltt.carcare.fragment.MyGraphAdapter;
-import com.teamltt.carcare.fragment.MyObdResponseRecyclerViewAdapter;
-import com.teamltt.carcare.fragment.ResponseFragment;
-import com.teamltt.carcare.fragment.SimpleDividerItemDecoration;
 import com.teamltt.carcare.fragment.StaticCard;
-import com.teamltt.carcare.model.ObdContent;
 import com.teamltt.carcare.model.Reminder;
-import com.teamltt.carcare.model.Response;
 import com.teamltt.carcare.service.BtStatusDisplay;
 import com.teamltt.carcare.service.ObdBluetoothService;
 
@@ -57,10 +52,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-public class HomeActivity extends BaseActivity implements BtStatusDisplay, ResponseFragment.OnListFragmentInteractionListener, GraphFragment.OnGraphFragmentInteractionListener {
-
-    // Used to keep track of the items in the RecyclerView
-    private RecyclerView.Adapter responseListAdapter;
+public class HomeActivity extends BaseActivity implements BtStatusDisplay, GraphFragment.OnGraphFragmentInteractionListener {
 
     private RecyclerView.Adapter mGraphAdapter;
     private StaticCard staticCard;
@@ -94,17 +86,6 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, Respo
         // Now start the new service
         startService(btServiceIntent);
 
-        // Set up the list for responses
-        responseListAdapter = new MyObdResponseRecyclerViewAdapter(ObdContent.ITEMS, this);
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.obd_reponse_list);
-        if (recyclerView != null) {
-            recyclerView.setHasFixedSize(true);
-            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-            recyclerView.setLayoutManager(layoutManager);
-            recyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
-            recyclerView.setAdapter(responseListAdapter);
-        }
-
         staticCard = new StaticCard((CardView) findViewById(R.id.static_data_card), this);
     }
 
@@ -130,11 +111,6 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, Respo
             // should this be removed from here since it is done in mConnection.onServiceDisconnected?
             bound = false;
         }
-    }
-
-    @Override
-    public void onListFragmentInteraction(Response item) {
-        Log.i("Response Card", item.toString());
     }
 
     @Override

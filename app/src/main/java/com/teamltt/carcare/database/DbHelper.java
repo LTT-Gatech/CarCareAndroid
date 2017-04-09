@@ -16,15 +16,11 @@
 
 package com.teamltt.carcare.database;
 
-import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
-import android.os.Environment;
-import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
 import com.teamltt.carcare.database.contract.OwnershipContract;
@@ -33,17 +29,11 @@ import com.teamltt.carcare.database.contract.ResponseContract;
 import com.teamltt.carcare.database.contract.TripContract;
 import com.teamltt.carcare.database.contract.UserContract;
 import com.teamltt.carcare.database.contract.VehicleContract;
-import com.teamltt.carcare.model.ObdContent;
 import com.teamltt.carcare.model.Reminder;
 import com.teamltt.carcare.model.Response;
 import com.teamltt.carcare.model.Trip;
 import com.teamltt.carcare.model.Vehicle;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.channels.FileChannel;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -412,7 +402,7 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
             String value = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_VALUE));
             String unit = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_UNIT));
             String timestamp = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_TIMESTAMP));
-            responses.add(ObdContent.createItemWithResponse(id, pId, name, value, unit, timestamp));
+            responses.add(new Response(id, pId, name, value, unit, timestamp));
         }
         cursor.close();
         db.close();
@@ -442,7 +432,7 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
             String value = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_VALUE));
             String unit = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_UNIT));
             String timestamp = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_TIMESTAMP));
-            items.add(ObdContent.createItemWithResponse(id, pId, name, value, unit, timestamp));
+            items.add(new Response(id, pId, name, value, unit, timestamp));
         }
         cursor.close();
         db.close();
