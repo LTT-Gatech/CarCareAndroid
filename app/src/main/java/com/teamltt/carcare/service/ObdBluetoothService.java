@@ -33,10 +33,11 @@ import com.github.pires.obd.commands.ObdCommand;
 import com.github.pires.obd.commands.SpeedCommand;
 import com.github.pires.obd.commands.engine.RPMCommand;
 import com.github.pires.obd.commands.engine.RuntimeCommand;
-import com.github.pires.obd.commands.protocol.EchoOffCommand;
 import com.teamltt.carcare.R;
 import com.teamltt.carcare.adapter.IObdSocket;
 import com.teamltt.carcare.adapter.bluetooth.DeviceSocket;
+import com.teamltt.carcare.command.FuelEconomyCommand;
+import com.teamltt.carcare.command.ObdInitCommand;
 import com.teamltt.carcare.database.DbHelper;
 import com.teamltt.carcare.database.IObserver;
 import com.teamltt.carcare.database.contract.ResponseContract;
@@ -339,8 +340,8 @@ public class ObdBluetoothService extends Service {
         protected Void doInBackground(Void... ignore) {
             try {
                 if (socket.isConnected()) {
-                    EchoOffCommand echo = new EchoOffCommand();
-                    echo.run(socket.getInputStream(), socket.getOutputStream());
+                    ObdInitCommand init = new ObdInitCommand();
+                    init.sendCommands(socket.getInputStream(), socket.getOutputStream());
                 }
 
                 while (socket.isConnected()) {
@@ -368,6 +369,7 @@ public class ObdBluetoothService extends Service {
                     commands.add(RuntimeCommand.class);
                     commands.add(SpeedCommand.class);
                     commands.add(RPMCommand.class);
+                    commands.add(FuelEconomyCommand.class);
 
                     for (Class<? extends ObdCommand> commandClass : commands) {
                         ObdCommand sendCommand = commandClass.newInstance();
