@@ -67,11 +67,8 @@ public class MyGraphAdapter extends RecyclerView.Adapter<MyGraphAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-//        String pId = mPIds.get(position);
         String name = mNames.get(position);
-//        holder.mPId = pId;
         holder.mName = name;
-//        holder.mGraphView.setTitle(pId);
         holder.mGraphView.setTitle(name);
 
         if (mObservable != null) {
@@ -127,6 +124,9 @@ public class MyGraphAdapter extends RecyclerView.Adapter<MyGraphAdapter.ViewHold
 
         @Override
         public void update(IObservable o, Bundle args) {
+            if (args == null) {
+                return;
+            }
             boolean reset = args.getBoolean("RESET", false);
             if (reset) {
                 List<Response> responses = args.getParcelableArrayList(ResponseContract.ResponseEntry.COLUMN_NAME_NAME + "_LIST_" + mName);
@@ -143,13 +143,6 @@ public class MyGraphAdapter extends RecyclerView.Adapter<MyGraphAdapter.ViewHold
             } else {
                 Response response = args.getParcelable(ResponseContract.ResponseEntry.COLUMN_NAME_NAME + "_" + mName);
                 addNewDataPoint(response);
-//                if (response != null && response.name.equals(mName)) {
-//                    String value = response.value;
-//                    // For some reason, trying this with dates clutters the bottom axis with long strings
-////                mSeries.appendData(new DataPoint(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(response.timestamp), Double.parseDouble(value)), true, 20);
-//                    mSeries.appendData(new DataPoint(lastXValue++, Double.parseDouble(value)), true, 20);
-//
-//                }
             }
         }
 
@@ -157,7 +150,6 @@ public class MyGraphAdapter extends RecyclerView.Adapter<MyGraphAdapter.ViewHold
             if (response != null && response.name.equals(mName)) {
                 String value = response.value;
                 // For some reason, trying this with dates clutters the bottom axis with long strings
-//                mSeries.appendData(new DataPoint(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(response.timestamp), Double.parseDouble(value)), true, 20);
                 mSeries.appendData(new DataPoint(lastXValue++, Double.parseDouble(value)), true, 20);
             }
         }

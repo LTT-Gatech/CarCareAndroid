@@ -90,7 +90,6 @@ public class DynamicActivity extends BaseActivity implements AdapterView.OnItemS
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
         // this will get called on Spinner construction
         Log.i(TAG, "onItemSelected: " + adapterView + ", " + view + ", " + i + ", " + l);
-        // TODO set mTripId here with a call to updateTripId
         updateTripId(mTrips.get(i).getId());
     }
 
