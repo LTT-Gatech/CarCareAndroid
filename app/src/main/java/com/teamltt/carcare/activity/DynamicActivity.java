@@ -36,6 +36,7 @@ import com.teamltt.carcare.model.Response;
 import com.teamltt.carcare.model.Trip;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -58,7 +59,11 @@ public class DynamicActivity extends BaseActivity implements AdapterView.OnItemS
         activityContent = R.layout.activity_dynamic;
         includeDrawer = false;
         super.onCreate(savedInstanceState);
-        mTrips = new ArrayList<>();
+
+        mDbHelper = new DbHelper(this);
+
+        mTrips = mDbHelper.getAllTrips();
+        Collections.sort(mTrips);
         mSpinnerAdapter = new ArrayAdapter<>(DynamicActivity.this, android.R.layout.simple_spinner_item, mTrips);
         mSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         Spinner spinner = (Spinner) findViewById(R.id.spinner_trips);
@@ -66,14 +71,6 @@ public class DynamicActivity extends BaseActivity implements AdapterView.OnItemS
             spinner.setAdapter(mSpinnerAdapter);
             spinner.setOnItemSelectedListener(DynamicActivity.this);
         }
-
-        mDbHelper = new DbHelper(this);
-        if (mTrips == null) {
-            mTrips = new ArrayList<>();
-        }
-        mTrips.addAll(mDbHelper.getAllTrips());
-        Collections.sort(mTrips);
-        mSpinnerAdapter.notifyDataSetChanged();
 
         mNames = new ArrayList<>();
         mGraphAdapter = new MyGraphAdapter(DynamicActivity.this, DynamicActivity.this, mNames);
@@ -84,6 +81,9 @@ public class DynamicActivity extends BaseActivity implements AdapterView.OnItemS
             graphRecyclerView.setLayoutManager(layoutManager);
             graphRecyclerView.setAdapter(mGraphAdapter);
         }
+
+        Log.i(TAG, "mTrips: " + Arrays.toString(mTrips.toArray()));
+        Log.i(TAG, "mNames: " + Arrays.toString(mNames.toArray()));
     }
 
     @Override
