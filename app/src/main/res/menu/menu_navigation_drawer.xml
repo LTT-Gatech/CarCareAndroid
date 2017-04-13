@@ -5,7 +5,9 @@
         <item
             android:id="@+id/nav_search"
             android:title="@string/search_statistics"/>
-
+        <item
+            android:id="@+id/nav_dynamic_statistics"
+            android:title="Dynamic Statistics"/>
     </group>
 
 </menu>

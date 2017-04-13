@@ -17,9 +17,11 @@
 package com.teamltt.carcare.fragment;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -30,6 +32,8 @@ import android.view.ViewGroup;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 import com.teamltt.carcare.R;
+import com.teamltt.carcare.activity.HomeActivity;
+import com.teamltt.carcare.activity.SettingsActivity;
 import com.teamltt.carcare.database.IObservable;
 
 import java.util.ArrayList;
@@ -96,7 +100,14 @@ public class GraphFragment extends Fragment {
             List<String> pIds = new ArrayList<>();
             // TODO get the IObservable database connection (from btService.getObservable())
             IObservable observable = null;
-            recyclerView.setAdapter(new MyGraphAdapter(mListener, observable, getActivity()));
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+            List<String> names = new ArrayList<>();
+            for (String preferenceKey : SettingsActivity.dynamicPreferenceTitles) {
+                if (preferences.getBoolean("dynamic " + preferenceKey, false)) {
+                    names.add(preferenceKey);
+                }
+            }
+            recyclerView.setAdapter(new MyGraphAdapter(mListener, observable, names));
         }
         return view;
     }
