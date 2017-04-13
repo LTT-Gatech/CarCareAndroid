@@ -36,6 +36,8 @@ import com.github.pires.obd.commands.engine.RuntimeCommand;
 import com.github.pires.obd.commands.pressure.BarometricPressureCommand;
 import com.github.pires.obd.commands.protocol.EchoOffCommand;
 import com.github.pires.obd.commands.temperature.AirIntakeTemperatureCommand;
+import com.github.pires.obd.exceptions.NoDataException;
+import com.github.pires.obd.exceptions.UnknownErrorException;
 import com.teamltt.carcare.R;
 import com.teamltt.carcare.adapter.IObdSocket;
 import com.teamltt.carcare.adapter.bluetooth.DeviceSocket;
@@ -373,9 +375,7 @@ public class ObdBluetoothService extends Service {
 
                     Set<Class<? extends ObdCommand>> commands = new HashSet<>();
                     // TODO get these classes from somewhere else
-                    //commands.add(ConsumptionRateCommand.class);
                     commands.add(AirIntakeTemperatureCommand.class);
-                    //commands.add(FuelLevelCommand.class);
                     commands.add(BarometricPressureCommand.class);
                     commands.add(RuntimeCommand.class);
                     commands.add(SpeedCommand.class);
@@ -383,22 +383,30 @@ public class ObdBluetoothService extends Service {
 
                     for (Class<? extends ObdCommand> commandClass : commands) {
                         ObdCommand sendCommand = commandClass.newInstance();
-                        if (socket.isConnected()) {
-                            sendCommand.run(socket.getInputStream(), socket.getOutputStream());
-                        } else {
-                            // In case the Bluetooth connection breaks suddenly
-                            break;
-                        }
-                        // Get information about the command that should go in the database
-                        String pId = sendCommand.getCommandPID();
-                        String name = sendCommand.getName();
-                        String value = sendCommand.getCalculatedResult();
-                        String unit = sendCommand.getResultUnit();
-                        String timestamp = DbHelper.convertDate(new Date(sendCommand.getEnd()));
-                        Response response = new Response(-1, pId, name, value, unit, timestamp);
-                        long responseId = dbHelper.insertResponse(tripId, response);
-                        response.id = responseId;
-                        if (responseId > DbHelper.DB_OK) {
+                        try {
+                            if (socket.isConnected()) {
+                                sendCommand.run(socket.getInputStream(), socket.getOutputStream());
+                            } else {
+                                // In case the Bluetooth connection breaks suddenly
+                                break;
+                            }
+                            // Get information about the command that should go in the database
+                            String pId = sendCommand.getCommandPID();
+                            String name = sendCommand.getName();
+                            String value = sendCommand.getCalculatedResult();
+                            String unit = sendCommand.getResultUnit();
+                            String timestamp = DbHelper.convertDate(new Date(sendCommand.getEnd()));
+                            Response response = new Response(-1, pId, name, value, unit, timestamp);
+                            long responseId = dbHelper.insertResponse(tripId, response);
+                            response.id = responseId;
+                            if (responseId > DbHelper.DB_OK) {
+                                newResponses.add(response);
+                            }
+                        } catch (NoDataException | UnknownErrorException e) {
+                            String pId = sendCommand.getCommandPID();
+                            String name = sendCommand.getName();
+                            String unit = sendCommand.getResultUnit();
+                            Response response = new Response(-1, pId, name, null, unit, null);
                             newResponses.add(response);
                         }
                     }
@@ -425,9 +433,10 @@ public class ObdBluetoothService extends Service {
                 int i = 0;
                 for (Response newResponse : newResponses) {
                     // Put the row ID of the response in the bundle
-                    args.putParcelable(ResponseContract.ResponseEntry.COLUMN_NAME_NAME, newResponse);
+                    args.putParcelable(ResponseContract.ResponseEntry.COLUMN_NAME_NAME + newResponse.name, newResponse);
                     newResponseIds[i++] = newResponse.id;
                 }
+                // todo remove the next line, it's no longer used
                 args.putLongArray(ResponseContract.ResponseEntry.COLUMN_NAME_ID + "_ARRAY", newResponseIds);
                 newResponses.clear();
                 // Send the bundle to all observers
