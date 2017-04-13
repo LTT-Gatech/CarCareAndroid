@@ -99,30 +99,33 @@ public class DynamicActivity extends BaseActivity implements AdapterView.OnItemS
     }
 
     private void updateTripId(long tripId) {
-        mTripId = tripId;
-        changed = true;
-        Bundle args = new Bundle();
-        args.putBoolean("RESET", true);
-        mNames = mDbHelper.getAllNamesInTripId(mTripId);
-        mGraphAdapter.notifyDataSetChanged();
+        if (tripId != mTripId) {
+            setChanged();
+            mTripId = tripId;
+            changed = true;
+            Bundle args = new Bundle();
+            args.putBoolean("RESET", true);
+            mNames = mDbHelper.getAllNamesInTripId(mTripId);
+            mGraphAdapter.notifyDataSetChanged();
 
-        List<Response> responses = mDbHelper.getResponsesByTrip(mTripId);
-        Map<String, ArrayList<Response>> nameToResponse = new HashMap<>();
-        for (Response response : responses) {
-            String name = response.name;
-            if (!nameToResponse.containsKey(name)) {
-                nameToResponse.put(name, new ArrayList<Response>());
+            List<Response> responses = mDbHelper.getResponsesByTrip(mTripId);
+            Map<String, ArrayList<Response>> nameToResponse = new HashMap<>();
+            for (Response response : responses) {
+                String name = response.name;
+                if (!nameToResponse.containsKey(name)) {
+                    nameToResponse.put(name, new ArrayList<Response>());
+                }
+                nameToResponse.get(name).add(response);
             }
-            nameToResponse.get(name).add(response);
-        }
-        for (Map.Entry<String, ArrayList<Response>> entry : nameToResponse.entrySet()) {
-            String name = entry.getKey();
-            List<Response> currentResponses = entry.getValue();
-            Collections.sort(currentResponses);
-            args.putParcelableArrayList(ResponseContract.ResponseEntry.COLUMN_NAME_NAME + "_LIST_" + name, (ArrayList<Response>) currentResponses);
-        }
+            for (Map.Entry<String, ArrayList<Response>> entry : nameToResponse.entrySet()) {
+                String name = entry.getKey();
+                List<Response> currentResponses = entry.getValue();
+                Collections.sort(currentResponses);
+                args.putParcelableArrayList(ResponseContract.ResponseEntry.COLUMN_NAME_NAME + "_LIST_" + name, (ArrayList<Response>) currentResponses);
+            }
 
-        notifyObservers(args);
+            notifyObservers(args);
+        }
     }
 
     @Override
@@ -157,6 +160,10 @@ public class DynamicActivity extends BaseActivity implements AdapterView.OnItemS
     @Override
     public boolean hasChanged() {
         return changed;
+    }
+
+    private void setChanged() {
+        changed = true;
     }
 
     private void clearChanged() {
