@@ -80,6 +80,16 @@ public class ResponseContract {
         return db.query(table, columns, selection, selectionArgs, null, null, orderBy);
     }
 
+    public static Cursor queryDistinctNamesByTripId(SQLiteDatabase db, long tripId) {
+        String table = ResponseEntry.TABLE_NAME;
+        String[] columns = {
+                ResponseEntry.COLUMN_NAME_NAME,
+        };
+        String selection = ResponseEntry.COLUMN_NAME_TRIP_ID + " = ?";
+        String[] selectionArgs = {Long.toString(tripId)};
+        return db.query(true, table, columns, selection, selectionArgs, null, null, null, null);
+    }
+
     public static Cursor queryByIds(SQLiteDatabase db, long... rowIds) {
         String table = ResponseEntry.TABLE_NAME;
         String[] columns = {

@@ -17,6 +17,8 @@
 package com.teamltt.carcare.activity;
 
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -25,19 +27,31 @@ import android.widget.Spinner;
 
 import com.teamltt.carcare.R;
 import com.teamltt.carcare.database.DbHelper;
+import com.teamltt.carcare.database.IObservable;
+import com.teamltt.carcare.database.IObserver;
+import com.teamltt.carcare.database.contract.ResponseContract;
+import com.teamltt.carcare.fragment.GraphFragment;
+import com.teamltt.carcare.fragment.MyGraphAdapter;
+import com.teamltt.carcare.model.Response;
 import com.teamltt.carcare.model.Trip;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-public class DynamicActivity extends BaseActivity implements AdapterView.OnItemSelectedListener {
+public class DynamicActivity extends BaseActivity implements AdapterView.OnItemSelectedListener, GraphFragment.OnGraphFragmentInteractionListener, IObservable {
 
     private static final String TAG = "DynamicActivity";
 
     private DbHelper mDbHelper;
     private List<Trip> mTrips;
+    private List<String> mNames;
     private ArrayAdapter<Trip> mSpinnerAdapter;
+    private RecyclerView.Adapter mGraphAdapter;
     private long mTripId;
 
     public void onCreate(Bundle savedInstanceState) {
@@ -45,18 +59,14 @@ public class DynamicActivity extends BaseActivity implements AdapterView.OnItemS
         includeDrawer = false;
         super.onCreate(savedInstanceState);
         mTrips = new ArrayList<>();
-        mSpinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, mTrips);
+        mSpinnerAdapter = new ArrayAdapter<>(DynamicActivity.this, android.R.layout.simple_spinner_item, mTrips);
         mSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         Spinner spinner = (Spinner) findViewById(R.id.spinner_trips);
         if (spinner != null) {
             spinner.setAdapter(mSpinnerAdapter);
-            spinner.setOnItemSelectedListener(this);
+            spinner.setOnItemSelectedListener(DynamicActivity.this);
         }
-    }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
         mDbHelper = new DbHelper(this);
         if (mTrips == null) {
             mTrips = new ArrayList<>();
@@ -64,13 +74,24 @@ public class DynamicActivity extends BaseActivity implements AdapterView.OnItemS
         mTrips.addAll(mDbHelper.getAllTrips());
         Collections.sort(mTrips);
         mSpinnerAdapter.notifyDataSetChanged();
+
+        mNames = new ArrayList<>();
+        mGraphAdapter = new MyGraphAdapter(DynamicActivity.this, DynamicActivity.this, mNames);
+        RecyclerView graphRecyclerView = (RecyclerView) findViewById(R.id.graph_list);
+        if (graphRecyclerView != null) {
+            graphRecyclerView.setHasFixedSize(true);
+            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(DynamicActivity.this);
+            graphRecyclerView.setLayoutManager(layoutManager);
+            graphRecyclerView.setAdapter(mGraphAdapter);
+        }
     }
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-        // this will get called on Spinner instantiation
+        // this will get called on Spinner construction
         Log.i(TAG, "onItemSelected: " + adapterView + ", " + view + ", " + i + ", " + l);
         // TODO set mTripId here with a call to updateTripId
+        updateTripId(mTrips.get(i).getId());
     }
 
     @Override
@@ -80,6 +101,81 @@ public class DynamicActivity extends BaseActivity implements AdapterView.OnItemS
 
     private void updateTripId(long tripId) {
         mTripId = tripId;
-        // TODO update graphs with mTripId
+        changed = true;
+        Bundle args = new Bundle();
+        args.putBoolean("RESET", true);
+        mNames = mDbHelper.getAllNamesInTripId(mTripId);
+        mGraphAdapter.notifyDataSetChanged();
+
+        List<Response> responses = mDbHelper.getResponsesByTrip(mTripId);
+        Map<String, ArrayList<Response>> nameToResponse = new HashMap<>();
+        for (Response response : responses) {
+            String name = response.name;
+            if (!nameToResponse.containsKey(name)) {
+                nameToResponse.put(name, new ArrayList<Response>());
+            }
+            nameToResponse.get(name).add(response);
+        }
+        for (Map.Entry<String, ArrayList<Response>> entry : nameToResponse.entrySet()) {
+            String name = entry.getKey();
+            List<Response> currentResponses = entry.getValue();
+            Collections.sort(currentResponses);
+            args.putParcelableArrayList(ResponseContract.ResponseEntry.COLUMN_NAME_NAME + "_LIST_" + name, (ArrayList<Response>) currentResponses);
+        }
+
+        notifyObservers(args);
+    }
+
+    @Override
+    public void onGraphFragmentInteraction(String pId) {
+        Log.i(TAG, "onGraphFragmntInteraction: " + pId);
+    }
+
+    private Set<IObserver> mObservers = new HashSet<>();
+
+    @Override
+    public void addObserver(IObserver observer) {
+        mObservers.add(observer);
+    }
+
+    @Override
+    public int countObservers() {
+        return mObservers.size();
+    }
+
+    @Override
+    public void deleteObserver(IObserver observer) {
+        mObservers.remove(observer);
+    }
+
+    @Override
+    public void deleteObservers() {
+        mObservers.clear();
+    }
+
+    private boolean changed = false;
+
+    @Override
+    public boolean hasChanged() {
+        return changed;
+    }
+
+    private void clearChanged() {
+        changed = false;
+    }
+
+    @Override
+    public void notifyObservers(Bundle args) {
+        if (hasChanged()) {
+            for (IObserver observer : mObservers) {
+                observer.update(this, args);
+            }
+            clearChanged();
+        }
+    }
+
+    @Override
+    public void notifyObservers() {
+        notifyObservers(null);
     }
 }

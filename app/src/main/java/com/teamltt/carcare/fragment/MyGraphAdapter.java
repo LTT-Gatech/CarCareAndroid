@@ -16,10 +16,7 @@
 
 package com.teamltt.carcare.fragment;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,7 +37,7 @@ import com.teamltt.carcare.model.Response;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.teamltt.carcare.activity.SettingsActivity.dynamicPreferenceTitles;
+//import static com.teamltt.carcare.activity.SettingsActivity.dynamicPreferenceTitles;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link Response} and makes a call to the
@@ -48,22 +45,15 @@ import static com.teamltt.carcare.activity.SettingsActivity.dynamicPreferenceTit
  */
 public class MyGraphAdapter extends RecyclerView.Adapter<MyGraphAdapter.ViewHolder> {
 
-    private final List<String> mPIds;
+    private final List<String> mNames;
     private final OnGraphFragmentInteractionListener mListener;
     private final IObservable mObservable;
 
     /**
      * @param listener a class which implements the {@link OnGraphFragmentInteractionListener} interface.
      */
-    public MyGraphAdapter(OnGraphFragmentInteractionListener listener, IObservable observable, Context context) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-
-        mPIds = new ArrayList<>();
-        for (String preferenceKey : dynamicPreferenceTitles) {
-            if (preferences.getBoolean("dynamic " + preferenceKey, false)) {
-                mPIds.add(preferenceKey);
-            }
-        }
+    public MyGraphAdapter(OnGraphFragmentInteractionListener listener, IObservable observable, List<String> names) {
+        mNames = new ArrayList<>(names);
         mListener = listener;
         mObservable = observable;
     }
@@ -77,11 +67,16 @@ public class MyGraphAdapter extends RecyclerView.Adapter<MyGraphAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        String pId = mPIds.get(position);
-        holder.mPId = pId;
-        holder.mGraphView.setTitle(pId);
+//        String pId = mPIds.get(position);
+        String name = mNames.get(position);
+//        holder.mPId = pId;
+        holder.mName = name;
+//        holder.mGraphView.setTitle(pId);
+        holder.mGraphView.setTitle(name);
 
-        mObservable.addObserver(holder);
+        if (mObservable != null) {
+            mObservable.addObserver(holder);
+        }
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,7 +84,7 @@ public class MyGraphAdapter extends RecyclerView.Adapter<MyGraphAdapter.ViewHold
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    mListener.onGraphFragmentInteraction(holder.mPId);
+                    mListener.onGraphFragmentInteraction(holder.mName);
                 }
             }
         });
@@ -97,14 +92,14 @@ public class MyGraphAdapter extends RecyclerView.Adapter<MyGraphAdapter.ViewHold
 
     @Override
     public int getItemCount() {
-        return mPIds.size();
+        return mNames.size();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder implements IObserver {
         final View mView;
         final GraphView mGraphView;
         private int lastXValue;
-        String mPId;
+        String mName;
 
         private LineGraphSeries<DataPoint> mSeries;
 
@@ -128,19 +123,42 @@ public class MyGraphAdapter extends RecyclerView.Adapter<MyGraphAdapter.ViewHold
 
             mSeries = new LineGraphSeries<>();
             mGraphView.addSeries(mSeries);
-
-
         }
 
         @Override
         public void update(IObservable o, Bundle args) {
-            Response response = args.getParcelable(ResponseContract.ResponseEntry.COLUMN_NAME_NAME);
-            if (response != null && response.name.equals(mPId)) {
+            boolean reset = args.getBoolean("RESET", false);
+            if (reset) {
+                List<Response> responses = args.getParcelableArrayList(ResponseContract.ResponseEntry.COLUMN_NAME_NAME + "_LIST_" + mName);
+                if (responses != null) {
+                    mGraphView.removeSeries(mSeries);
+                    mSeries = new LineGraphSeries<>();
+                    mGraphView.addSeries(mSeries);
+                    lastXValue = 0;
+                    for (Response response : responses) {
+                        addNewDataPoint(response);
+                    }
+
+                }
+            } else {
+                Response response = args.getParcelable(ResponseContract.ResponseEntry.COLUMN_NAME_NAME + "_" + mName);
+                addNewDataPoint(response);
+//                if (response != null && response.name.equals(mName)) {
+//                    String value = response.value;
+//                    // For some reason, trying this with dates clutters the bottom axis with long strings
+////                mSeries.appendData(new DataPoint(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(response.timestamp), Double.parseDouble(value)), true, 20);
+//                    mSeries.appendData(new DataPoint(lastXValue++, Double.parseDouble(value)), true, 20);
+//
+//                }
+            }
+        }
+
+        private void addNewDataPoint(Response response) {
+            if (response != null && response.name.equals(mName)) {
                 String value = response.value;
                 // For some reason, trying this with dates clutters the bottom axis with long strings
 //                mSeries.appendData(new DataPoint(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(response.timestamp), Double.parseDouble(value)), true, 20);
                 mSeries.appendData(new DataPoint(lastXValue++, Double.parseDouble(value)), true, 20);
-
             }
         }
 

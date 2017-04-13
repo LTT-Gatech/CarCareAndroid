@@ -388,6 +388,19 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         return trips;
     }
 
+    public List<String> getAllNamesInTripId(long tripId) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = ResponseContract.queryDistinctNamesByTripId(db, tripId);
+        List<String> names = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            String name = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_NAME));
+            names.add(name);
+        }
+        cursor.close();
+        db.close();
+        return names;
+    }
+
     public List<Response> getResponsesByTrip(long tripId) {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = ResponseContract.queryByTripId(db, tripId);

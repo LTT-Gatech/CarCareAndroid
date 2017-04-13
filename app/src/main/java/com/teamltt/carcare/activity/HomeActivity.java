@@ -20,9 +20,11 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -47,6 +49,7 @@ import com.teamltt.carcare.service.ObdBluetoothService;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
@@ -135,7 +138,14 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, Graph
             btService.observeDatabase(staticCard);
 
             IObservable observable = btService.getObservable();
-            mGraphAdapter = new MyGraphAdapter(HomeActivity.this, observable, HomeActivity.this);
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(HomeActivity.this);
+            List<String> names = new ArrayList<>();
+            for (String preferenceKey : SettingsActivity.dynamicPreferenceTitles) {
+                if (preferences.getBoolean("dynamic " + preferenceKey, false)) {
+                    names.add(preferenceKey);
+                }
+            }
+            mGraphAdapter = new MyGraphAdapter(HomeActivity.this, observable, names);
             RecyclerView graphRecyclerView = (RecyclerView) findViewById(R.id.graph_list);
             if (graphRecyclerView != null) {
                 graphRecyclerView.setHasFixedSize(true);

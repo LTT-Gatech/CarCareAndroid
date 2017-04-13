@@ -425,7 +425,7 @@ public class ObdBluetoothService extends Service {
                 int i = 0;
                 for (Response newResponse : newResponses) {
                     // Put the row ID of the response in the bundle
-                    args.putParcelable(ResponseContract.ResponseEntry.COLUMN_NAME_NAME, newResponse);
+                    args.putParcelable(ResponseContract.ResponseEntry.COLUMN_NAME_NAME + "_" + newResponse.name, newResponse);
                     newResponseIds[i++] = newResponse.id;
                 }
                 args.putLongArray(ResponseContract.ResponseEntry.COLUMN_NAME_ID + "_ARRAY", newResponseIds);

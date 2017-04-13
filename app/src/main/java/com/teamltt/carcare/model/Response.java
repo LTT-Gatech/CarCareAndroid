@@ -18,8 +18,9 @@ package com.teamltt.carcare.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
-public class Response implements Parcelable {
+public class Response implements Comparable<Response>, Parcelable {
     public long id;
     public String pId;
     public String name;
@@ -62,6 +63,11 @@ public class Response implements Parcelable {
     @Override
     public String toString() {
         return name + " (" + pId + ") : " + value + unit;
+    }
+
+    @Override
+    public int compareTo(@NonNull Response response) {
+        return this.timestamp.compareTo(response.timestamp);
     }
 
     protected Response(Parcel in) {
