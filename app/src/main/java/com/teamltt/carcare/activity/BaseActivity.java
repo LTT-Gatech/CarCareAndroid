@@ -150,6 +150,9 @@ public class BaseActivity extends AppCompatActivity
         } else if(id == R.id.nav_search) {
             intent = new Intent(this, StaticActivity.class);
             startActivity(intent);
+        } else if(id == R.id.nav_dynamic_statistics) {
+            intent = new Intent(this, DynamicActivity.class);
+            startActivity(intent);
         } else if (id == R.id.sign_out) {
             Auth.GoogleSignInApi.signOut(googleApiClient).setResultCallback(
                     new ResultCallback<Status>() {

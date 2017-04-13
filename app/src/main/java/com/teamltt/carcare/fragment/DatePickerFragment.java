@@ -49,9 +49,7 @@ public class DatePickerFragment extends DialogFragment
     public void onDateSet(DatePicker view, int year, int month, int day) {
         //TODO if we keep this sort of calendar fragment we should make an interface for the activities
         //that use set date
-        if (getActivity() instanceof DynamicActivity) {
-            ((DynamicActivity) getActivity()).setDate(year, month + 1, day);
-        } else {
+        if (getActivity() instanceof ReminderEditActivity) {
             ((ReminderEditActivity) getActivity()).setDate(year, month + 1, day);
         }
     }
