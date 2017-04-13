@@ -18,6 +18,7 @@ package com.teamltt.carcare.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -26,31 +27,41 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
 import com.teamltt.carcare.R;
-import com.teamltt.carcare.model.ObdContent;
+import com.teamltt.carcare.database.IObservable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A fragment representing a list of Items.
  * <p/>
- * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
+ * Activities containing this fragment MUST implement the {@link OnGraphFragmentInteractionListener}
  * interface.
  */
-public class ObdResponseFragment extends Fragment {
+public class GraphFragment extends Fragment {
 
     private static final String ARG_COLUMN_COUNT = "column-count";
     private int mColumnCount = 1;
-    private OnListFragmentInteractionListener mListener;
+    private OnGraphFragmentInteractionListener mListener;
+
+
+    private final Handler mHandler = new Handler();
+    private Runnable mTimer1;
+    private LineGraphSeries<DataPoint> mSeries1;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public ObdResponseFragment() {
+    public GraphFragment() {
     }
 
     @SuppressWarnings("unused")
-    public static ObdResponseFragment newInstance(int columnCount, int rowCount) {
-        ObdResponseFragment fragment = new ObdResponseFragment();
+    public static GraphFragment newInstance(int columnCount, int rowCount) {
+        GraphFragment fragment = new GraphFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         fragment.setArguments(args);
@@ -69,7 +80,7 @@ public class ObdResponseFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_obdresponse_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_graph_list, container, false);
 
         // Set the adapter
         if (view instanceof RecyclerView) {
@@ -80,7 +91,12 @@ public class ObdResponseFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new MyObdResponseRecyclerViewAdapter(ObdContent.ITEMS, mListener));
+
+            // TODO get list of parameter identifiers here
+            List<String> pIds = new ArrayList<>();
+            // TODO get the IObservable database connection (from btService.getObservable())
+            IObservable observable = null;
+            recyclerView.setAdapter(new MyGraphAdapter(mListener, observable, getActivity()));
         }
         return view;
     }
@@ -88,8 +104,8 @@ public class ObdResponseFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnListFragmentInteractionListener) {
-            mListener = (OnListFragmentInteractionListener) context;
+        if (context instanceof OnGraphFragmentInteractionListener) {
+            mListener = (OnGraphFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnListFragmentInteractionListener");
@@ -112,7 +128,7 @@ public class ObdResponseFragment extends Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnListFragmentInteractionListener {
-        void onListFragmentInteraction(ObdContent.ObdResponse item);
+    public interface OnGraphFragmentInteractionListener {
+        void onGraphFragmentInteraction(String pId);
     }
 }

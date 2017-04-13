@@ -5,7 +5,7 @@
   ~ you may not use this file except in compliance with the License.
   ~ You may obtain a copy of the License at
   ~
-  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~     http://www.apache.org/licenses/LICENSE-2.0
   ~
   ~ Unless required by applicable law or agreed to in writing, software
   ~ distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,7 +26,7 @@
     <string name="status_bt">Bluetooth status:</string>
     <string name="request_selector">Request Selector:</string>
     <string name="send_request">Send Request</string>
-    <string name="response">Response</string>
+    <string name="value">Response</string>
     <string name="bt_service_description">Handles Bluetooth connection to your OBD adapter for the CarCare application.</string>
     <string name="read_data">Read data</string>
     <string name="login">Login</string>
@@ -56,12 +56,102 @@
     <string name="title_dynamic">Dynamic title visual placeholder</string>
     <string name="button_from">From</string>
     <string name="button_to">To</string>
-
+    <!---Reminder Info Edit strings-->
     <string name="field_reminder_name">Reminder Name</string>
+    <string-array name="reminder_types">
+        <item>Set by Feature</item>
+        <item>Set by Date</item>
+    </string-array>
+    <string-array name="comparison_types">
+        <item>&lt;</item>
+        <item>=</item>
+        <item>&gt;</item>
+    </string-array>
+    <string-array name="feature_types">
+        <item>Mileage</item>
+        <item>Air intake temperature</item>
+        <item>Ambient air temperature</item>
+        <item>Engine coolant temperature</item>
+        <item>Barometric pressure</item>
+        <item>Fuel pressure</item>
+        <item>Intake manifold pressure</item>
+        <item>Engine load</item>
+        <item>Engine runtime</item>
+        <item>Engine RPM</item>
+        <item>Engine fuel rate</item>
+        <item>Engine oil pressure</item>
+        <item>Vehicle speed</item>
+        <item>Mass air flow</item>
+        <item>Fuel level</item>
+        <item>Fuel consumption rate</item>
+        <item>Timing advance</item>
+        <item>Distance since codes cleared</item>
+        <item>Control module power supply</item>
+        <item>Fuel rail pressure</item>
+        <item>Distance travelled with MIL on</item>
+        <item>Time run with MIL on</item>
+        <item>Time since trouble codes cleared</item>
+        <item>Absolute load</item>
+        <item>Air/fuel ratio</item>
+    </string-array>
+    <string name="hint_value">Enter Value</string>
+    <string name="hint_date">Enter Date</string>
+    <string name="button_select_date">Select Date</string>
+    <!--Car info strings-->
+    <string name="text_car_info_title">Car Info</string>
+    <string name="text_year">Year</string>
+    <string name="hint_year">Enter Year</string>
+    <string name="text_make">Make</string>
+    <string name="hint_make">Enter Make</string>
+    <string name="text_model">Model</string>
+    <string name="hint_model">Enter Model</string>
+    <string name="text_VIN">VIN</string>
+    <string name="hint_VIN">Enter VIN</string>
+    <string name="text_license_plate">License Plate</string>
+    <string name="hint_license_plate">Enter License Plate</string>
+    <string name="text_color">Color</string>
+    <string name="hint_color">Enter Color</string>
+    <string name="text_nickname">Nickname</string>
+    <string name="hint_nickname">Enter Nickname</string>
+    <string name="button_edit">Edit</string>
+    <string name="button_save">Save</string>
+
+    <!--Alerts strings-->
+    <string name="text_alerts_title">Alerts</string>
+
+    <!--Menu strings-->
+    <string name="text_trips">Trips</string>
+    <string name="text_dynamic">Dynamic</string>
+    <string name="text_reminders_title">Reminders</string>
+
+    <string name="text_welcome">Welcome</string>
+    <string name="button_read_data">Read Data</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="search_statistics">Search Statistics</string>
     <string name="car_information">Car Information</string>
     <string name="sign_out">Sign Out</string>
+    <string name="text_placeholder">Placeholder text</string>
+    <string name="placeholder_data_type">Data type:</string>
+    <string name="placeholder_value">0 mph</string>
+    <string name="engine_temp">Engine Temperature</string>
+    <string name="current_mpg">Current MPG</string>
+    <string name="current_mph">Current MPH</string>
+    <string name="graph_mpg">MPG Graph</string>
+    <string name="graph_mph">MPH Graph</string>
+    <string name="graph_tire_pressure">Tire Pressure Graph</string>
+    <string name="key_engine_temp">sEngineTemp</string>
+    <string name="key_mpg">sMPG</string>
+    <string name="key_mph">sMPH</string>
+    <string name="key_mpg_d">dMPG</string>
+    <string name="key_mph_d">dMPH</string>
+    <string name="key_tire_pressure_d">dTirePress</string>
+    <string name="settings">Settings</string>
+    <string name="help">Help</string>
+    <string name="static_data">Static Data</string>
+    <string name="dynamic_data">Dynamic Data</string>
+
+    <string name="export_database">Export Database</string>
+
 </resources>

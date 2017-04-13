@@ -6,7 +6,7 @@
   ~ you may not use this file except in compliance with the License.
   ~ You may obtain a copy of the License at
   ~
-  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~     http://www.apache.org/licenses/LICENSE-2.0
   ~
   ~ Unless required by applicable law or agreed to in writing, software
   ~ distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,41 +26,43 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/textAlert"
-        android:text="Alerts"
-        android:textSize="30dp"/>
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="No Alerts"
-        />
-    <ListView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/listAlert">
+        android:orientation="vertical"
+        android:id="@+id/layout_alerts">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/text_alerts_title"
+            android:text="@string/text_alerts_title"
+            android:textSize="30sp"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/layout_alerts_content"
+            android:orientation="vertical">
+        </LinearLayout>
 
-    </ListView>
-    <!--This view is the placeholder divisor you see between alerts
+        <!--This view is the placeholder divisor you see between alerts
      and the next thing when the app runs-->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@android:color/darker_gray"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"/>
+    </LinearLayout>
 
     <TextView
-        android:text="Welcome"
+        android:id="@+id/tv_welcome"
         android:layout_width="match_parent"
         android:layout_height="31dp"
-        android:id="@+id/tvWelcome"
-        android:textSize="24sp"
-        android:textColor="@color/colorPrimary"
-        android:textStyle="normal|bold"
-        android:textAllCaps="false"
         android:layout_gravity="start"
-        android:textAlignment="viewStart" />
+        android:text="@string/text_welcome"
+        android:textAlignment="viewStart"
+        android:textAllCaps="false"
+        android:textColor="@color/colorPrimary"
+        android:textSize="24sp"
+        android:textStyle="normal|bold"/>
 
     <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -70,8 +72,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:paddingBottom="@dimen/activity_vertical_margin"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin"
         tools:context="com.teamltt.carcare.activity.HomeActivity">
 
@@ -83,36 +83,38 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/status_bt" />
+                android:text="@string/status_bt"/>
 
             <TextView
+                android:id="@+id/status_bt"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/status_bt"
-                android:text="@string/not_connecting_bt" />
+                android:text="@string/not_connecting_bt"/>
         </LinearLayout>
 
-
-        <LinearLayout
+        <android.support.v7.widget.CardView
+            xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/static_data_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:visibility="gone"
-            android:id="@+id/topPanel">
+            android:layout_gravity="center"
+            card_view:cardCornerRadius="4dp"
+            card_view:elevation="14.5sp">
 
-            <Button
-                android:text="Read Data"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:onClick="readData"
-                android:id="@+id/readData" />
-
-        </LinearLayout>
+            <LinearLayout
+                android:id="@+id/static_data"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="10dp">
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
 
         <include
+            layout="@layout/fragment_graph_list"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            layout="@layout/fragment_obdresponse_list" />
+            android:layout_height="match_parent"/>
+
 
     </LinearLayout>
 </LinearLayout>
