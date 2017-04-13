@@ -21,13 +21,19 @@ import java.util.Date;
 
 public class Trip implements Comparable<Trip> {
 
+    private long id;
     private Date startTime, endTime;
     // Format in which dates are displayed to the user. Example: Tue 07/14/02, 21:40
     private static final SimpleDateFormat readableFormat = new SimpleDateFormat("EEE MM/dd/yy, HH:mm");
 
-    public Trip(Date startTime, Date endTime) {
+    public Trip(long id, Date startTime, Date endTime) {
+        this.id = id;
         this.startTime = startTime;
         this.endTime = endTime;
+    }
+
+    public long getId() {
+        return id;
     }
 
     public Date getStartTime() {
@@ -50,7 +56,8 @@ public class Trip implements Comparable<Trip> {
             return false;
         }
         Trip that = (Trip) o;
-        return this.startTime.equals(that.startTime) && this.endTime.equals(that.endTime);
+        return this.id == that.id;
+//        return this.startTime.equals(that.startTime) && this.endTime.equals(that.endTime);
     }
 
     @Override

@@ -17,47 +17,69 @@
 package com.teamltt.carcare.activity;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
-import android.widget.TextView;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 
 import com.teamltt.carcare.R;
-import com.teamltt.carcare.fragment.DatePickerFragment;
+import com.teamltt.carcare.database.DbHelper;
+import com.teamltt.carcare.model.Trip;
 
-public class DynamicActivity extends BaseActivity {
-    private boolean from;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+public class DynamicActivity extends BaseActivity implements AdapterView.OnItemSelectedListener {
+
+    private static final String TAG = "DynamicActivity";
+
+    private DbHelper mDbHelper;
+    private List<Trip> mTrips;
+    private ArrayAdapter<Trip> mSpinnerAdapter;
+    private long mTripId;
 
     public void onCreate(Bundle savedInstanceState) {
         activityContent = R.layout.activity_dynamic;
         includeDrawer = false;
         super.onCreate(savedInstanceState);
-        from = true;
+        mTrips = new ArrayList<>();
+        mSpinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, mTrips);
+        mSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        Spinner spinner = (Spinner) findViewById(R.id.spinner_trips);
+        if (spinner != null) {
+            spinner.setAdapter(mSpinnerAdapter);
+            spinner.setOnItemSelectedListener(this);
+        }
     }
 
-
-    public void showDatePickerDialog(View v) {
-        from = findViewById(R.id.button_to) != v;
-        DatePickerFragment dialog = new DatePickerFragment();
-        dialog.show(getFragmentManager(), "DateFragment");
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mDbHelper = new DbHelper(this);
+        if (mTrips == null) {
+            mTrips = new ArrayList<>();
+        }
+        mTrips.addAll(mDbHelper.getAllTrips());
+        Collections.sort(mTrips);
+        mSpinnerAdapter.notifyDataSetChanged();
     }
 
-    /**
-     * Called by a date picker fragment. TODO see DatePickerFragment
-     * @param year an int
-     * @param month an int
-     * @param day an int
-     */
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+        // this will get called on Spinner instantiation
+        Log.i(TAG, "onItemSelected: " + adapterView + ", " + view + ", " + i + ", " + l);
+        // TODO set mTripId here with a call to updateTripId
+    }
 
-    public void setDate(int year, int month, int day) {
-        TextView tv;
-        if (from) {
-            tv = (TextView) findViewById(R.id.text_from);
-        } else {
-            tv = (TextView) findViewById(R.id.text_to);
-        }
-        String date = month + "/" + day + "/" + year;
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+        Log.i(TAG, "onNothingSelected: " + adapterView);
+    }
 
-        if (tv != null) {
-            tv.setText(date);
-        }
+    private void updateTripId(long tripId) {
+        mTripId = tripId;
+        // TODO update graphs with mTripId
     }
 }

@@ -33,44 +33,11 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:layout_marginTop="10dp"
-        android:text="@string/title_dynamic"
-        />
-    <LinearLayout
+        android:text="@string/title_dynamic" />
+
+    <Spinner
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="6dp"
-        android:paddingTop="6dp">
-        <Button
-            android:id="@+id/button_from"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="showDatePickerDialog"
-            android:text="@string/button_from" />
-
-        <TextView
-            android:id="@+id/text_from"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/text_from" />
-
-        <Button
-            android:id="@+id/button_to"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="showDatePickerDialog"
-            android:text="@string/button_to" />
-
-        <TextView
-            android:id="@+id/text_to"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/text_to"/>
-    </LinearLayout>
-    <!-- graph goes here-->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/text_data_value"
-        android:text="@string/data_value"/>
+        android:id="@+id/spinner_trips" />
 
 </LinearLayout>

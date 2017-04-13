@@ -38,10 +38,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -366,12 +364,12 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
     }
 
     /**
-     * Returns a map of Trip objects to trip id's
+     * Returns a List of Trip objects
      */
-    public Map<Trip, Long> getAllTrips() {
+    public List<Trip> getAllTrips() {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = TripContract.queryAll(db);
-        Map<Trip, Long> trips = new HashMap<>();
+        List<Trip> trips = new ArrayList<>();
         while (cursor.moveToNext()) {
             long tripId = cursor.getLong(cursor.getColumnIndexOrThrow(TripContract.TripEntry.COLUMN_NAME_ID));
             String startTime = getCursorColumn(cursor, TripContract.TripEntry.COLUMN_NAME_START_TIME);
@@ -380,7 +378,7 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
             try {
                 startDate = sqlDateFormat.parse(startTime);
                 endDate = sqlDateFormat.parse(endTime);
-                trips.put(new Trip(startDate, endDate), tripId);
+                trips.add(new Trip(tripId, startDate, endDate));
             } catch (ParseException e) {
                 e.printStackTrace();
             }
