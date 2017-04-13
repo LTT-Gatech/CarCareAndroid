@@ -60,14 +60,18 @@ public class StaticCard implements IObserver {
     @Override
     public void update(IObservable o, Bundle args) {
         if (args != null && o instanceof DbHelper) {
-
-            DbHelper dbHelper = (DbHelper) o;
-            long[] responseIds = args.getLongArray(ResponseContract.ResponseEntry.COLUMN_NAME_ID + "_ARRAY");
-            List<Response> items = dbHelper.getResponsesByIds(responseIds);
-            for (Response response : items) {
-                if (shownData.containsKey(response.name)) {
-                    TextView valueText = (TextView) shownData.get(response.name).getChildAt(2);
-                    valueText.setText(response.getFormattedResult());
+            for (String name : shownData.keySet()) {
+                Response response = args.getParcelable(ResponseContract.ResponseEntry.COLUMN_NAME_NAME + name);
+                if (response != null) {
+                    if (response.id != -1) {
+                        // A response for this preference was found during this update
+                        TextView valueText = (TextView) shownData.get(response.name).getChildAt(2);
+                        valueText.setText(response.getFormattedResult());
+                    } else {
+                        // The response is not supported on this vehicle
+                        TextView valueText = (TextView) shownData.get(response.name).getChildAt(2);
+                        valueText.setText(R.string.unsupported_pid_static);
+                    }
                 }
             }
         }
