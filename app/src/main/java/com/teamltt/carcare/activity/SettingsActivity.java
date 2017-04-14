@@ -38,12 +38,18 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
             SPEED.getValue(),
             ENGINE_RUNTIME.getValue(),
             AIR_INTAKE_TEMP.getValue(),
-            BAROMETRIC_PRESSURE.getValue()
+            BAROMETRIC_PRESSURE.getValue(),
+            FUEL_PRESSURE.getValue(),
+            FUEL_LEVEL.getValue(),
+            DISTANCE_TRAVELED_MIL_ON.getValue(),
+            ENGINE_OIL_TEMP.getValue()
             };
 
     public static final String[] dynamicPreferenceTitles = new String[]{
             SPEED.getValue(),
-            ENGINE_RPM.getValue()};
+            ENGINE_RPM.getValue(),
+            FUEL_CONSUMPTION_RATE.getValue()
+            };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
