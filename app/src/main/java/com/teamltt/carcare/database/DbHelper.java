@@ -24,11 +24,13 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.teamltt.carcare.database.contract.OwnershipContract;
+import com.teamltt.carcare.database.contract.ReminderContract;
 import com.teamltt.carcare.database.contract.ResponseContract;
 import com.teamltt.carcare.database.contract.TripContract;
 import com.teamltt.carcare.database.contract.UserContract;
 import com.teamltt.carcare.database.contract.VehicleContract;
-import com.teamltt.carcare.model.ObdContent;
+import com.teamltt.carcare.model.Reminder;
+import com.teamltt.carcare.model.Response;
 import com.teamltt.carcare.model.Trip;
 import com.teamltt.carcare.model.Vehicle;
 
@@ -42,20 +44,37 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * An abstraction over a SQLiteDatabase to be used by Activities and Fragments.
+ * To query the DB, methods here should open a connection to the SQLiteDatabase
+ * and query the specific Contract classes with the open connection.
+ * In all queries, the SQLiteDatabase connection should be closed. In queries with
+ * a Cursor, the Cursor should be closed before the SQLiteDatabase.
+ * When possible, this class accepts Models as arguments and returns Models to its caller.
+ * The Contract classes should favor interaction with individual arguments over Models.
+ * Methods in this class should return List objects instead of a Cursor.
+ * If the query is writing, open a writable connection, otherwise use read-only.
+ * This class handles upgrades when the DB schema changes. This is handled by
+ * the monotonically increasing DATABASE_VERSION constant.
+ * This class is an observable subject in the Observer pattern. When the state changes,
+ * its observers are notified.
+ */
 public class DbHelper extends SQLiteOpenHelper implements IObservable {
 
     private static final String TAG = "DbHelper";
 
-    private static final String SQL_INIT = "PRAGMA foreign_keys = on;";
+    private static final String SQL_FOREIGN_KEY = "PRAGMA foreign_keys = on;";
+    private static final String SQL_INIT = SQL_FOREIGN_KEY;
 
     // errors are negative, ok is 0, anything else is positive.
     public static final long DB_ERROR_NULL = -6;
     public static final long DB_ERROR_NOT_OPEN = -5;
     public static final long DB_ERROR_READ_ONLY = -4;
+    public static final long DB_ERROR_BAD_INPUT = -2;
     public static final long DB_WRITE_ERROR = -1; // from SQLiteDatabase if an error occurred
     public static final long DB_OK = 0;
 
-    public static final int DATABASE_VERSION = 5;
+    public static final int DATABASE_VERSION = 6;
     public static final String DATABASE_NAME = "CarCare.db";
 
     // Format in which the database stores DateTimes. Example: 2004-12-13 13:14:15
@@ -71,12 +90,17 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        // db is being created for the first time.
+        // db-wide constraints
         db.execSQL(SQL_INIT);
+
+        // individual table creates
         db.execSQL(OwnershipContract.SQL_CREATE_ENTRIES);
         db.execSQL(ResponseContract.SQL_CREATE_ENTRIES);
         db.execSQL(TripContract.SQL_CREATE_ENTRIES);
         db.execSQL(UserContract.SQL_CREATE_ENTRIES);
         db.execSQL(VehicleContract.SQL_CREATE_ENTRIES);
+        db.execSQL(ReminderContract.SQL_CREATE_ENTRIES);
     }
 
     @Override
@@ -87,6 +111,7 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         db.execSQL(TripContract.SQL_DROP_ENTRIES);
         db.execSQL(UserContract.SQL_DROP_ENTRIES);
         db.execSQL(VehicleContract.SQL_DROP_ENTRIES);
+        db.execSQL(ReminderContract.SQL_DROP_ENTRIES);
         onCreate(db);
     }
 
@@ -94,7 +119,6 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         onUpgrade(db, oldVersion, newVersion);
     }
-
 
     private static long errorChecks(SQLiteDatabase db) {
         if (db == null) {
@@ -108,7 +132,12 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         }
     }
 
-
+    /**
+     * Helper method to convert from a Date object to a SQLite Date String
+     *
+     * @param date the Date object
+     * @return a SQLite Date String
+     */
     public static String convertDate(Date date) {
         if (date == null) {
             return null;
@@ -117,11 +146,22 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
     }
 
 
+    /**
+     * Helper method which returns a SQLite Date String for the NOW() function
+     * @return the NOW() function
+     */
     public static String now() {
         // set the format to sql date time
         return sqlDateFormat.format(new Date());
     }
 
+    /**
+     * Helper method which builds a multi-argument where clause.
+     * returns in the format "COLUMN IN (?,?,?,...,?)" to select an array of arguments.
+     * @param column the column to select
+     * @param numArgs the number of "?" to append
+     * @return a String SQLite "COLUMN IN (?,...,?)" clause
+     */
     public static String inClauseBuilder(String column, int numArgs) {
         // length will be length of column plus 5 characters " IN (" plus numArgs of "?" plus
         // numArgs of "," - 1 plus 1 for closing parentheses.
@@ -137,6 +177,12 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         return res.toString();
     }
 
+    /**
+     * A helper method which returns a String column from a cursor
+     * @param cursor the cursor
+     * @param column the column name
+     * @return the String value at the column
+     */
     private String getCursorColumn(Cursor cursor, String column) {
         return cursor.getString(cursor.getColumnIndexOrThrow(column));
     }
@@ -161,17 +207,22 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = VehicleContract.query(db, vehicleId);
 //        long id = cursor.getLong(cursor.getColumnIndexOrThrow(VehicleContract.VehicleEntry.COLUMN_NAME_ID));
-        cursor.moveToFirst();
-        String vin = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_VIN);
-        String make = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_MAKE);
-        String model = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_MODEL);
-        String year = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_YEAR);
-        String color = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_COLOR);
-        String nickname = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_NICKNAME);
-        String plateNumber = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_PLATE_NUMBER);
-        cursor.close();
-        db.close();
-        return new Vehicle(vin, make, model, year, color, nickname, plateNumber);
+        if (cursor.moveToFirst()) {
+            String vin = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_VIN);
+            String make = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_MAKE);
+            String model = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_MODEL);
+            String year = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_YEAR);
+            String color = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_COLOR);
+            String nickname = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_NICKNAME);
+            String plateNumber = getCursorColumn(cursor, VehicleContract.VehicleEntry.COLUMN_NAME_PLATE_NUMBER);
+            cursor.close();
+            db.close();
+            return new Vehicle(vin, make, model, year, color, nickname, plateNumber);}
+        else {
+            cursor.close();
+            db.close();
+            return null;
+        }
     }
 
     public int updateVehicle(long vehicleId, Vehicle vehicle) {
@@ -186,6 +237,84 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         int numAffected = VehicleContract.update(db, vehicleId, vehicle.getVin(),
                 vehicle.getMake(), vehicle.getModel(), vehicle.getYear(), vehicle.getColor(),
                 vehicle.getNickname(), vehicle.getPlateNumber());
+        db.close();
+        return numAffected;
+    }
+
+    public long createNewReminder(Reminder reminder)  {
+        SQLiteDatabase db = getWritableDatabase();
+        long status = DbHelper.errorChecks(db);
+        if (status != DbHelper.DB_OK) {
+            return status;
+        }
+        status = ReminderContract.insert(db, reminder.getVehicleId(), reminder.getName(),
+                reminder.getFeatureId(), reminder.getComparisonType(), reminder.getComparisonValue(), reminder.getDate());
+        db.close();
+        setChanged(status);
+        return status;
+    }
+
+    public long updateReminder(Reminder reminder) {
+        SQLiteDatabase db = getWritableDatabase();
+        long status = DbHelper.errorChecks(db);
+        if (status != DbHelper.DB_OK) {
+            return status;
+        }
+        if (reminder.getReminderId() < 0) {
+            return DB_ERROR_BAD_INPUT;
+        }
+        int numAffected = ReminderContract.update(db, reminder.getReminderId(), reminder.getVehicleId(),
+                reminder.getName(), reminder.getFeatureId(), reminder.getComparisonType(), reminder.getComparisonValue(),
+                reminder.getDate());
+        db.close();
+        return numAffected;
+    }
+
+    //takes a vehicle id, returns a list of all reminders associated with that vehicle
+    public List<Reminder> getRemindersByVehicleId(long vehicleId) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = ReminderContract.queryByVehicleId(db, vehicleId);
+        List<Reminder> reminders = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            long reminderId = cursor.getLong(cursor.getColumnIndexOrThrow(ReminderContract.ReminderEntry.COLUMN_NAME_ID));
+            String name = getCursorColumn(cursor, ReminderContract.ReminderEntry.COLUMN_NAME_NAME);
+            int featureId = cursor.getInt(cursor.getColumnIndexOrThrow(ReminderContract.ReminderEntry.COLUMN_NAME_FEATURE_ID));
+            int comparison = cursor.getInt(cursor.getColumnIndexOrThrow(ReminderContract.ReminderEntry.COLUMN_NAME_COMPARISON));
+            int value = cursor.getInt(cursor.getColumnIndexOrThrow(ReminderContract.ReminderEntry.COLUMN_NAME_VALUE));
+            String date = getCursorColumn(cursor, ReminderContract.ReminderEntry.COLUMN_NAME_DATE);
+            reminders.add(new Reminder(reminderId, vehicleId, name, featureId, comparison, value, date));
+        }
+        cursor.close();
+        db.close();
+        return reminders;
+    }
+
+    //takes a reminder id (the integer identifier from the table) and returns a Reminder object with the
+    //values associated with that reminder
+    public Reminder getReminderByReminderId(long reminderId) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = ReminderContract.queryByReminderId(db, reminderId);
+        cursor.moveToFirst();
+        int vehicleId = cursor.getInt(cursor.getColumnIndexOrThrow(ReminderContract.ReminderEntry.COLUMN_NAME_VEHICLE_ID));
+        String name = cursor.getString(cursor.getColumnIndexOrThrow(ReminderContract.ReminderEntry.COLUMN_NAME_NAME));
+        int featureId = cursor.getInt(cursor.getColumnIndexOrThrow(ReminderContract.ReminderEntry.COLUMN_NAME_FEATURE_ID));
+        int comparison = cursor.getInt(cursor.getColumnIndexOrThrow(ReminderContract.ReminderEntry.COLUMN_NAME_COMPARISON));
+        int value = cursor.getInt(cursor.getColumnIndexOrThrow(ReminderContract.ReminderEntry.COLUMN_NAME_VALUE));
+        String date = getCursorColumn(cursor, ReminderContract.ReminderEntry.COLUMN_NAME_DATE);
+        return new Reminder(reminderId, vehicleId, name, featureId, comparison, value, date);
+
+    }
+
+    public int deleteReminder(long reminderId) {
+        SQLiteDatabase db = getWritableDatabase();
+        long status = DbHelper.errorChecks(db);
+        if (status != DbHelper.DB_OK) {
+            return (int) status;
+        }
+        if (reminderId < 0) {
+            return (int) DB_ERROR_BAD_INPUT;
+        }
+        int numAffected = ReminderContract.delete(db, reminderId);
         db.close();
         return numAffected;
     }
@@ -261,48 +390,55 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         return trips;
     }
 
-    public List<ObdContent.ObdResponse> getResponsesByTrip(long tripId) {
+    public List<Response> getResponsesByTrip(long tripId) {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = ResponseContract.queryByTripId(db, tripId);
-        List<ObdContent.ObdResponse> responses = new ArrayList<>();
+        List<Response> responses = new ArrayList<>();
         while (cursor.moveToNext()) {
             long id = cursor.getLong(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_ID));
+            String pId = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_PID));
             String name = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_NAME));
             String value = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_VALUE));
-            responses.add(ObdContent.createItemWithResponse(((Long) id).intValue(), name, value));
+            String unit = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_UNIT));
+            String timestamp = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_TIMESTAMP));
+            responses.add(new Response(id, pId, name, value, unit, timestamp));
         }
         cursor.close();
         db.close();
         return responses;
     }
 
-    public long insertResponse(long tripId, String name, String pId, String value) {
+    public long insertResponse(long tripId, Response response) {
         SQLiteDatabase db = getWritableDatabase();
         long status = DbHelper.errorChecks(db);
         if (status != DbHelper.DB_OK) {
             return status;
         }
-        status = ResponseContract.insert(db, tripId, name, pId, value);
+        status = ResponseContract.insert(db, tripId, response.pId, response.name, response.value, response.unit);
         db.close();
         setChanged(status);
         return status;
     }
 
-    public List<ObdContent.ObdResponse> getResponsesById(long[] responseIds) {
+    public List<Response> getResponsesByIds(long[] responseIds) {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = ResponseContract.queryByIds(db, responseIds);
-        List<ObdContent.ObdResponse> items = new ArrayList<>();
+        List<Response> items = new ArrayList<>();
         while (cursor.moveToNext()) {
             long id = cursor.getLong(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_ID));
+            String pId = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_PID));
             String name = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_NAME));
             String value = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_VALUE));
-            items.add(ObdContent.createItemWithResponse(((Long) id).intValue(), name, value));
+            String unit = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_UNIT));
+            String timestamp = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_TIMESTAMP));
+            items.add(new Response(id, pId, name, value, unit, timestamp));
         }
         cursor.close();
         db.close();
         return items;
     }
 
+    // Observer pattern. See IObservable and IObserver.
     @Override
     public void addObserver(IObserver observer) {
         observers.add(observer);
@@ -343,16 +479,25 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         notifyObservers(null);
     }
 
+    /**
+     * Used by notifyObservers
+     */
     private void clearChanged() {
         changed = false;
     }
 
+    /**
+     * used by query methods to set whether the state has changed.
+     * The state has changed if the status is not an error code (>0)
+     * @param status The status code.
+     */
     private void setChanged(long status) {
         if (status > DB_OK) {
             changed = true;
         } else {
             Log.e(TAG, "error occurred when writing: " + status);
         }
-
     }
+
+
 }

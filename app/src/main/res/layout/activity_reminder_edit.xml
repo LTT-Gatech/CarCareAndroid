@@ -1,4 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2017, Team LTT
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_reminder_edit"
@@ -16,13 +32,62 @@
         android:layout_height="wrap_content"
         android:id="@+id/field_reminder_name"
         android:text="@string/field_reminder_name"/>
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/spinner_reminder_type"
+        android:gravity="center"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/layout_feature">
+        <Spinner
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/spinner_feature"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"/>
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/field_value"
+            android:gravity="bottom"
+            android:layout_alignParentRight="true"
+            android:hint="@string/hint_value"/>
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/spinner_comparison"
+            android:layout_toLeftOf="@id/field_value"
+            android:layout_below="@id/spinner_feature"/>
+    </RelativeLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/layout_time"
+        android:visibility="gone">
+        <Button
+            android:id="@+id/button_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/button_select_date"
+            android:onClick="showDatePickerDialog"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_date"
+            android:id="@+id/text_date"/>
+
+    </LinearLayout>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/button_create_new"
+            android:text="@string/button_save"
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
             android:onClick="saveInfo"/>
@@ -32,9 +97,7 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentBottom="true"
             android:text="@string/button_back"
-            android:onClick="back"/>
-
+            android:onClick="cancel"/>
     </RelativeLayout>
-
 
 </LinearLayout>

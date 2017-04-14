@@ -31,9 +31,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingBottom="32dp"
-        android:id="@+id/textCarInfo"
-        android:text="Car Info"
-        android:textSize="32dp" />
+        android:id="@+id/text_car_info_title"
+        android:text="@string/text_car_info_title"
+        android:textSize="32sp" />
 
     <TableLayout
         android:layout_width="match_parent"
@@ -43,104 +43,104 @@
             <TextView
                 android:layout_column="0"
                 android:layout_weight="1"
-                android:id="@+id/textYear"
-                android:text="Year"
-                android:textSize="20dp"
+                android:id="@+id/text_year"
+                android:text="@string/text_year"
+                android:textSize="20sp"
                 android:padding="3dp" />
             <TextView
 
                 android:layout_column="1"
                 android:layout_weight="3"
-                android:id="@+id/fieldYear"
-                android:text="the year goes here"
-                android:textSize="20dp"
+                android:id="@+id/field_year"
+                android:hint="@string/hint_year"
+                android:textSize="20sp"
                 android:padding="3dp" />
         </TableRow>
         <TableRow>
             <TextView
                 android:layout_weight="1"
-                android:id="@+id/textMake"
-                android:text="Make"
-                android:textSize="20dp"
+                android:id="@+id/text_make"
+                android:text="@string/text_make"
+                android:textSize="20sp"
                 android:padding="3dp" />
             <TextView
                 android:layout_weight="3"
-                android:id="@+id/fieldMake"
-                android:text="the make goes here"
-                android:textSize="20dp"
+                android:id="@+id/field_make"
+                android:hint="@string/hint_make"
+                android:textSize="20sp"
                 android:padding="3dp"/>
         </TableRow>
         <TableRow>
             <TextView
                 android:layout_weight="1"
-                android:id="@+id/textModel"
-                android:text="Model"
-                android:textSize="20dp"
+                android:id="@+id/text_model"
+                android:text="@string/text_model"
+                android:textSize="20sp"
                 android:padding="3dp"/>
             <TextView
                 android:layout_weight="3"
-                android:id="@+id/fieldModel"
-                android:text="the model goes here"
-                android:textSize="20dp"
+                android:id="@+id/field_model"
+                android:hint="@string/hint_model"
+                android:textSize="20sp"
                 android:padding="3dp"/>
 
         </TableRow>
         <TableRow>
             <TextView
                 android:layout_weight="1"
-                android:id="@+id/textVIN"
-                android:text="VIN"
-                android:textSize="20dp"
+                android:id="@+id/text_VIN"
+                android:text="@string/text_VIN"
+                android:textSize="20sp"
                 android:padding="3dp"/>
             <TextView
                 android:layout_weight="3"
-                android:id="@+id/fieldVIN"
-                android:text="the VIN goes here"
-                android:textSize="20dp"
+                android:id="@+id/field_VIN"
+                android:hint="@string/hint_VIN"
+                android:textSize="20sp"
                 android:padding="3dp"/>
 
         </TableRow>
         <TableRow>
             <TextView
                 android:layout_weight="1"
-                android:id="@+id/textPlate"
-                android:text="License Plate"
-                android:textSize="20dp"
+                android:id="@+id/text_plate"
+                android:text="@string/text_license_plate"
+                android:textSize="20sp"
                 android:padding="3dp"/>
             <TextView
                 android:layout_weight="3"
-                android:id="@+id/fieldPlate"
-                android:text="the plate goes here"
-                android:textSize="20dp"
+                android:id="@+id/field_plate"
+                android:hint="@string/hint_license_plate"
+                android:textSize="20sp"
                 android:padding="3dp"/>
         </TableRow>
         <TableRow>
             <TextView
                 android:layout_weight="1"
-                android:id="@+id/textColor"
-                android:text="Color"
-                android:textSize="20dp"
+                android:id="@+id/text_color"
+                android:text="@string/text_color"
+                android:textSize="20sp"
                 android:padding="3dp"/>
             <TextView
                 android:layout_weight="3"
-                android:id="@+id/fieldColor"
-                android:text="the color goes here"
-                android:textSize="20dp"
+                android:id="@+id/field_color"
+                android:hint="@string/hint_color"
+                android:textSize="20sp"
                 android:padding="3dp"/>
         </TableRow>
         <TableRow>
             <TextView
                 android:layout_weight="1"
-                android:id="@+id/textNickname"
-                android:text="Nickname"
-                android:textSize="20dp"
+                android:id="@+id/text_nickname"
+                android:text="@string/text_nickname"
+                android:textSize="20sp"
                 android:padding="3dp" />
 
             <TextView
                 android:layout_weight="3"
-                android:id="@+id/fieldNickname"
-                android:text="your nickname goes here"
-                android:textSize="20dp"
+                android:id="@+id/field_nickname"
+                android:hint="@string/hint_nickname"
+                android:textSize="20sp"
                 android:padding="3dp" />
         </TableRow>
     </TableLayout>
@@ -148,9 +148,9 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Edit"
+        android:text="@string/button_edit"
         android:onClick="editInfo"
         android:layout_gravity="end"
-        android:id="@+id/carInfoEdit"/>
+        android:id="@+id/button_edit"/>
 
 </LinearLayout>
