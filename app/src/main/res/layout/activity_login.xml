@@ -25,6 +25,15 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.teamltt.carcare.activity.LoginActivity">
 
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:contentDescription="@string/logo"
+        android:src="@mipmap/car_care_logo" />
+
     <TextView
         android:text="@string/please_sign_in"
         android:layout_width="wrap_content"
