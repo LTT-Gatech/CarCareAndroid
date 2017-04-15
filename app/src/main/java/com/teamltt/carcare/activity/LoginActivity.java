@@ -19,7 +19,7 @@ package com.teamltt.carcare.activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -30,6 +30,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
@@ -40,13 +41,12 @@ import com.teamltt.carcare.database.DbHelper;
 public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
 
     private GoogleApiClient googleApiClient;
-    private GoogleSignInAccount googleSignInAccount;
 
     private static final String TAG = "SignInActivity";
     private static final int RC_SIGN_IN = 9001;
 
     private TextView tvStatus;
-    ProgressDialog progressDialog;
+    private ProgressDialog progressDialog;
 
     public final static String EXTRA_FIRST_NAME = "com.teamltt.carcare.activity.LoginActivity.FIRSTNAME";
     public final static String EXTRA_LAST_NAME = "com.teamltt.carcare.activity.LoginActivity.LASTNAME";
@@ -59,10 +59,14 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
         buildNewGoogleApiClient();
         setContentView(R.layout.activity_login);
-        setBtnClickListeners();
 
         // Set view
         tvStatus = (TextView) findViewById(R.id.text_status);
+        SignInButton signInButton = (SignInButton) findViewById(R.id.button_google_sign_in);
+        if (signInButton != null) {
+            signInButton.setOnClickListener(this);
+            signInButton.setStyle(SignInButton.SIZE_WIDE, SignInButton.COLOR_DARK);
+        }
     }
 
     private void buildNewGoogleApiClient() {
@@ -79,10 +83,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 .build();
     }
 
-    private void setBtnClickListeners() {
-        findViewById(R.id.button_google_sign_in).setOnClickListener(this);
-    }
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -94,8 +94,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             // If the user's cached credentials are valid, the OptionalPendingResult will be "done"
             // and the GoogleSignInResult will be available instantly.
             Log.d(TAG, "Got cached sign-in");
-            GoogleSignInResult result = opr.get();
-            handleSignInResult(result);
+            handleSignInResult(opr.get());
         } else {
             // If the user has not previously signed in on this device or the sign-in has expired,
             // this asynchronous branch will attempt to sign in the user silently.  Cross-device
@@ -103,9 +102,9 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             showProgressDialog();
             opr.setResultCallback(new ResultCallback<GoogleSignInResult>() {
                 @Override
-                public void onResult(GoogleSignInResult googleSignInResult) {
-                    hideProgressDialog();
+                public void onResult(@NonNull GoogleSignInResult googleSignInResult) {
                     handleSignInResult(googleSignInResult);
+                    hideProgressDialog();
                 }
             });
         }
@@ -134,13 +133,42 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         Log.d(TAG, "handleSignInResult:" + result.isSuccess());
         if (result.isSuccess()) {
             // Signed in successfully, show authenticated UI.
-            googleSignInAccount = result.getSignInAccount();
-            tvStatus.setText(getString(R.string.signed_in_fmt, googleSignInAccount.getDisplayName()));
-            updateUI(true);
+            GoogleSignInAccount googleSignInAccount = result.getSignInAccount();
+            if (googleSignInAccount != null) {
+                tvStatus.setText(getString(R.string.signed_in_fmt, googleSignInAccount.getDisplayName()));
+
+                String firstName = googleSignInAccount.getGivenName();
+                String lastName = googleSignInAccount.getFamilyName();
+                String googleId = googleSignInAccount.getId();
+
+                if (!addUserIfNew(googleId, firstName, lastName)) {
+                    Log.e(TAG, "could not create new user");
+                }
+
+                // Go to Home Screen
+                Intent intent = new Intent(this, HomeActivity.class);
+                intent.putExtra(EXTRA_FIRST_NAME, firstName);
+                intent.putExtra(EXTRA_LAST_NAME, lastName);
+                intent.putExtra(EXTRA_USER_ID, googleId);
+                startActivity(intent);
+                finish();
+            }
         } else {
             // Signed out, show unauthenticated UI.
-            updateUI(false);
+            tvStatus.setText(R.string.please_sign_in);
         }
+    }
+
+    private boolean addUserIfNew(String googleId, String firstName, String lastName) {
+        // Add user to database
+        long result = DbHelper.DB_WRITE_ERROR;
+        DbHelper dbHelper = new DbHelper(this);
+        // Make sure you're not adding duplicates to the database
+        if (!dbHelper.containsUser(googleId)) {
+            result = dbHelper.createNewUser(googleId, firstName, lastName);
+        }
+        dbHelper.close();
+        return result > DbHelper.DB_OK;
     }
 
     private void signIn() {
@@ -149,12 +177,11 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     }
 
     @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         // An unresolvable error has occurred and Google APIs (including Sign-In) will not
         // be available.
         Log.d(TAG, "onConnectionFailed:" + connectionResult);
     }
-
 
     private void showProgressDialog() {
         if (progressDialog == null) {
@@ -166,38 +193,9 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         progressDialog.show();
     }
 
-
     private void hideProgressDialog() {
         if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.hide();
-        }
-    }
-
-
-    private void updateUI(boolean signedIn) {
-        if (signedIn) {
-            String firstName = googleSignInAccount.getGivenName();
-            String lastName = googleSignInAccount.getFamilyName();
-            String google_id = googleSignInAccount.getId();
-
-            // Add user to database
-            DbHelper dbHelper = new DbHelper(this);
-            // Make sure you're not adding duplicates to the database
-            if (!dbHelper.containsUser(google_id)) {
-                dbHelper.createNewUser(google_id, firstName, lastName);
-            }
-            dbHelper.close();
-
-            // Go to Home Screen
-            Intent intent = new Intent(this, HomeActivity.class);
-            intent.putExtra(EXTRA_FIRST_NAME, firstName);
-            intent.putExtra(EXTRA_LAST_NAME, lastName);
-            intent.putExtra(EXTRA_USER_ID, google_id);
-            startActivity(intent);
-        } else {
-            tvStatus.setText(R.string.please_sign_in);
-
-            findViewById(R.id.button_google_sign_in).setVisibility(View.VISIBLE);
         }
     }
 
@@ -209,5 +207,4 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 break;
         }
     }
-
 }
