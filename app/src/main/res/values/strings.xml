@@ -57,6 +57,7 @@
     <string name="button_from">From</string>
     <string name="button_to">To</string>
     <!---Reminder Info Edit strings-->
+    <string name="text_archived">View Archived</string>
     <string name="field_reminder_name">Reminder Name</string>
     <string-array name="reminder_types">
         <item>Set by Feature</item>

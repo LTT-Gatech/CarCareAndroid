@@ -45,7 +45,7 @@ import com.teamltt.carcare.model.Reminder;
 public class ReminderEditActivity extends AppCompatActivity implements OnItemSelectedListener {
 
     private boolean edited;
-    private int featureId; //based on some id for the features reminders can check for, i.e. oil pressure, -2 if type is date
+    private String featureId; //based on some id for the features reminders can check for, i.e. oil pressure, "Date" if type is date
     private int reminderId; //if editing a reminder, id is passed in as an extra from ReminderActivity. Set to -2 otherwise
     private int vehicleId;
     private String formattedDate;
@@ -76,7 +76,6 @@ public class ReminderEditActivity extends AppCompatActivity implements OnItemSel
         vehicleId = 0;
 
         edited = false;
-        featureId = 1;
         updateUI();
     }
 
@@ -121,10 +120,12 @@ public class ReminderEditActivity extends AppCompatActivity implements OnItemSel
         if (pos == 0) {
             featureLayout.setVisibility(View.VISIBLE);
             timeLayout.setVisibility(View.GONE);
+            Spinner spinner = (Spinner) findViewById(R.id.spinner_feature);
+            featureId = spinner.getSelectedItem().toString();
         } else if (pos == 1) {
             featureLayout.setVisibility(View.GONE);
             timeLayout.setVisibility(View.VISIBLE);
-            featureId = -2; //if checking for date, featureId is -2 for now
+            featureId = "Date"; //if checking for date, featureId is -2 for now
         }
     }
 
@@ -155,9 +156,20 @@ public class ReminderEditActivity extends AppCompatActivity implements OnItemSel
             Reminder reminder = dbHelper.getReminderByReminderId(reminderId);
             ((TextView) findViewById(R.id.field_reminder_name)).setText(reminder.getName());
             //check feature id to see if reminder checks for date or for a feature
-            if (reminder.getFeatureId() >= 0) { //if checks for feature, set feature type spinner, value, and comparison type spinner
-                ((Spinner) findViewById(R.id.spinner_feature)).setSelection(0); //TODO: add a way to automatically switch to correct spinner choice from feature id
-                ((Spinner) findViewById(R.id.spinner_feature)).setSelection(reminder.getComparisonType());
+            if (!(reminder.getFeatureId().equals("Date"))) { //if checks for feature, set feature type spinner, value, and comparison type spinner
+                int position = 0;
+                Spinner featureSpinner = ((Spinner) findViewById(R.id.spinner_feature));
+                while (position < featureSpinner.getAdapter().getCount() &&
+                        !(featureSpinner.getSelectedItem().toString().equals(reminder.getFeatureId()))) {
+                    position++;
+                    featureSpinner.setSelection(position, false);
+                    Log.i(TAG, "checking position " + position);
+                    Log.i(TAG, reminder.getFeatureId() + " vs " + featureSpinner.getSelectedItem().toString());
+                }
+                if (position > featureSpinner.getAdapter().getCount()) {
+                    Log.i(TAG, "position went out of position, was " + position + " and max was " + featureSpinner.getAdapter().getCount());
+                    featureSpinner.setSelection(0);
+                }
                 ((EditText) findViewById(R.id.field_value)).setText(""+reminder.getComparisonValue());
             } else {
                 ((Spinner) findViewById(R.id.spinner_reminder_type)).setSelection(1); //if checks for date, set the spinner to date, populate with date
@@ -171,6 +183,9 @@ public class ReminderEditActivity extends AppCompatActivity implements OnItemSel
         String name = ((EditText) findViewById(R.id.field_reminder_name)).getText().toString();
         int comparison = ((Spinner) findViewById(R.id.spinner_comparison)).getSelectedItemPosition();
         String valueStr = ((EditText) findViewById(R.id.field_value)).getText().toString();
+        if (!(featureId.equals("Date"))) {
+            featureId = ((Spinner) findViewById(R.id.spinner_feature)).getSelectedItem().toString();
+        }
         int value;
         if (valueStr.equals("")) {
             value = -1;
@@ -180,11 +195,11 @@ public class ReminderEditActivity extends AppCompatActivity implements OnItemSel
 
         if (reminderId < 0) {
             Log.i(TAG, "adding new reminder");
-            long status = dbHelper.createNewReminder(new Reminder(reminderId, vehicleId, name, featureId, comparison, value, formattedDate));
+            long status = dbHelper.createNewReminder(new Reminder(reminderId, vehicleId, name, featureId, comparison, value, formattedDate, false));
             return status > 0;
         } else {
             Log.i(TAG, "editing reminder of id " + reminderId);
-            long status = dbHelper.updateReminder(new Reminder(reminderId, vehicleId, name, featureId, comparison, value, formattedDate));
+            long status = dbHelper.updateReminder(new Reminder(reminderId, vehicleId, name, featureId, comparison, value, formattedDate, false));
             return status > 0;
         }
     }
