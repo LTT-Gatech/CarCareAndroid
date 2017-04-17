@@ -62,16 +62,6 @@ public class DynamicActivity extends BaseActivity implements AdapterView.OnItemS
 
         mDbHelper = new DbHelper(this);
 
-        mTrips = mDbHelper.getAllTrips();
-        Collections.sort(mTrips);
-        mSpinnerAdapter = new ArrayAdapter<>(DynamicActivity.this, android.R.layout.simple_spinner_item, mTrips);
-        mSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        Spinner spinner = (Spinner) findViewById(R.id.spinner_trips);
-        if (spinner != null) {
-            spinner.setAdapter(mSpinnerAdapter);
-            spinner.setOnItemSelectedListener(DynamicActivity.this);
-        }
-
         mNames = new ArrayList<>();
         mGraphAdapter = new MyGraphAdapter(DynamicActivity.this, DynamicActivity.this, mNames);
         RecyclerView graphRecyclerView = (RecyclerView) findViewById(R.id.graph_list);
@@ -82,15 +72,38 @@ public class DynamicActivity extends BaseActivity implements AdapterView.OnItemS
             graphRecyclerView.setAdapter(mGraphAdapter);
         }
 
+        mTrips = mDbHelper.getAllTrips();
+        Collections.sort(mTrips);
+        mSpinnerAdapter = new ArrayAdapter<>(DynamicActivity.this, android.R.layout.simple_spinner_item, mTrips);
+        mSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        Spinner spinner = (Spinner) findViewById(R.id.spinner_trips);
+        if (spinner != null) {
+            spinner.setAdapter(mSpinnerAdapter);
+            spinner.setOnItemSelectedListener(DynamicActivity.this);
+        }
+
         Log.i(TAG, "mTrips: " + Arrays.toString(mTrips.toArray()));
         Log.i(TAG, "mNames: " + Arrays.toString(mNames.toArray()));
+
+        // HACK onItemSelected should be called on construction but it is not
+        /*
+        if (mTrips.size() > 0) {
+            updateTripId(mTrips.get(0).getId());
+        }
+        // other solutions?
+
+        if (spinner != null && mTrips.size() > 0) {
+            spinner.setSelection(0);
+        }
+        */
     }
 
     @Override
-    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+    public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
         // this will get called on Spinner construction
-        Log.i(TAG, "onItemSelected: " + adapterView + ", " + view + ", " + i + ", " + l);
-        updateTripId(mTrips.get(i).getId());
+        Log.i(TAG, "onItemSelected: " + parent + ", " + view + ", " + pos + ", " + id);
+        Log.i(TAG, parent.getItemAtPosition(pos).toString());
+        updateTripId(mTrips.get(pos).getId());
     }
 
     @Override
