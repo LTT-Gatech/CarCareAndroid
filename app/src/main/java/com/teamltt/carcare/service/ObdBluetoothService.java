@@ -33,16 +33,21 @@ import com.github.pires.obd.commands.ObdCommand;
 import com.github.pires.obd.commands.SpeedCommand;
 import com.github.pires.obd.commands.engine.RPMCommand;
 import com.github.pires.obd.commands.engine.RuntimeCommand;
+import com.github.pires.obd.commands.pressure.BarometricPressureCommand;
 import com.github.pires.obd.commands.protocol.EchoOffCommand;
+import com.github.pires.obd.commands.temperature.AirIntakeTemperatureCommand;
 import com.teamltt.carcare.R;
 import com.teamltt.carcare.adapter.IObdSocket;
 import com.teamltt.carcare.adapter.bluetooth.DeviceSocket;
 import com.teamltt.carcare.database.DbHelper;
+import com.teamltt.carcare.database.IObservable;
 import com.teamltt.carcare.database.IObserver;
 import com.teamltt.carcare.database.contract.ResponseContract;
 import com.teamltt.carcare.database.contract.TripContract;
+import com.teamltt.carcare.model.Response;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -222,6 +227,10 @@ public class ObdBluetoothService extends Service {
         dbHelper.deleteObserver(observer);
     }
 
+    public IObservable getObservable() {
+        return dbHelper;
+    }
+
     /**
      * Returns a cached bluetooth device named OBDII_NAME or starts a discovery and bonds with a device like that.
      */
@@ -275,7 +284,7 @@ public class ObdBluetoothService extends Service {
         }
     }
 
-    public void startNewTrip () {
+    public void startNewTrip() {
         new ConnectTask().execute();
     }
 
@@ -306,7 +315,6 @@ public class ObdBluetoothService extends Service {
 
         @Override
         protected void onPostExecute(Void result) {
-            // TODO Add user feedback with Messenger and Handler
             // change R.id.status_bt to display connected
             if (dbHelper != null && socket.isConnected()) {
                 Log.i(TAG, "bluetooth connected");
@@ -315,7 +323,7 @@ public class ObdBluetoothService extends Service {
             } else if (!bluetoothAdapter.isEnabled()) {
                 Log.i(TAG, "Bluetooth is not on");
                 sendToDisplays(getString(R.string.not_connecting_bt));
-            } else{
+            } else {
                 Log.i(TAG, "bluetooth not connected");
                 sendToDisplays(getString(R.string.retry_connect));
             }
@@ -333,7 +341,7 @@ public class ObdBluetoothService extends Service {
         long vehicleId = 1;
         long tripId;
 
-        Set<Long> newResponseIds = new HashSet<>();
+        Set<Response> newResponses = new HashSet<>();
 
         @Override
         protected Void doInBackground(Void... ignore) {
@@ -344,7 +352,7 @@ public class ObdBluetoothService extends Service {
                 }
 
                 while (socket.isConnected()) {
-                    // Check for can's "heartbeat"
+                    // Check for car's "heartbeat"
                     ObdCommand heartbeat = new RPMCommand();
                     while (true) {
                         heartbeat.run(socket.getInputStream(), socket.getOutputStream()); // TODO catch NoDataException
@@ -365,6 +373,10 @@ public class ObdBluetoothService extends Service {
 
                     Set<Class<? extends ObdCommand>> commands = new HashSet<>();
                     // TODO get these classes from somewhere else
+                    //commands.add(ConsumptionRateCommand.class);
+                    commands.add(AirIntakeTemperatureCommand.class);
+                    //commands.add(FuelLevelCommand.class);
+                    commands.add(BarometricPressureCommand.class);
                     commands.add(RuntimeCommand.class);
                     commands.add(SpeedCommand.class);
                     commands.add(RPMCommand.class);
@@ -377,13 +389,17 @@ public class ObdBluetoothService extends Service {
                             // In case the Bluetooth connection breaks suddenly
                             break;
                         }
+                        // Get information about the command that should go in the database
+                        String pId = sendCommand.getCommandPID();
                         String name = sendCommand.getName();
-                        String commandPID = sendCommand.getCommandPID();
-                        String formattedResult = sendCommand.getFormattedResult();
-                        long responseId = dbHelper.insertResponse(tripId, name,
-                                commandPID, formattedResult);
+                        String value = sendCommand.getCalculatedResult();
+                        String unit = sendCommand.getResultUnit();
+                        String timestamp = DbHelper.convertDate(new Date(sendCommand.getEnd()));
+                        Response response = new Response(-1, pId, name, value, unit, timestamp);
+                        long responseId = dbHelper.insertResponse(tripId, response);
+                        response.id = responseId;
                         if (responseId > DbHelper.DB_OK) {
-                            newResponseIds.add(responseId);
+                            newResponses.add(response);
                         }
                     }
                     publishProgress();
@@ -400,18 +416,21 @@ public class ObdBluetoothService extends Service {
         @Override
         protected void onProgressUpdate(Void... ignore) {
             super.onProgressUpdate(ignore);
-            if (!newResponseIds.isEmpty()) {
+            if (!newResponses.isEmpty()) {
+                // Use this bundle to notify observers
                 Bundle args = new Bundle();
+                // Put Trip ID in the bundle
                 args.putLong(TripContract.TripEntry.COLUMN_NAME_ID, tripId);
-
-                // HACK because Java hates primitives
-                Long[] foo = newResponseIds.toArray(new Long[0]);
-                long[] bar = new long[foo.length];
-                for (int i = 0; i < foo.length; i++) {
-                    bar[i] = foo[i];
+                long[] newResponseIds = new long[newResponses.size()];
+                int i = 0;
+                for (Response newResponse : newResponses) {
+                    // Put the row ID of the response in the bundle
+                    args.putParcelable(ResponseContract.ResponseEntry.COLUMN_NAME_NAME, newResponse);
+                    newResponseIds[i++] = newResponse.id;
                 }
-                args.putLongArray(ResponseContract.ResponseEntry.COLUMN_NAME_ID + "_ARRAY", bar);
-                newResponseIds.clear();
+                args.putLongArray(ResponseContract.ResponseEntry.COLUMN_NAME_ID + "_ARRAY", newResponseIds);
+                newResponses.clear();
+                // Send the bundle to all observers
                 dbHelper.notifyObservers(args);
             }
         }
@@ -433,10 +452,11 @@ public class ObdBluetoothService extends Service {
 
     /**
      * Calls displayStatus on all listening activities
+     *
      * @param status the current adapter state
      */
     private void sendToDisplays(String status) {
-        for(BtStatusDisplay display : btActivities) {
+        for (BtStatusDisplay display : btActivities) {
             display.displayStatus(status);
         }
     }

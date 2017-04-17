@@ -1,0 +1,46 @@
+﻿Merge remote-tracking branch 'refs/remotes/origin/master' into giuliano/dev
+
+# Conflicts:
+#	app/src/main/java/com/teamltt/carcare/activity/HomeActivity.java
+#	app/src/main/java/com/teamltt/carcare/database/DbHelper.java
+#	app/src/main/java/com/teamltt/carcare/model/Response.java
+#
+# It looks like you may be committing a merge.
+# If this is not correct, please remove the file
+#	.git/MERGE_HEAD
+# and try again.
+
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+# On branch giuliano/dev
+# Your branch is up-to-date with 'origin/giuliano/dev'.
+#
+# All conflicts fixed but you are still merging.
+#
+# Changes to be committed:
+#	modified:   LICENSE
+#	modified:   app/build.gradle
+#	modified:   app/src/main/AndroidManifest.xml
+#	modified:   app/src/main/java/com/teamltt/carcare/activity/HomeActivity.java
+#	modified:   app/src/main/java/com/teamltt/carcare/activity/SettingsActivity.java
+#	deleted:    app/src/main/java/com/teamltt/carcare/activity/TripsActivity.java
+#	modified:   app/src/main/java/com/teamltt/carcare/database/DbHelper.java
+#	modified:   app/src/main/java/com/teamltt/carcare/database/contract/ResponseContract.java
+#	renamed:    app/src/main/java/com/teamltt/carcare/fragment/ResponseFragment.java -> app/src/main/java/com/teamltt/carcare/fragment/GraphFragment.java
+#	new file:   app/src/main/java/com/teamltt/carcare/fragment/MyGraphAdapter.java
+#	deleted:    app/src/main/java/com/teamltt/carcare/fragment/MyObdResponseRecyclerViewAdapter.java
+#	new file:   app/src/main/java/com/teamltt/carcare/fragment/StaticCard.java
+#	deleted:    app/src/main/java/com/teamltt/carcare/model/ObdContent.java
+#	modified:   app/src/main/java/com/teamltt/carcare/model/Response.java
+#	modified:   app/src/main/java/com/teamltt/carcare/service/ObdBluetoothService.java
+#	deleted:    app/src/main/res/layout/activity_demo.xml
+#	modified:   app/src/main/res/layout/activity_home.xml
+#	deleted:    app/src/main/res/layout/activity_trips.xml
+#	new file:   app/src/main/res/layout/fragment_graph.xml
+#	new file:   app/src/main/res/layout/fragment_graph_list.xml
+#	deleted:    app/src/main/res/layout/fragment_obdresponse.xml
+#	modified:   app/src/main/res/values/strings.xml
+#	renamed:    app/src/main/res/layout/fragment_obdresponse_list.xml -> app/src/main/res/xml/preferences.xml
+#
+

@@ -18,15 +18,32 @@ package com.teamltt.carcare.activity;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceScreen;
+import android.preference.PreferenceCategory;
 
+import static com.github.pires.obd.enums.AvailableCommandNames.*;
 import com.teamltt.carcare.R;
+
+import java.util.List;
+
 
 public class SettingsActivity extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     public static final String KEY_PREF_SYNC_CONN = "pref_syncConnectionType";
+    public static final String[] staticPreferenceTitles = new String[]{
+            SPEED.getValue(),
+            ENGINE_RUNTIME.getValue(),
+            AIR_INTAKE_TEMP.getValue(),
+            BAROMETRIC_PRESSURE.getValue()
+            };
+
+    public static final String[] dynamicPreferenceTitles = new String[]{
+            SPEED.getValue(),
+            ENGINE_RPM.getValue()};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +58,34 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
         {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.preferences);
+            PreferenceScreen preferenceScreen = this.getPreferenceScreen();
+
+            // Static Category
+            PreferenceCategory preferenceCategory = new PreferenceCategory(preferenceScreen.getContext());
+            preferenceCategory.setTitle(getString(R.string.static_data));
+            preferenceScreen.addPreference(preferenceCategory);
+
+            for (String title : staticPreferenceTitles) {
+                Preference preference = new CheckBoxPreference(preferenceScreen.getContext());
+                preference.setTitle(title);
+                preference.setKey("static " + title);
+                preference.setDefaultValue(false);
+                preferenceCategory.addPreference(preference);
+            }
+
+            // Dynamic Category
+            preferenceCategory = new PreferenceCategory(preferenceScreen.getContext());
+            preferenceCategory.setTitle(getString(R.string.dynamic_data));
+            preferenceScreen.addPreference(preferenceCategory);
+
+            for (String title : dynamicPreferenceTitles) {
+                Preference preference = new CheckBoxPreference(preferenceScreen.getContext());
+                preference.setTitle(title);
+                preference.setKey("dynamic " + title);
+                preferenceCategory.addPreference(preference);
+                preference.setDefaultValue(false);
+            }
+
         }
     }
 

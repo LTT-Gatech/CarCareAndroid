@@ -16,15 +16,11 @@
 
 package com.teamltt.carcare.database;
 
-import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
-import android.os.Environment;
-import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
 import com.teamltt.carcare.database.contract.OwnershipContract;
@@ -33,17 +29,11 @@ import com.teamltt.carcare.database.contract.ResponseContract;
 import com.teamltt.carcare.database.contract.TripContract;
 import com.teamltt.carcare.database.contract.UserContract;
 import com.teamltt.carcare.database.contract.VehicleContract;
-import com.teamltt.carcare.model.ObdContent;
 import com.teamltt.carcare.model.Reminder;
 import com.teamltt.carcare.model.Response;
 import com.teamltt.carcare.model.Trip;
 import com.teamltt.carcare.model.Vehicle;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.channels.FileChannel;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -409,36 +399,42 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         List<Response> responses = new ArrayList<>();
         while (cursor.moveToNext()) {
             long id = cursor.getLong(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_ID));
+            String pId = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_PID));
             String name = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_NAME));
             String value = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_VALUE));
-            responses.add(ObdContent.createItemWithResponse(((Long) id).intValue(), name, value));
+            String unit = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_UNIT));
+            String timestamp = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_TIMESTAMP));
+            responses.add(new Response(id, pId, name, value, unit, timestamp));
         }
         cursor.close();
         db.close();
         return responses;
     }
 
-    public long insertResponse(long tripId, String name, String pId, String value) {
+    public long insertResponse(long tripId, Response response) {
         SQLiteDatabase db = getWritableDatabase();
         long status = DbHelper.errorChecks(db);
         if (status != DbHelper.DB_OK) {
             return status;
         }
-        status = ResponseContract.insert(db, tripId, name, pId, value);
+        status = ResponseContract.insert(db, tripId, response.pId, response.name, response.value, response.unit);
         db.close();
         setChanged(status);
         return status;
     }
 
-    public List<Response> getResponsesById(long[] responseIds) {
+    public List<Response> getResponsesByIds(long[] responseIds) {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = ResponseContract.queryByIds(db, responseIds);
         List<Response> items = new ArrayList<>();
         while (cursor.moveToNext()) {
             long id = cursor.getLong(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_ID));
+            String pId = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_PID));
             String name = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_NAME));
             String value = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_VALUE));
-            items.add(ObdContent.createItemWithResponse(((Long) id).intValue(), name, value));
+            String unit = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_UNIT));
+            String timestamp = cursor.getString(cursor.getColumnIndexOrThrow(ResponseContract.ResponseEntry.COLUMN_NAME_TIMESTAMP));
+            items.add(new Response(id, pId, name, value, unit, timestamp));
         }
         cursor.close();
         db.close();
