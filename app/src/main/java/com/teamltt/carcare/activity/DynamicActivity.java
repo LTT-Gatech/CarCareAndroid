@@ -53,7 +53,7 @@ public class DynamicActivity extends BaseActivity implements AdapterView.OnItemS
     private List<String> mNames;
     private ArrayAdapter<Trip> mSpinnerAdapter;
     private RecyclerView.Adapter mGraphAdapter;
-    private long mTripId;
+    private long mTripId = -1;
 
     public void onCreate(Bundle savedInstanceState) {
         activityContent = R.layout.activity_dynamic;
@@ -64,6 +64,7 @@ public class DynamicActivity extends BaseActivity implements AdapterView.OnItemS
 
         mTrips = mDbHelper.getAllTrips();
         if (mTrips.size() > 0) {
+            Collections.sort(mTrips);
             mNames = mDbHelper.getAllNamesInTripId(mTrips.get(0).getId());
         } else {
             mNames = new ArrayList<>();
@@ -78,7 +79,7 @@ public class DynamicActivity extends BaseActivity implements AdapterView.OnItemS
         }
 
 //        mTrips = mDbHelper.getAllTrips();
-        Collections.sort(mTrips);
+//        Collections.sort(mTrips);
         mSpinnerAdapter = new ArrayAdapter<>(DynamicActivity.this, android.R.layout.simple_spinner_item, mTrips);
         mSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         Spinner spinner = (Spinner) findViewById(R.id.spinner_trips);
