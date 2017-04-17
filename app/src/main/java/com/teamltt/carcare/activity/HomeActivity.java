@@ -121,7 +121,7 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
 
         DbHelper helper = new DbHelper(HomeActivity.this);
         reminders = helper.getRemindersByVehicleId(0);
-        checkReminders();
+        checkDateReminders();
         displayStaticData();
     }
 
@@ -169,6 +169,13 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
             List<Response> items = dbHelper.getResponsesById(responseIds);
             ObdContent.setItems(items);
             responseListAdapter.notifyDataSetChanged();
+            for (Response response : items) {
+                for (Reminder reminder : reminders) {
+                    if (reminder.getFeatureId().equals(response.name)) {
+                        checkFeatureReminder(reminder, response.value);
+                    }
+                }
+            }
         }
     }
 
@@ -215,7 +222,7 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
         }
 
     }
-    private void checkReminders() {
+    private void checkDateReminders() {
         List<Reminder> triggered = new ArrayList<Reminder>();
         LinearLayout layout = (LinearLayout) findViewById(R.id.layout_alerts_content);
         layout.removeAllViews();
@@ -263,55 +270,61 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, IObse
                     } catch (ParseException e1) {
                         e1.printStackTrace();
                     }
-                } else {
-                    Log.i(TAG, "checking for feature");
-                    Log.i(TAG, "comparisonType is " + reminder.getComparisonType());
-                    Log.i(TAG, "feature is " + reminder.getFeatureId());
-                    //check for hardcoded var here
-                    if (reminder.getComparisonType() == 0 && reminder.getComparisonValue() > comparisonValue
-                            || reminder.getComparisonType() == 1 && reminder.getComparisonValue() == comparisonValue
-                            || reminder.getComparisonType() == 2 && reminder.getComparisonValue() < comparisonValue) {
-
-                        //add reminder to list of reminders to remove (so they don't constantly trigger)
-                        triggered.add(reminder);
-                        //this sets the otherwise unused date field in a non date reminder to the latest trigger date for that reminder
-                        Calendar calendar = Calendar.getInstance();
-                        SimpleDateFormat mdformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                        Date date = calendar.getTime();
-                        reminder.setDate(mdformat.format(date));
-                        //after changing the date the reminder needs to be updated in the db
-                        DbHelper helper = new DbHelper(this);
-                        helper.updateReminder(reminder);
-                        helper.close();
-
-                        final String alertType;
-                        if (reminder.getComparisonType() == 0) {
-                            alertType = reminder.getFeatureId() + " < ";
-                            Log.i(TAG, "comparison type <");
-                        } else if (reminder.getComparisonType() == 1) {
-                            alertType = reminder.getFeatureId() + " = ";
-                            Log.i(TAG, "comparison type ==");
-                        } else {
-                            Log.i(TAG, "comparison type >");
-                            alertType = reminder.getFeatureId() + " > ";
-                        }
-                        TextView alertText = new TextView(this);
-                        alertText.setText("Reminder " + reminder.getName() + " is active.");
-                        alertText.setTextColor(Color.BLUE);
-                        alertText.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                viewAlert(view, "Reminder", alertType, reminder.getName(), Integer.toString(reminder.getComparisonValue()));
-                                //the hardcoded mileage will eventually draw from somewhere depending on Reminder.featureId
-                            }
-                        });
-                        layout.addView(alertText);
-                    }
-
                 }
             }
         }
         reminders.removeAll(triggered);
+    }
+
+    private void checkFeatureReminder(final Reminder reminder, String value) {
+        LinearLayout layout = (LinearLayout) findViewById(R.id.layout_alerts_content);
+        if (!reminder.isArchived()) {
+            Log.i(TAG, "checking for feature");
+            Log.i(TAG, "comparisonType is " + reminder.getComparisonType());
+            Log.i(TAG, "feature is " + reminder.getFeatureId());
+            int intValue = Integer.parseInt(value);
+            //check for hardcoded var here
+            if (reminder.getComparisonType() == 0 && reminder.getComparisonValue() > intValue
+                    || reminder.getComparisonType() == 1 && reminder.getComparisonValue() == intValue
+                    || reminder.getComparisonType() == 2 && reminder.getComparisonValue() < intValue) {
+
+                //add reminder to list of reminders to remove (so they don't constantly trigger)
+                //triggered.add(reminder);
+                //this sets the otherwise unused date field in a non date reminder to the latest trigger date for that reminder
+                Calendar calendar = Calendar.getInstance();
+                SimpleDateFormat mdformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                Date date = calendar.getTime();
+                reminder.setDate(mdformat.format(date));
+                //after changing the date the reminder needs to be updated in the db
+                DbHelper helper = new DbHelper(this);
+                helper.updateReminder(reminder);
+                helper.close();
+
+                final String alertType;
+                if (reminder.getComparisonType() == 0) {
+                    alertType = reminder.getFeatureId() + " < ";
+                    Log.i(TAG, "comparison type <");
+                } else if (reminder.getComparisonType() == 1) {
+                    alertType = reminder.getFeatureId() + " = ";
+                    Log.i(TAG, "comparison type ==");
+                } else {
+                    Log.i(TAG, "comparison type >");
+                    alertType = reminder.getFeatureId() + " > ";
+                }
+                TextView alertText = new TextView(this);
+                alertText.setText("Reminder " + reminder.getName() + " is active.");
+                alertText.setTextColor(Color.BLUE);
+                alertText.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        viewAlert(view, "Reminder", alertType, reminder.getName(), Integer.toString(reminder.getComparisonValue()));
+                        //the hardcoded mileage will eventually draw from somewhere depending on Reminder.featureId
+                    }
+                });
+                layout.addView(alertText);
+                reminders.remove(reminder);
+            }
+        }
     }
 
     private void viewAlert(View view, String alertTitle, String alertType, String alertName, String alertValue) {
