@@ -17,13 +17,13 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
              xmlns:tools="http://schemas.android.com/tools"
              android:layout_width="match_parent"
-             android:layout_height="match_parent"
+             android:layout_height="wrap_content"
              tools:context="com.teamltt.carcare.fragment.GraphFragment">
 
     <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
                                         xmlns:card_view="http://schemas.android.com/apk/res-auto"
                                         android:layout_width="match_parent"
-                                        android:layout_height="match_parent"
+                                        android:layout_height="wrap_content"
                                         android:layout_gravity="center"
                                         android:layout_margin="2dp"
                                         card_view:cardCornerRadius="4dp"
@@ -34,7 +34,15 @@
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:layout_gravity="center"
+            android:visibility="visible"
             />
+
+        <TextView
+            android:id="@+id/unsupported_pid_dynamic"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/unsupported_pid_dynamic"
+            android:visibility="gone"/>
     </android.support.v7.widget.CardView>
 
 </FrameLayout>

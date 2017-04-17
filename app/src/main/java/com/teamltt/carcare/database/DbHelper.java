@@ -377,7 +377,11 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
             Date startDate, endDate;
             try {
                 startDate = sqlDateFormat.parse(startTime);
-                endDate = sqlDateFormat.parse(endTime);
+                if (endTime == null) {
+                    endDate = sqlDateFormat.parse(startTime);
+                } else {
+                    endDate = sqlDateFormat.parse(endTime);
+                }
                 trips.add(new Trip(tripId, startDate, endDate));
             } catch (ParseException e) {
                 e.printStackTrace();

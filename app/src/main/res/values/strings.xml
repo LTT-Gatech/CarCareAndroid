@@ -53,7 +53,7 @@
     <string name="button_create_new">Create New</string>
     <string name="button_back">Back</string>
     <!---Dynamic activity strings-->
-    <string name="title_dynamic">Dynamic title visual placeholder</string>
+    <string name="title_dynamic">View Statistics by Trip</string>
     <string name="button_from">From</string>
     <string name="button_to">To</string>
     <!---Reminder Info Edit strings-->
@@ -154,5 +154,6 @@
 
     <string name="export_database">Export Database</string>
     <string name="unsupported_pid_static">Unsupported Parameter on this Vehicle</string>
+    <string name="unsupported_pid_dynamic">This parameter is not supported by this vehicle.</string>
 
 </resources>

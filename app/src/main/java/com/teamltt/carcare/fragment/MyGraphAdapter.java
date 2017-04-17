@@ -21,6 +21,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.GridLabelRenderer;
@@ -37,8 +38,6 @@ import com.teamltt.carcare.model.Response;
 import java.util.ArrayList;
 import java.util.List;
 
-//import static com.teamltt.carcare.activity.SettingsActivity.dynamicPreferenceTitles;
-
 /**
  * {@link RecyclerView.Adapter} that can display a {@link Response} and makes a call to the
  * specified {@link OnGraphFragmentInteractionListener}.
@@ -53,7 +52,7 @@ public class MyGraphAdapter extends RecyclerView.Adapter<MyGraphAdapter.ViewHold
      * @param listener a class which implements the {@link OnGraphFragmentInteractionListener} interface.
      */
     public MyGraphAdapter(OnGraphFragmentInteractionListener listener, IObservable observable, List<String> names) {
-        mNames = new ArrayList<>(names);
+        mNames = names;
         mListener = listener;
         mObservable = observable;
     }
@@ -92,11 +91,18 @@ public class MyGraphAdapter extends RecyclerView.Adapter<MyGraphAdapter.ViewHold
         return mNames.size();
     }
 
+    public void setNames(List<String> names) {
+        mNames.clear();
+        mNames.addAll(names);
+    }
+
     class ViewHolder extends RecyclerView.ViewHolder implements IObserver {
         final View mView;
         final GraphView mGraphView;
+        final TextView mUnsupportedMessage;
         private int lastXValue;
         String mName;
+        private boolean supported = true;
 
         private LineGraphSeries<DataPoint> mSeries;
 
@@ -104,6 +110,7 @@ public class MyGraphAdapter extends RecyclerView.Adapter<MyGraphAdapter.ViewHold
             super(view);
             mView = view;
             mGraphView = (GraphView) view.findViewById(R.id.graph);
+            mUnsupportedMessage = (TextView) view.findViewById(R.id.unsupported_pid_dynamic);
 
             GridLabelRenderer gridLabelRenderer = mGraphView.getGridLabelRenderer();
             gridLabelRenderer.setTextSize(gridLabelRenderer.getTextSize() - 4);
@@ -148,9 +155,26 @@ public class MyGraphAdapter extends RecyclerView.Adapter<MyGraphAdapter.ViewHold
 
         private void addNewDataPoint(Response response) {
             if (response != null && response.name.equals(mName)) {
-                String value = response.value;
-                // For some reason, trying this with dates clutters the bottom axis with long strings
-                mSeries.appendData(new DataPoint(lastXValue++, Double.parseDouble(value)), true, 20);
+
+                if (response.id != -1) {
+                    if (!supported) {
+                        supported = true;
+                        mGraphView.setVisibility(View.VISIBLE);
+                        mUnsupportedMessage.setVisibility(View.GONE);
+                    }
+                    String value = response.value;
+                    // For some reason, trying this with dates clutters the bottom axis with long strings
+//                mSeries.appendData(new DataPoint(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(response.timestamp), Double.parseDouble(value)), true, 20);
+                    mSeries.appendData(new DataPoint(lastXValue++, Double.parseDouble(value)), true, 20);
+                    mGraphView.setTitle(mName + " (" + response.unit + ")");
+                } else {
+                    // The response did not get put into the database, so the pid was not supported by the vehicle
+                    if (supported) {
+                        supported = false;
+                        mGraphView.setVisibility(View.GONE);
+                        mUnsupportedMessage.setVisibility(View.VISIBLE);
+                    }
+                }
             }
         }
 

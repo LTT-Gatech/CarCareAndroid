@@ -38,6 +38,7 @@ import com.teamltt.carcare.model.Trip;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -52,8 +53,9 @@ public class DynamicActivity extends BaseActivity implements AdapterView.OnItemS
     private List<Trip> mTrips;
     private List<String> mNames;
     private ArrayAdapter<Trip> mSpinnerAdapter;
-    private RecyclerView.Adapter mGraphAdapter;
+    private MyGraphAdapter mGraphAdapter;
     private long mTripId = -1;
+    private Bundle lastArgs;
 
     public void onCreate(Bundle savedInstanceState) {
         activityContent = R.layout.activity_dynamic;
@@ -72,7 +74,7 @@ public class DynamicActivity extends BaseActivity implements AdapterView.OnItemS
         mGraphAdapter = new MyGraphAdapter(DynamicActivity.this, DynamicActivity.this, mNames);
         RecyclerView graphRecyclerView = (RecyclerView) findViewById(R.id.graph_list);
         if (graphRecyclerView != null) {
-            graphRecyclerView.setHasFixedSize(true);
+//            graphRecyclerView.setHasFixedSize(true);
             RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(DynamicActivity.this);
             graphRecyclerView.setLayoutManager(layoutManager);
             graphRecyclerView.setAdapter(mGraphAdapter);
@@ -80,6 +82,7 @@ public class DynamicActivity extends BaseActivity implements AdapterView.OnItemS
 
 //        mTrips = mDbHelper.getAllTrips();
 //        Collections.sort(mTrips);
+
         mSpinnerAdapter = new ArrayAdapter<>(DynamicActivity.this, android.R.layout.simple_spinner_item, mTrips);
         mSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         Spinner spinner = (Spinner) findViewById(R.id.spinner_trips);
@@ -87,17 +90,23 @@ public class DynamicActivity extends BaseActivity implements AdapterView.OnItemS
             spinner.setAdapter(mSpinnerAdapter);
             spinner.setOnItemSelectedListener(DynamicActivity.this);
             // HACK if the above line doesn't automatically call onItemSelected, uncomment the lines below
-            /*
             if (mTrips.size() > 0) {
-                spinner.setSelection(0, false);
+                spinner.setSelection(1, false);
             }
-            */
+
         }
 
         Log.i(TAG, "mTrips: " + Arrays.toString(mTrips.toArray()));
         Log.i(TAG, "mNames: " + Arrays.toString(mNames.toArray()));
     }
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Spinner spinner = (Spinner) findViewById(R.id.spinner_trips);
+        if (spinner != null && mTrips.size() > 0) {
+            spinner.setSelection(0, false);
+        }
+    }
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
         // this will get called on Spinner construction
@@ -119,6 +128,7 @@ public class DynamicActivity extends BaseActivity implements AdapterView.OnItemS
             Bundle args = new Bundle();
             args.putBoolean("RESET", true);
             mNames = mDbHelper.getAllNamesInTripId(mTripId);
+            mGraphAdapter.setNames(mNames);
             mGraphAdapter.notifyDataSetChanged();
 
             List<Response> responses = mDbHelper.getResponsesByTrip(mTripId);
@@ -135,8 +145,9 @@ public class DynamicActivity extends BaseActivity implements AdapterView.OnItemS
                 List<Response> currentResponses = entry.getValue();
                 Collections.sort(currentResponses);
                 args.putParcelableArrayList(ResponseContract.ResponseEntry.COLUMN_NAME_NAME + "_LIST_" + name, (ArrayList<Response>) currentResponses);
-            }
 
+            }
+            lastArgs = args;
             notifyObservers(args);
         }
     }
@@ -151,6 +162,7 @@ public class DynamicActivity extends BaseActivity implements AdapterView.OnItemS
     @Override
     public void addObserver(IObserver observer) {
         mObservers.add(observer);
+        observer.update(this, lastArgs);
     }
 
     @Override
