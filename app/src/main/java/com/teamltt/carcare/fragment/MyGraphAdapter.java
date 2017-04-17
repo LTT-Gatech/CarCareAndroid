@@ -21,6 +21,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.jjoe64.graphview.GraphView;
@@ -69,6 +70,7 @@ public class MyGraphAdapter extends RecyclerView.Adapter<MyGraphAdapter.ViewHold
         String name = mNames.get(position);
         holder.mName = name;
         holder.mGraphView.setTitle(name);
+        ((TextView) holder.mUnsupportedMessage.findViewById(R.id.unsupported_pid_name)).setText(holder.mName);
 
         if (mObservable != null) {
             mObservable.addObserver(holder);
@@ -99,7 +101,7 @@ public class MyGraphAdapter extends RecyclerView.Adapter<MyGraphAdapter.ViewHold
     class ViewHolder extends RecyclerView.ViewHolder implements IObserver {
         final View mView;
         final GraphView mGraphView;
-        final TextView mUnsupportedMessage;
+        final LinearLayout mUnsupportedMessage;
         private int lastXValue;
         String mName;
         private boolean supported = true;
@@ -110,7 +112,7 @@ public class MyGraphAdapter extends RecyclerView.Adapter<MyGraphAdapter.ViewHold
             super(view);
             mView = view;
             mGraphView = (GraphView) view.findViewById(R.id.graph);
-            mUnsupportedMessage = (TextView) view.findViewById(R.id.unsupported_pid_dynamic);
+            mUnsupportedMessage = (LinearLayout) view.findViewById(R.id.unsupported_pid_dynamic);
 
             GridLabelRenderer gridLabelRenderer = mGraphView.getGridLabelRenderer();
             gridLabelRenderer.setTextSize(gridLabelRenderer.getTextSize() - 4);

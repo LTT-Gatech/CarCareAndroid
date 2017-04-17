@@ -37,12 +37,27 @@
             android:visibility="visible"
             />
 
-        <TextView
+        <LinearLayout
             android:id="@+id/unsupported_pid_dynamic"
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/unsupported_pid_dynamic"
-            android:visibility="gone"/>
+            android:visibility="gone"
+            >
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:id="@+id/unsupported_pid_name"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/unsupported_pid_dynamic"
+                />
+        </LinearLayout>
+
     </android.support.v7.widget.CardView>
 
 </FrameLayout>

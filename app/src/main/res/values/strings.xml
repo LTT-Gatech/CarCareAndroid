@@ -153,7 +153,7 @@
     <string name="dynamic_data">Dynamic Data</string>
 
     <string name="export_database">Export Database</string>
-    <string name="unsupported_pid_static">Unsupported Parameter on this Vehicle</string>
+    <string name="unsupported_pid_static">Vehicle doesn\'t support</string>
     <string name="unsupported_pid_dynamic">This parameter is not supported by this vehicle.</string>
 
 </resources>
