@@ -80,22 +80,16 @@ public class DynamicActivity extends BaseActivity implements AdapterView.OnItemS
         if (spinner != null) {
             spinner.setAdapter(mSpinnerAdapter);
             spinner.setOnItemSelectedListener(DynamicActivity.this);
+            // HACK if the above line doesn't automatically call onItemSelected, uncomment the lines below
+            /*
+            if (mTrips.size() > 0) {
+                spinner.setSelection(0, false);
+            }
+            */
         }
 
         Log.i(TAG, "mTrips: " + Arrays.toString(mTrips.toArray()));
         Log.i(TAG, "mNames: " + Arrays.toString(mNames.toArray()));
-
-        // HACK onItemSelected should be called on construction but it is not
-        /*
-        if (mTrips.size() > 0) {
-            updateTripId(mTrips.get(0).getId());
-        }
-        // other solutions?
-
-        if (spinner != null && mTrips.size() > 0) {
-            spinner.setSelection(0);
-        }
-        */
     }
 
     @Override
