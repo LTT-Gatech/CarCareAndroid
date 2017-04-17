@@ -61,7 +61,7 @@ public class StaticCard implements IObserver {
     public void update(IObservable o, Bundle args) {
         if (args != null && o instanceof DbHelper) {
             for (String name : shownData.keySet()) {
-                Response response = args.getParcelable(ResponseContract.ResponseEntry.COLUMN_NAME_NAME + name);
+                Response response = args.getParcelable(ResponseContract.ResponseEntry.COLUMN_NAME_NAME + "_" + name);
                 if (response != null) {
                     if (response.id != -1) {
                         // A response for this preference was found during this update
