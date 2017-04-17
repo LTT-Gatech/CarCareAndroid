@@ -62,7 +62,12 @@ public class DynamicActivity extends BaseActivity implements AdapterView.OnItemS
 
         mDbHelper = new DbHelper(this);
 
-        mNames = new ArrayList<>();
+        mTrips = mDbHelper.getAllTrips();
+        if (mTrips.size() > 0) {
+            mNames = mDbHelper.getAllNamesInTripId(mTrips.get(0).getId());
+        } else {
+            mNames = new ArrayList<>();
+        }
         mGraphAdapter = new MyGraphAdapter(DynamicActivity.this, DynamicActivity.this, mNames);
         RecyclerView graphRecyclerView = (RecyclerView) findViewById(R.id.graph_list);
         if (graphRecyclerView != null) {
@@ -72,7 +77,7 @@ public class DynamicActivity extends BaseActivity implements AdapterView.OnItemS
             graphRecyclerView.setAdapter(mGraphAdapter);
         }
 
-        mTrips = mDbHelper.getAllTrips();
+//        mTrips = mDbHelper.getAllTrips();
         Collections.sort(mTrips);
         mSpinnerAdapter = new ArrayAdapter<>(DynamicActivity.this, android.R.layout.simple_spinner_item, mTrips);
         mSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
