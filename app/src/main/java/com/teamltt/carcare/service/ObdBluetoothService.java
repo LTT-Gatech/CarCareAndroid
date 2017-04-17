@@ -358,12 +358,19 @@ public class ObdBluetoothService extends Service {
                     // Check for car's "heartbeat"
                     ObdCommand heartbeat = new RPMCommand();
                     while (true) {
-                        heartbeat.run(socket.getInputStream(), socket.getOutputStream()); // TODO catch NoDataException
-                        String rpm = heartbeat.getCalculatedResult();
-                        if (Integer.parseInt(rpm) > 0) {
+                        try {
 
-                            break;
+                            heartbeat = new RPMCommand();
+                            heartbeat.run(socket.getInputStream(), socket.getOutputStream()); // TODO catch NoDataException
+                            String rpm = heartbeat.getCalculatedResult();
+                            if (Integer.parseInt(rpm) > 0) {
+
+                                break;
+                            }
+                        } catch (UnknownErrorException | NoDataException e) {
+                            // HACK this library sucks. But I'm glad I didn't write it.
                         }
+
                     }
 
                     if (!tripEstablished) {
