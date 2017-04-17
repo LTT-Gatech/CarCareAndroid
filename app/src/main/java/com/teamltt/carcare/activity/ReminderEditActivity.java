@@ -21,6 +21,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -41,6 +42,10 @@ import com.teamltt.carcare.database.DbHelper;
 import com.teamltt.carcare.database.contract.ReminderContract;
 import com.teamltt.carcare.fragment.DatePickerFragment;
 import com.teamltt.carcare.model.Reminder;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class ReminderEditActivity extends AppCompatActivity implements OnItemSelectedListener {
 
@@ -173,7 +178,17 @@ public class ReminderEditActivity extends AppCompatActivity implements OnItemSel
                 ((EditText) findViewById(R.id.field_value)).setText(""+reminder.getComparisonValue());
             } else {
                 ((Spinner) findViewById(R.id.spinner_reminder_type)).setSelection(1); //if checks for date, set the spinner to date, populate with date
-                ((TextView) findViewById(R.id.text_date)).setText(reminder.getDate());
+                formattedDate = reminder.getDate();
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                try {
+                    Date displayableDate = format.parse(formattedDate);
+                    String day = (String) DateFormat.format("dd", displayableDate);
+                    String month = (String) DateFormat.format("MM", displayableDate);
+                    String year = (String) DateFormat.format("yyyy", displayableDate);
+                    ((TextView) findViewById(R.id.text_date)).setText(month + "/" + day + "/" + year);
+                } catch (ParseException e1) {
+                    e1.printStackTrace();
+                }
             }
 
         }

@@ -40,6 +40,7 @@ import com.teamltt.carcare.database.DbHelper;
 import com.teamltt.carcare.database.IObservable;
 import com.teamltt.carcare.database.IObserver;
 import com.teamltt.carcare.database.contract.ResponseContract;
+import com.teamltt.carcare.fragment.AlertFragment;
 import com.teamltt.carcare.fragment.GraphFragment;
 import com.teamltt.carcare.fragment.MyGraphAdapter;
 import com.teamltt.carcare.fragment.StaticCard;
@@ -56,10 +57,11 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-public class HomeActivity extends BaseActivity implements BtStatusDisplay, GraphFragment.OnGraphFragmentInteractionListener, IObserver {
+public class HomeActivity extends BaseActivity implements BtStatusDisplay, GraphFragment.OnGraphFragmentInteractionListener {
 
     private RecyclerView.Adapter mGraphAdapter;
     private StaticCard staticCard;
+    private AlertFragment alertFragment;
 
     ObdBluetoothService btService;
     Intent btServiceIntent;
@@ -93,7 +95,11 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, Graph
         // Now start the new service
         startService(btServiceIntent);
 
+        DbHelper helper = new DbHelper(HomeActivity.this);
+        reminders = helper.getRemindersByVehicleId(0);
+
         staticCard = new StaticCard((CardView) findViewById(R.id.static_data_card), this);
+        alertFragment = new AlertFragment(reminders, this, (LinearLayout) findViewById(R.id.layout_alerts_content), (LinearLayout) findViewById(R.id.layout_alerts));
     }
 
     @Override
@@ -103,10 +109,9 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, Graph
             bindService(btServiceIntent, mConnection, Context.BIND_AUTO_CREATE);
         }
 
-
-        DbHelper helper = new DbHelper(HomeActivity.this);
-        reminders = helper.getRemindersByVehicleId(0);
-        checkDateReminders();
+        //DbHelper helper = new DbHelper(HomeActivity.this);
+        //reminders = helper.getRemindersByVehicleId(0);
+        //checkDateReminders();
     }
 
     @Override
@@ -118,6 +123,15 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, Graph
             // should this be removed from here since it is done in mConnection.onServiceDisconnected?
             bound = false;
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        DbHelper helper = new DbHelper(HomeActivity.this);
+        alertFragment.updateRemindersList(helper.getRemindersByVehicleId(0));
+        alertFragment.checkDateReminders();
     }
 
     @Override
@@ -138,6 +152,8 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, Graph
             staticCard.displayStaticData();
             btService.observeDatabase(staticCard);
 
+            btService.observeDatabase(alertFragment);
+
             IObservable observable = btService.getObservable();
             mGraphAdapter = new MyGraphAdapter(HomeActivity.this, observable, HomeActivity.this);
             RecyclerView graphRecyclerView = (RecyclerView) findViewById(R.id.graph_list);
@@ -157,23 +173,6 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, Graph
             bound = false;
         }
     };
-
-    @Override
-    public void update(IObservable o, Bundle args) {
-        if (args != null && o instanceof DbHelper) {
-            DbHelper dbHelper = (DbHelper) o;
-            long[] responseIds = args.getLongArray(ResponseContract.ResponseEntry.COLUMN_NAME_ID + "_ARRAY");
-            List<Response> items = dbHelper.getResponsesByIds(responseIds);
-
-            for (Response response : items) {
-                for (Reminder reminder : reminders) {
-                    if (reminder.getFeatureId().equals(response.name)) {
-                        checkFeatureReminder(reminder, response.value);
-                    }
-                }
-            }
-        }
-    }
 
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -221,135 +220,6 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, Graph
             btService.startNewTrip();
         }
 
-    }
-    private void checkDateReminders() {
-        List<Reminder> triggered = new ArrayList<Reminder>();
-        LinearLayout layout = (LinearLayout) findViewById(R.id.layout_alerts_content);
-        if (layout != null) {
-            layout.removeAllViews();
-        }
-        Log.i(TAG, "checking reminders");
-        Iterator<Reminder> iterator = reminders.iterator();
-        if (!iterator.hasNext()) {
-            Log.e(TAG, "iterator does not have next");
-            LinearLayout alertLayout = (LinearLayout) findViewById(R.id.layout_alerts);
-            if (alertLayout != null) {
-                alertLayout.setVisibility(View.GONE);
-            }
-        } else {
-            LinearLayout alertLayout = (LinearLayout) findViewById(R.id.layout_alerts);
-            if (alertLayout != null) {
-                alertLayout.setVisibility(View.VISIBLE);
-            }
-        }
-        while (iterator.hasNext()) {
-            final Reminder reminder = iterator.next();
-            //only check unarchived reminders
-            if (!reminder.isArchived()) {
-                if (reminder.getFeatureId().equals("Date")) {
-                    Log.i(TAG, "checking for Date");
-                    Calendar calendar = Calendar.getInstance();
-                    SimpleDateFormat mdformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    Date date = calendar.getTime();
-                    Log.i(TAG, "Reminder's date is " + reminder.getDate());
-                    try {
-                        if (mdformat.parse(reminder.getDate()).before(date)) {
-                            Log.i(TAG, "today is after date!");
-                            //TextView textView = new TextView(this);
-                            //textView.setText("Reminder " + reminder.getName() + " is triggered!");
-                            TextView alertText = new TextView(this);
-                            alertText.setText("Reminder " + reminder.getName() + " is active.");
-                            alertText.setTextColor(Color.BLUE);
-                            alertText.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    viewAlert(view, "Reminder", "Date", reminder.getName(), reminder.getDate());
-                                }
-                            });
-                            layout.addView(alertText);
-
-
-                        } else {
-                            Log.i(TAG, "today is not after date!");
-                        }
-                    } catch (ParseException e1) {
-                        e1.printStackTrace();
-                    }
-                }
-            }
-        }
-        reminders.removeAll(triggered);
-    }
-
-    private void checkFeatureReminder(final Reminder reminder, String value) {
-        LinearLayout layout = (LinearLayout) findViewById(R.id.layout_alerts_content);
-        if (!reminder.isArchived()) {
-            Log.i(TAG, "checking for feature");
-            Log.i(TAG, "comparisonType is " + reminder.getComparisonType());
-            Log.i(TAG, "feature is " + reminder.getFeatureId());
-
-            int intValue = 0;
-            if (value != null && value.length() > 0) {
-                Integer.parseInt(value);
-            } else {
-                Log.e(TAG, reminder.getFeatureId() + "'s response was null or an empty string, cannot compare.");
-                return; //if the value cannot be parsed (due to being null or "") then we can't do any actual comparing
-            }
-            //check for hardcoded var here
-            if (reminder.getComparisonType() == 0 && reminder.getComparisonValue() > intValue
-                    || reminder.getComparisonType() == 1 && reminder.getComparisonValue() == intValue
-                    || reminder.getComparisonType() == 2 && reminder.getComparisonValue() < intValue) {
-
-                //add reminder to list of reminders to remove (so they don't constantly trigger)
-                //triggered.add(reminder);
-                //this sets the otherwise unused date field in a non date reminder to the latest trigger date for that reminder
-                Calendar calendar = Calendar.getInstance();
-                SimpleDateFormat mdformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                Date date = calendar.getTime();
-                reminder.setDate(mdformat.format(date));
-                //after changing the date the reminder needs to be updated in the db
-                DbHelper helper = new DbHelper(this);
-                helper.updateReminder(reminder);
-                helper.close();
-
-                final String alertType;
-                if (reminder.getComparisonType() == 0) {
-                    alertType = reminder.getFeatureId() + " < ";
-                    Log.i(TAG, "comparison type <");
-                } else if (reminder.getComparisonType() == 1) {
-                    alertType = reminder.getFeatureId() + " = ";
-                    Log.i(TAG, "comparison type ==");
-                } else {
-                    Log.i(TAG, "comparison type >");
-                    alertType = reminder.getFeatureId() + " > ";
-                }
-                TextView alertText = new TextView(this);
-                alertText.setText("Reminder " + reminder.getName() + " is active.");
-                alertText.setTextColor(Color.BLUE);
-                alertText.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        viewAlert(view, "Reminder", alertType, reminder.getName(), Integer.toString(reminder.getComparisonValue()));
-                        //the hardcoded mileage will eventually draw from somewhere depending on Reminder.featureId
-                    }
-                });
-                layout.addView(alertText);
-                reminders.remove(reminder);
-            }
-        }
-    }
-
-    private void viewAlert(View view, String alertTitle, String alertType, String alertName, String alertValue) {
-        Intent intent = new Intent(this, AlertActivity.class);
-        String keyTitle = "alert_title"; //this is either reminder or alert
-        String keyType = "alert_type";
-        String keyName = "alert_name";
-        String keyValue = "alert_value";
-        intent.putExtra(keyTitle, alertTitle);
-        intent.putExtra(keyType, alertType);
-        intent.putExtra(keyName, alertName);
-        intent.putExtra(keyValue, alertValue);
-        startActivity(intent);
     }
 
 }
