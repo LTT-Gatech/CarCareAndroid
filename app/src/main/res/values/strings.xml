@@ -153,5 +153,7 @@
     <string name="dynamic_data">Dynamic Data</string>
 
     <string name="export_database">Export Database</string>
+    <string name="logo">Logo</string>
+    <string name="car_care_title">Car Care</string>
 
 </resources>
