@@ -86,7 +86,7 @@ public class AlertFragment implements IObserver {
 
             int intValue = 0;
             if (value != null && value.length() > 0) {
-                Integer.parseInt(value);
+                intValue = Integer.parseInt(value);
             } else {
                 Log.e(TAG, reminder.getFeatureId() + "'s response was null or an empty string, cannot compare.");
                 return; //if the value cannot be parsed (due to being null or "") then we can't do any actual comparing
@@ -137,10 +137,6 @@ public class AlertFragment implements IObserver {
         if (showAlerts) {
             if (mainLayout != null) {
                 mainLayout.setVisibility(View.VISIBLE);
-            }
-        } else {
-            if (mainLayout != null) {
-                mainLayout.setVisibility(View.GONE);
             }
         }
     }
