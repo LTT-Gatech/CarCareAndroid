@@ -129,7 +129,7 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="search_statistics">Search Statistics</string>
+    <string name="search_statistics">Static Statistics</string>
     <string name="car_information">Car Information</string>
     <string name="sign_out">Sign Out</string>
     <string name="text_placeholder">Placeholder text</string>
@@ -155,5 +155,6 @@
     <string name="export_database">Export Database</string>
     <string name="unsupported_pid_static">Vehicle doesn\'t support</string>
     <string name="unsupported_pid_dynamic">This parameter is not supported by this vehicle.</string>
+    <string name="title_static">View Statistics by Trip</string>
 
 </resources>
