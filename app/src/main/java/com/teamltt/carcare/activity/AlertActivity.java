@@ -22,6 +22,7 @@ import android.text.format.DateFormat;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 import com.teamltt.carcare.R;
@@ -36,6 +37,7 @@ public class AlertActivity extends BaseActivity {
     private String alertType;
     private String alertName;
     private String alertValue;
+    private String alertDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,17 +52,20 @@ public class AlertActivity extends BaseActivity {
                 alertType = "NullType";
                 alertName = "NullAlert";
                 alertValue = "NullValue";
+                alertDate = "NullDate";
             } else {
                 alertTitle = extras.getString("alert_title");
                 alertType = extras.getString("alert_type");
                 alertName = extras.getString("alert_name");
                 alertValue = extras.getString("alert_value");
+                alertDate = extras.getString("alert_date");
             }
         } else {
             alertTitle = (String) savedInstanceState.getSerializable("alert_title");
             alertType = (String) savedInstanceState.getSerializable("alert_type");
             alertName = (String) savedInstanceState.getSerializable("alert_name");
             alertValue = (String) savedInstanceState.getSerializable("alert_value");
+            alertDate = (String) savedInstanceState.getSerializable("alert_date");
         }
         updateUi();
     }
@@ -84,8 +89,14 @@ public class AlertActivity extends BaseActivity {
         TextView alertTitleTv = (TextView) findViewById(R.id.text_alert_title);
         alertTitleTv.setText(alertTitle);
         TextView alertIntro = (TextView) findViewById(R.id.text_alert_intro);
-        alertIntro.setText("Your reminder titled " + alertName + " was triggered.");
-        if (alertType.equals("date")) {
+        TextView alertDateView = (TextView) findViewById(R.id.text_alert_date);
+        if (alertTitle.equals("Archived Reminder")) {
+            alertIntro.setText("Your reminder was titled " + alertName + ".");
+            alertDateView.setVisibility(View.VISIBLE);
+        } else {
+            alertIntro.setText("Your reminder titled " + alertName + " was triggered.");
+        }
+        if (alertType.equals("Date")) {
             SimpleDateFormat mdformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             Date convertedDate = new Date();
             String day = "";
@@ -99,9 +110,30 @@ public class AlertActivity extends BaseActivity {
             } catch (ParseException e1) {
                 e1.printStackTrace();
             }
+            TextView alertContent = (TextView) findViewById(R.id.text_alert_content);
+            alertContent.setText("Your reminder was set to date " + month + "/" + day + "/" + year + ".");
         } else {
             TextView alertContent = (TextView) findViewById(R.id.text_alert_content);
             alertContent.setText("Your reminder was set to " + alertType + alertValue + ".");
+            if (alertDate != null && alertDate.length() > 1) {
+                SimpleDateFormat mdformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                Date convertedDate = new Date();
+                String day = "";
+                String month = "";
+                String year = "";
+                try {
+                    convertedDate = mdformat.parse(alertDate);
+                    day = (String) DateFormat.format("dd", convertedDate);
+                    month = (String) DateFormat.format("MM", convertedDate);
+                    year = (String) DateFormat.format("yyyy", convertedDate);
+                } catch (ParseException e1) {
+                    e1.printStackTrace();
+                }
+                alertDateView.setText("Your reminder was last triggered " + month + "/" + day + "/" + year + ".");
+            } else {
+                alertDateView.setText("Your reminder was never triggered.");
+            }
         }
+
     }
 }

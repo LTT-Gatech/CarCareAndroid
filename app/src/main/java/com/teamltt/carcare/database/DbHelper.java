@@ -74,7 +74,7 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
     public static final long DB_WRITE_ERROR = -1; // from SQLiteDatabase if an error occurred
     public static final long DB_OK = 0;
 
-    public static final int DATABASE_VERSION = 6;
+    public static final int DATABASE_VERSION = 7;
     public static final String DATABASE_NAME = "CarCare.db";
 
     // Format in which the database stores DateTimes. Example: 2004-12-13 13:14:15
@@ -248,7 +248,7 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
             return status;
         }
         status = ReminderContract.insert(db, reminder.getVehicleId(), reminder.getName(),
-                reminder.getFeatureId(), reminder.getComparisonType(), reminder.getComparisonValue(), reminder.getDate());
+                reminder.getFeatureId(), reminder.getComparisonType(), reminder.getComparisonValue(), reminder.getDate(), false);
         db.close();
         setChanged(status);
         return status;
@@ -265,7 +265,7 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         }
         int numAffected = ReminderContract.update(db, reminder.getReminderId(), reminder.getVehicleId(),
                 reminder.getName(), reminder.getFeatureId(), reminder.getComparisonType(), reminder.getComparisonValue(),
-                reminder.getDate());
+                reminder.getDate(), reminder.isArchived());
         db.close();
         return numAffected;
     }
@@ -278,11 +278,12 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         while (cursor.moveToNext()) {
             long reminderId = cursor.getLong(cursor.getColumnIndexOrThrow(ReminderContract.ReminderEntry.COLUMN_NAME_ID));
             String name = getCursorColumn(cursor, ReminderContract.ReminderEntry.COLUMN_NAME_NAME);
-            int featureId = cursor.getInt(cursor.getColumnIndexOrThrow(ReminderContract.ReminderEntry.COLUMN_NAME_FEATURE_ID));
+            String featureId = getCursorColumn(cursor, ReminderContract.ReminderEntry.COLUMN_NAME_FEATURE_ID);
             int comparison = cursor.getInt(cursor.getColumnIndexOrThrow(ReminderContract.ReminderEntry.COLUMN_NAME_COMPARISON));
             int value = cursor.getInt(cursor.getColumnIndexOrThrow(ReminderContract.ReminderEntry.COLUMN_NAME_VALUE));
             String date = getCursorColumn(cursor, ReminderContract.ReminderEntry.COLUMN_NAME_DATE);
-            reminders.add(new Reminder(reminderId, vehicleId, name, featureId, comparison, value, date));
+            boolean archived = cursor.getInt(cursor.getColumnIndexOrThrow(ReminderContract.ReminderEntry.COLUMN_NAME_ARCHIVED)) != 0;
+            reminders.add(new Reminder(reminderId, vehicleId, name, featureId, comparison, value, date, archived));
         }
         cursor.close();
         db.close();
@@ -297,11 +298,13 @@ public class DbHelper extends SQLiteOpenHelper implements IObservable {
         cursor.moveToFirst();
         int vehicleId = cursor.getInt(cursor.getColumnIndexOrThrow(ReminderContract.ReminderEntry.COLUMN_NAME_VEHICLE_ID));
         String name = cursor.getString(cursor.getColumnIndexOrThrow(ReminderContract.ReminderEntry.COLUMN_NAME_NAME));
-        int featureId = cursor.getInt(cursor.getColumnIndexOrThrow(ReminderContract.ReminderEntry.COLUMN_NAME_FEATURE_ID));
+        String featureId = getCursorColumn(cursor, ReminderContract.ReminderEntry.COLUMN_NAME_FEATURE_ID);
         int comparison = cursor.getInt(cursor.getColumnIndexOrThrow(ReminderContract.ReminderEntry.COLUMN_NAME_COMPARISON));
         int value = cursor.getInt(cursor.getColumnIndexOrThrow(ReminderContract.ReminderEntry.COLUMN_NAME_VALUE));
         String date = getCursorColumn(cursor, ReminderContract.ReminderEntry.COLUMN_NAME_DATE);
-        return new Reminder(reminderId, vehicleId, name, featureId, comparison, value, date);
+        boolean archived = cursor.getInt(cursor.getColumnIndexOrThrow(ReminderContract.ReminderEntry.COLUMN_NAME_ARCHIVED)) != 0;
+        Reminder reminder = new Reminder(reminderId, vehicleId, name, featureId, comparison, value, date, archived);
+        return reminder;
 
     }
 
