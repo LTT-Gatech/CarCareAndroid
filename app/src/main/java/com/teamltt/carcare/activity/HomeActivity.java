@@ -71,6 +71,7 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, Graph
     private int comparisonValue = 95000; //hardcoded value to use with feature reminders until they are implemented
 
     private static final String TAG = "HomeActivity";
+    private DbHelper helper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,7 +96,7 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, Graph
         // Now start the new service
         startService(btServiceIntent);
 
-        DbHelper helper = new DbHelper(HomeActivity.this);
+        helper = new DbHelper(HomeActivity.this);
         reminders = helper.getRemindersByVehicleId(0);
 
         staticCard = new StaticCard((CardView) findViewById(R.id.static_data_card), this);
@@ -129,7 +130,7 @@ public class HomeActivity extends BaseActivity implements BtStatusDisplay, Graph
     protected void onResume() {
         super.onResume();
 
-        DbHelper helper = new DbHelper(HomeActivity.this);
+        helper = new DbHelper(HomeActivity.this);
         alertFragment.updateRemindersList(helper.getRemindersByVehicleId(0));
         alertFragment.checkDateReminders();
     }

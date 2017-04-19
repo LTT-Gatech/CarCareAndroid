@@ -85,14 +85,14 @@ public class ReminderActivity extends BaseActivity {
         editReminder(view, -2);
     }
 
-    public void editReminder(View view, int reminderId) {
+    public void editReminder(View view, long reminderId) {
         Intent intent = new Intent(this, ReminderEditActivity.class);
         String key = "reminder_id";
         intent.putExtra(key, reminderId);
         startActivity(intent);
     }
 
-    public void activateReminder(int reminderId) {
+    public void activateReminder(long reminderId) {
         Reminder reminder = dbHelper.getReminderByReminderId(reminderId);
         reminder.setArchived(false);
         long status = dbHelper.updateReminder(reminder);
@@ -101,7 +101,7 @@ public class ReminderActivity extends BaseActivity {
         }
     }
 
-    public void archiveReminder(int reminderId) {
+    public void archiveReminder(long reminderId) {
         Reminder reminder = dbHelper.getReminderByReminderId(reminderId);
         reminder.setArchived(true);
         long status = dbHelper.updateReminder(reminder);
@@ -142,7 +142,7 @@ public class ReminderActivity extends BaseActivity {
                 //adds edit button to
                 button = new Button(this);
                 button.setId(id);
-                final int reminderId = info.getInt(info.getColumnIndexOrThrow(ReminderContract.ReminderEntry.COLUMN_NAME_ID));
+                final long reminderId = info.getLong(info.getColumnIndexOrThrow(ReminderContract.ReminderEntry.COLUMN_NAME_ID));
 
                 if (isArchived) {
                     button.setText("Activate");
