@@ -17,8 +17,10 @@
 package com.teamltt.carcare.activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.format.DateFormat;
@@ -45,13 +47,16 @@ import com.teamltt.carcare.model.Reminder;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+
+import static com.teamltt.carcare.activity.SettingsActivity.staticPreferenceTitles;
 
 public class ReminderEditActivity extends AppCompatActivity implements OnItemSelectedListener {
 
     private boolean edited;
     private String featureId; //based on some id for the features reminders can check for, i.e. oil pressure, "Date" if type is date
-    private int reminderId; //if editing a reminder, id is passed in as an extra from ReminderActivity. Set to -2 otherwise
+    private long reminderId; //if editing a reminder, id is passed in as an extra from ReminderActivity. Set to -2 otherwise
     private int vehicleId;
     private String formattedDate;
     private static final String TAG = "ReminderEditActivity";
@@ -69,10 +74,10 @@ public class ReminderEditActivity extends AppCompatActivity implements OnItemSel
             if(extras == null) {
                 reminderId = -2;
             } else {
-                reminderId = extras.getInt("reminder_id");
+                reminderId = extras.getLong("reminder_id");
             }
         } else {
-            reminderId = (Integer) savedInstanceState.getSerializable("reminder_id");
+            reminderId = (Long) savedInstanceState.getSerializable("reminder_id");
         }
 
 
@@ -148,9 +153,14 @@ public class ReminderEditActivity extends AppCompatActivity implements OnItemSel
         spinner.setOnItemSelectedListener(this);
 
         spinner = (Spinner) findViewById(R.id.spinner_feature);
-        adapter = ArrayAdapter.createFromResource(this, R.array.feature_types, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        ArrayList<String> names = new ArrayList<String>();
+        for (String preferenceKey : staticPreferenceTitles) {
+            names.add(preferenceKey);
+        }
+        ArrayAdapter<String> stringAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, names);
+        stringAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(stringAdapter);
 
         spinner = (Spinner) findViewById(R.id.spinner_comparison);
         adapter = ArrayAdapter.createFromResource(this, R.array.comparison_types, android.R.layout.simple_spinner_item);
