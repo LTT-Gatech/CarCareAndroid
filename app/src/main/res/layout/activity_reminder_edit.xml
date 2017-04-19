@@ -36,6 +36,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/spinner_reminder_type"
+        android:paddingBottom="6dp"
         android:gravity="center"/>
 
     <RelativeLayout
@@ -46,6 +47,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/spinner_feature"
+            android:paddingBottom="6dp"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"/>
         <EditText
@@ -54,11 +56,13 @@
             android:id="@+id/field_value"
             android:gravity="bottom"
             android:layout_alignParentRight="true"
+            android:paddingTop="26dp"
             android:hint="@string/hint_value"/>
         <Spinner
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/spinner_comparison"
+            android:paddingBottom="6dp"
             android:layout_toLeftOf="@id/field_value"
             android:layout_below="@id/spinner_feature"/>
     </RelativeLayout>

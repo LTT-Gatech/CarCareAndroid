@@ -31,10 +31,11 @@ public class ReminderContract {
             + ReminderEntry.COLUMN_NAME_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
             + ReminderEntry.COLUMN_NAME_VEHICLE_ID + " INTEGER,"
             + ReminderEntry.COLUMN_NAME_NAME + " STRING,"
-            + ReminderEntry.COLUMN_NAME_FEATURE_ID + " INTEGER,"
+            + ReminderEntry.COLUMN_NAME_FEATURE_ID + " STRING,"
             + ReminderEntry.COLUMN_NAME_COMPARISON + " INTEGER,"
             + ReminderEntry.COLUMN_NAME_VALUE + " INTEGER,"
             + ReminderEntry.COLUMN_NAME_DATE + " DATE,"
+            + ReminderEntry.COLUMN_NAME_ARCHIVED + " BOOLEAN, "
             + "FOREIGN KEY(" + ReminderEntry.COLUMN_NAME_VEHICLE_ID + ") REFERENCES "
             + VehicleContract.VehicleEntry.TABLE_NAME + "(" + VehicleContract.VehicleEntry.COLUMN_NAME_ID + ") "
             + "ON DELETE CASCADE ON UPDATE CASCADE"
@@ -51,7 +52,8 @@ public class ReminderContract {
                 ReminderEntry.COLUMN_NAME_FEATURE_ID,
                 ReminderEntry.COLUMN_NAME_COMPARISON,
                 ReminderEntry.COLUMN_NAME_VALUE,
-                ReminderEntry.COLUMN_NAME_DATE
+                ReminderEntry.COLUMN_NAME_DATE,
+                ReminderEntry.COLUMN_NAME_ARCHIVED
         };
         String selection = ReminderEntry.COLUMN_NAME_ID + " = ?";
         String[] selectionArgs = {Long.toString(reminderId)};
@@ -68,7 +70,8 @@ public class ReminderContract {
                 ReminderEntry.COLUMN_NAME_FEATURE_ID,
                 ReminderEntry.COLUMN_NAME_COMPARISON,
                 ReminderEntry.COLUMN_NAME_VALUE,
-                ReminderEntry.COLUMN_NAME_DATE
+                ReminderEntry.COLUMN_NAME_DATE,
+                ReminderEntry.COLUMN_NAME_ARCHIVED
         };
         String selection = ReminderEntry.COLUMN_NAME_VEHICLE_ID + " = ?";
         String[] selectionArgs = {Long.toString(vehicleId)};
@@ -84,7 +87,7 @@ public class ReminderContract {
      * @param date a String
      * @return the new vehicle's primary key
      */
-    public static long insert(SQLiteDatabase db, long vehicleId, String name, int featureId, int comparison, int value, String date) {
+    public static long insert(SQLiteDatabase db, long vehicleId, String name, String featureId, int comparison, int value, String date, boolean archived) {
         ContentValues values = new ContentValues();
         values.put(ReminderEntry.COLUMN_NAME_VEHICLE_ID, vehicleId);
         values.put(ReminderEntry.COLUMN_NAME_NAME, name);
@@ -92,6 +95,7 @@ public class ReminderContract {
         values.put(ReminderEntry.COLUMN_NAME_COMPARISON, comparison);
         values.put(ReminderEntry.COLUMN_NAME_VALUE, value);
         values.put(ReminderEntry.COLUMN_NAME_DATE, date);
+        values.put(ReminderEntry.COLUMN_NAME_ARCHIVED, archived);
         return db.insert(ReminderEntry.TABLE_NAME, null, values);
     }
 
@@ -104,7 +108,7 @@ public class ReminderContract {
      * @param date a String
      * @return the number of rows affected
      */
-    public static int update(SQLiteDatabase db, long reminderId, long vehicleId, String name, int featureId, int comparison, int value, String date) {
+    public static int update(SQLiteDatabase db, long reminderId, long vehicleId, String name, String featureId, int comparison, int value, String date, boolean archived) {
         ContentValues values = new ContentValues();
         values.put(ReminderEntry.COLUMN_NAME_VEHICLE_ID, vehicleId);
         values.put(ReminderEntry.COLUMN_NAME_NAME, name);
@@ -112,6 +116,7 @@ public class ReminderContract {
         values.put(ReminderEntry.COLUMN_NAME_COMPARISON, comparison);
         values.put(ReminderEntry.COLUMN_NAME_VALUE, value);
         values.put(ReminderEntry.COLUMN_NAME_DATE, date);
+        values.put(ReminderEntry.COLUMN_NAME_ARCHIVED, archived);
         String whereClause = ReminderEntry.COLUMN_NAME_ID + " = ?";
         String[] whereArgs = {Long.toString(reminderId)};
         return db.update(ReminderEntry.TABLE_NAME, values, whereClause, whereArgs);
@@ -136,6 +141,7 @@ public class ReminderContract {
         public static final String COLUMN_NAME_COMPARISON = "comparison_type";
         public static final String COLUMN_NAME_VALUE = "value";
         public static final String COLUMN_NAME_DATE = "date";
+        public static final String COLUMN_NAME_ARCHIVED = "archive_status";
 
     }
 }

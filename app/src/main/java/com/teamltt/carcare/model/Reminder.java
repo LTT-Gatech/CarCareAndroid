@@ -20,19 +20,21 @@ package com.teamltt.carcare.model;
 
 public class Reminder {
     private int comparison, value;
-    private int featureId;
+    private String featureId;
     private String name, date;
     private long vehicleId;
     private long reminderId;
+    private boolean archived;
 
 
-    public Reminder(long reminderId, long vehicleId, String name, int featureId, int comparison, int value, String date) {
+    public Reminder(long reminderId, long vehicleId, String name, String featureId, int comparison, int value, String date, boolean archived) {
         this.name = name;
         this.reminderId = reminderId;
         this.featureId = featureId;
         this.comparison = comparison;
         this.value = value;
         this.date = date;
+        this.archived = archived;
     }
 
     public long getReminderId() { return reminderId; }
@@ -41,12 +43,21 @@ public class Reminder {
 
     public String getName() { return name; }
 
-    public int getFeatureId() { return featureId; }
+    public String getFeatureId() { return featureId; }
 
     public int getComparisonType() { return comparison; }
 
     public int getComparisonValue() { return value; }
 
     public String getDate() { return date; }
+
+    public void setDate(String date) { this.date = date; }
+
+    public boolean isArchived() { return archived; }
+
+    public boolean setArchived(boolean status) {
+        this.archived = status;
+        return this.archived;
+    }
 
 }
