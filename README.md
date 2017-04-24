@@ -7,7 +7,7 @@ Car Care is compatible with the ELM 327 OBDII adapter.
 ## Release notes for version 1.0.0
 ### New software features for this release
 * Added Google Services integrated login
-* Added Bluetooth pairing ability between the application and an OBDII bluetooth device.
+* Added Bluetooth pairing ability between the application and an OBDII bluetooth device
 * Added settings page to customize data shown on Home page
 * Added Vehicle Information page for storing vehicle information
 * Added static data card on Home Activity that displays current live values received from the OBD adapter
@@ -16,14 +16,14 @@ Car Care is compatible with the ELM 327 OBDII adapter.
 * Added a trip filter to the Dynamic Statistics page to view data from specific previous trips
 * Added date reminders that trigger an alert when the current date is after the date specified in the reminder
 * Added value reminders that trigger an alert when the application receives a value for a specified type of data that sastisfies the  comparison specified in the reminder
-* Added the ability to archive reminders, allowing for deactivation and history of reminders. 
+* Added the ability to archive reminders, allowing for deactivation and history of reminders
 
 ### Bug fixes made since last release
-* Fixed app crash when vehicles database was queried but no vehicles were present. 
+* Fixed app crash when vehicles database was queried but no vehicles were present
 
 ### Known bugs and defects
-* Diagnostic code viewing is not implemented. 
-* Miles per gallon viewing is not implemented.
+* Diagnostic code viewing is not implemented
+* Miles per gallon viewing is not implemente
 
 ## Install guide
 ### Pre-requisites
