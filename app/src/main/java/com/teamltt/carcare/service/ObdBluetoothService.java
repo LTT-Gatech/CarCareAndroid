@@ -31,9 +31,14 @@ import android.util.Log;
 
 import com.github.pires.obd.commands.ObdCommand;
 import com.github.pires.obd.commands.SpeedCommand;
+import com.github.pires.obd.commands.control.DistanceMILOnCommand;
+import com.github.pires.obd.commands.engine.OilTempCommand;
 import com.github.pires.obd.commands.engine.RPMCommand;
 import com.github.pires.obd.commands.engine.RuntimeCommand;
+import com.github.pires.obd.commands.fuel.ConsumptionRateCommand;
+import com.github.pires.obd.commands.fuel.FuelLevelCommand;
 import com.github.pires.obd.commands.pressure.BarometricPressureCommand;
+import com.github.pires.obd.commands.pressure.FuelPressureCommand;
 import com.github.pires.obd.commands.protocol.EchoOffCommand;
 import com.github.pires.obd.commands.temperature.AirIntakeTemperatureCommand;
 import com.teamltt.carcare.R;
@@ -380,6 +385,11 @@ public class ObdBluetoothService extends Service {
                     commands.add(RuntimeCommand.class);
                     commands.add(SpeedCommand.class);
                     commands.add(RPMCommand.class);
+                    commands.add(FuelPressureCommand.class);
+                    commands.add(FuelLevelCommand.class);
+                    commands.add(DistanceMILOnCommand.class);
+                    commands.add(OilTempCommand.class);
+                    commands.add(ConsumptionRateCommand.class);
 
                     for (Class<? extends ObdCommand> commandClass : commands) {
                         ObdCommand sendCommand = commandClass.newInstance();
